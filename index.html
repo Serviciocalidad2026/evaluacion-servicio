@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Evaluación de Calidad del Servicio</title>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body {
+      margin: 0; padding: 18px; background: #0f172a; color: #f8fafc;
+      display: flex; justify-content: center;
+    }
+    .card {
+      width: 100%; max-width: 460px; background: #1e293b;
+      border: 1px solid #334155; border-radius: 14px; padding: 22px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+    }
+    .badge {
+      display: inline-block; background: #0f172a; color: #38bdf8;
+      border: 1px solid #1e40af; padding: 5px 10px; border-radius: 8px;
+      font-size: 12px; font-weight: 600; margin-bottom: 10px;
+    }
+    h1 { font-size: 19px; margin: 0 0 4px 0; color: #ffffff; }
+    .sub { font-size: 13px; color: #94a3b8; margin-bottom: 18px; }
+    .bloque-pregunta {
+      background: #0f172a; border: 1px solid #334155;
+      border-radius: 10px; padding: 14px; margin-bottom: 14px;
+    }
+    .titulo-p { font-size: 14px; font-weight: 700; color: #f8fafc; margin: 0 0 4px 0; }
+    .explicacion-p { font-size: 12px; color: #94a3b8; margin: 0 0 12px 0; line-height: 1.35; }
+    
+    /* Estrellas CSAT */
+    .estrellas { display: flex; justify-content: space-between; gap: 6px; }
+    .btn-star {
+      flex: 1; padding: 10px 0; font-size: 18px; font-weight: bold;
+      background: #1e293b; color: #64748b; border: 1px solid #334155;
+      border-radius: 8px; cursor: pointer; transition: 0.15s;
+    }
+    .btn-star.activo { background: #f59e0b; color: #0f172a; border-color: #fbbf24; }
+
+    /* Botones Sí / No */
+    .fila-sino { display: flex; gap: 10px; }
+    .btn-sino {
+      flex: 1; padding: 10px; font-size: 14px; font-weight: bold;
+      background: #1e293b; color: #cbd5e1; border: 1px solid #334155;
+      border-radius: 8px; cursor: pointer;
+    }
+    .btn-sino.activo-si { background: #10b981; color: #0f172a; border-color: #34d399; }
+    .btn-sino.activo-no { background: #ef4444; color: #ffffff; border-color: #f87171; }
+
+    /* Escala NPS 0-10 */
+    .grid-nps { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
+    .btn-nps {
+      padding: 9px 0; font-size: 13px; font-weight: bold;
+      background: #1e293b; color: #cbd5e1; border: 1px solid #334155;
+      border-radius: 6px; cursor: pointer;
+    }
+    .btn-nps.activo { background: #38bdf8; color: #0f172a; border-color: #7dd3fc; }
+
+    select, textarea {
+      width: 100%; background: #1e293b; color: #ffffff;
+      border: 1px solid #475569; border-radius: 8px; padding: 10px;
+      font-size: 13px;
+    }
+    .oculto { display: none; }
+    .btn-enviar {
+      width: 100%; padding: 13px; font-size: 15px; font-weight: bold;
+      background: #2563eb; color: white; border: none; border-radius: 10px;
+      cursor: pointer; margin-top: 6px;
+    }
+    .btn-enviar:disabled { background: #475569; cursor: not-allowed; }
+    .mensaje-final { text-align: center; padding: 20px 10px; }
+  </style>
+</head>
+<body>
+
+<div class="card" id="contenedor-encuesta">
+  <div class="badge" id="badge-info">Cargando datos...</div>
+  <h1 id="titulo-empresa">Evaluación de Servicio</h1>
+  <div class="sub">Responda estas 4 preguntas breves. Toma menos de 30 segundos.</div>
+
+  <!-- PREGUNTA 1: CSAT (1 solo objetivo: desempeño del personal) -->
+  <div class="bloque-pregunta">
+    <p class="titulo-p" id="lbl-csat">1. ¿Qué tan satisfecho está con la atención del personal?</p>
+    <p class="explicacion-p">Evalúe únicamente el desempeño de la persona que le atendió hoy (1 = Muy bajo, 5 = Excelente).</p>
+    <div class="estrellas" id="grupo-csat">
+      <button type="button" class="btn-star" onclick="seleccionarCsat(1)">1 ★</button>
+      <button type="button" class="btn-star" onclick="seleccionarCsat(2)">2 ★</button>
+      <button type="button" class="btn-star" onclick="seleccionarCsat(3)">3 ★</button>
+      <button type="button" class="btn-star" onclick="seleccionarCsat(4)">4 ★</button>
+      <button type="button" class="btn-star" onclick="seleccionarCsat(5)">5 ★</button>
+    </div>
+  </div>
+
+  <!-- PREGUNTA CONDICIONAL: CAUSA RAÍZ (Opciones de 1 solo concepto, sin "y") -->
+  <div class="bloque-pregunta oculto" id="bloque-causa">
+    <p class="titulo-p">¿Cuál fue el aspecto principal por mejorar?</p>
+    <p class="explicacion-p">Seleccione el motivo principal de su calificación.</p>
+    <select id="select-causa">
+      <option value="">-- Seleccione un aspecto --</option>
+      <option value="Puntualidad">Puntualidad (Cumplimiento del horario)</option>
+      <option value="Limpieza del área">Limpieza del área (Orden al finalizar)</option>
+      <option value="Trato del personal">Trato del personal (Respeto brindado)</option>
+      <option value="Funcionamiento del servicio">Funcionamiento del servicio (Pruebas finales)</option>
+      <option value="Claridad de la información">Claridad de la información (Explicación brindada)</option>
+    </select>
+  </div>
+
+  <!-- PREGUNTA 2: RESOLUCIÓN (1 solo objetivo: servicio funcionando) -->
+  <div class="bloque-pregunta">
+    <p class="titulo-p">2. ¿El servicio solicitado quedó funcionando?</p>
+    <p class="explicacion-p">Indique si su solicitud quedó completada al finalizar la atención.</p>
+    <div class="fila-sino">
+      <button type="button" class="btn-sino" id="btn-si" onclick="seleccionarFuncionando('Sí')">Sí, funciona</button>
+      <button type="button" class="btn-sino" id="btn-no" onclick="seleccionarFuncionando('No')">No funciona</button>
+    </div>
+  </div>
+
+  <!-- PREGUNTA 3: NPS (1 solo objetivo: recomendar a la empresa) -->
+  <div class="bloque-pregunta">
+    <p class="titulo-p" id="lbl-nps">3. ¿Recomendaría nuestra empresa a otra persona?</p>
+    <p class="explicacion-p">Califique su confianza en la empresa de 0 (Nada probable) a 10 (Totalmente probable).</p>
+    <div class="grid-nps" id="grupo-nps"></div>
+  </div>
+
+  <!-- PREGUNTA 4: COMENTARIO BREVE -->
+  <div class="bloque-pregunta">
+    <p class="titulo-p">4. Comentario adicional (Opcional)</p>
+    <p class="explicacion-p">Si desea agregar una observación puntual, escríbala aquí.</p>
+    <textarea id="txt-comentario" rows="2" placeholder="Escriba su comentario..."></textarea>
+  </div>
+
+  <button type="button" class="btn-enviar" id="btn-submit" onclick="enviarEvaluacion()">Enviar Evaluación ✔</button>
+</div>
+
+<script>
+  const params = new URLSearchParams(window.location.search);
+  const tecnico = (params.get("tec") || "").trim().toUpperCase();
+  const ot = (params.get("ot") || "").trim();
+  const ts = params.get("ts") || "";
+  const sig = params.get("sig") || "";
+  const emp = params.get("emp") || "Cottech";
+  const rol = params.get("rol") || "Técnico";
+  const tx = params.get("tx") || "OT";
+  const apiKeyId = params.get("k") || "";
+
+  let csatElegido = null;
+  let npsElegido = null;
+  let funcionandoElegido = "Sí";
+
+  // Personalizar textos según el rubro
+  document.getElementById("titulo-empresa").innerText = "Evaluación · " + emp;
+  document.getElementById("badge-info").innerText = `${rol}: ${tecnico || "N/A"}  |  ${tx} #${ot || "N/A"}`;
+  document.getElementById("lbl-csat").innerText = `1. ¿Qué tan satisfecho está con la atención del ${rol}?`;
+  document.getElementById("lbl-nps").innerText = `3. ¿Recomendaría a ${emp} a otra persona?`;
+
+  // Crear botones NPS 0 a 10
+  const contenedorNps = document.getElementById("grupo-nps");
+  for (let i = 0; i <= 10; i++) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-nps";
+    b.innerText = i;
+    b.onclick = () => seleccionarNps(i, b);
+    contenedorNps.appendChild(b);
+  }
+
+  function seleccionarCsat(valor) {
+    csatElegido = valor;
+    const botones = document.querySelectorAll(".btn-star");
+    botones.forEach((b, idx) => b.classList.toggle("activo", idx + 1 <= valor));
+    // Mostrar pregunta de causa raíz si la calificación es de 1 a 3 estrellas
+    const bloqueCausa = document.getElementById("bloque-causa");
+    if (valor <= 3) {
+      bloqueCausa.classList.remove("oculto");
+    } else {
+      bloqueCausa.classList.add("oculto");
+      document.getElementById("select-causa").value = "";
+    }
+  }
+
+  function seleccionarFuncionando(valor) {
+    funcionandoElegido = valor;
+    document.getElementById("btn-si").classList.toggle("activo-si", valor === "Sí");
+    document.getElementById("btn-no").classList.toggle("activo-no", valor === "No");
+  }
+  seleccionarFuncionando("Sí");
+
+  function seleccionarNps(valor, btn) {
+    npsElegido = valor;
+    document.querySelectorAll(".btn-nps").forEach(b => b.classList.remove("activo"));
+    btn.classList.add("activo");
+  }
+
+  async function enviarEvaluacion() {
+    if (!csatElegido) return alert("Por favor seleccione las estrellas en la pregunta 1.");
+    if (csatElegido <= 3 && !document.getElementById("select-causa").value) {
+      return alert("Por favor seleccione el aspecto principal por mejorar.");
+    }
+    if (npsElegido === null) return alert("Por favor seleccione un número de 0 a 10 en la pregunta 3.");
+    if (!apiKeyId) return alert("Este enlace QR no contiene la dirección del servidor.");
+
+    const btn = document.getElementById("btn-submit");
+    btn.disabled = true;
+    btn.innerText = "Enviando respuesta...";
+
+    const urlWebhook = apiKeyId.startsWith("http")
+      ? apiKeyId
+      : `https://script.google.com/macros/s/${apiKeyId}/exec`;
+
+    const payload = {
+      accion: "REGISTRAR_ENCUESTA",
+      tecnico: tecnico,
+      ot: ot,
+      ts: Number(ts),
+      sig: sig,
+      csat: csatElegido,
+      nps: npsElegido,
+      causaRaiz: csatElegido <= 3 ? document.getElementById("select-causa").value : "Ninguna (Atención Óptima)",
+      navegando: funcionandoElegido,
+      comentario: document.getElementById("txt-comentario").value.trim(),
+      fingerprint: navigator.userAgent.substring(0, 80)
+    };
+
+    try {
+      const resp = await fetch(urlWebhook, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+      const resJson = await resp.json();
+      if (resJson.status === "success") {
+        document.getElementById("contenedor-encuesta").innerHTML = `
+          <div class="mensaje-final">
+            <h1 style="color:#4ade80;font-size:22px;">¡Muchas gracias!</h1>
+            <p style="color:#cbd5e1;font-size:14px;">${resJson.message}</p>
+          </div>`;
+      } else {
+        alert("Aviso: " + resJson.message);
+        btn.disabled = false;
+        btn.innerText = "Enviar Evaluación ✔";
+      }
+    } catch (err) {
+      alert("Error de conexión al enviar la encuesta.");
+      btn.disabled = false;
+      btn.innerText = "Enviar Evaluación ✔";
+    }
+  }
+</script>
+</body>
+</html>

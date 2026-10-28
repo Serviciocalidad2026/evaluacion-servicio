@@ -1,0 +1,173 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Generador QR de Calidad</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body {
+      margin: 0; padding: 18px; background: #0f172a; color: #f8fafc;
+      display: flex; justify-content: center;
+    }
+    .card {
+      width: 100%; max-width: 430px; background: #1e293b;
+      border: 1px solid #334155; border-radius: 14px; padding: 20px;
+    }
+    h2 { margin: 0 0 6px 0; color: #38bdf8; font-size: 18px; }
+    p.ayuda { margin: 0 0 14px 0; font-size: 12px; color: #94a3b8; }
+    label { display: block; font-size: 12px; font-weight: bold; margin: 10px 0 4px 0; color: #cbd5e1; }
+    input {
+      width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #475569;
+      background: #0f172a; color: white; font-size: 14px;
+    }
+    .btn {
+      width: 100%; padding: 12px; border: none; border-radius: 8px;
+      font-weight: bold; font-size: 14px; cursor: pointer; margin-top: 14px;
+    }
+    .btn-verde { background: #10b981; color: #0f172a; }
+    .btn-azul { background: #2563eb; color: white; }
+    .btn-gris { background: #334155; color: #cbd5e1; font-size: 12px; padding: 8px; margin-top: 10px; }
+    #caja-qr {
+      margin-top: 16px; background: white; padding: 16px; border-radius: 12px;
+      display: none; flex-direction: column; align-items: center;
+    }
+    .link-prueba {
+      margin-top: 10px; font-size: 12px; color: #2563eb; word-break: break-all;
+      text-align: center; text-decoration: underline; cursor: pointer;
+    }
+  </style>
+</head>
+<body>
+
+<div class="card">
+  <!-- PANTALLA 1: VINCULACIÓN ÚNICA DEL CELULAR -->
+  <div id="vista-config">
+    <h2>⚙️ Configuración del Personal</h2>
+    <p class="ayuda">Ingresa estos datos una sola vez. Quedarán guardados en tu teléfono.</p>
+
+    <label>Nombre de la Empresa (Ej. Cottech):</label>
+    <input type="text" id="cfg-emp" value="Cottech" />
+
+    <label>Tu Rol (Ej. Técnico, Entrenador, Vendedor):</label>
+    <input type="text" id="cfg-rol" value="Técnico" />
+
+    <label>Nombre del Documento (Ej. OT, Sesión, Ticket):</label>
+    <input type="text" id="cfg-tx" value="OT" />
+
+    <label>Tu Código de Personal (Ej. TÉC01):</label>
+    <input type="text" id="cfg-id" placeholder="TÉC01" />
+
+    <label>Tu Llave Secreta (Copiada del programa de PC):</label>
+    <input type="text" id="cfg-llave" placeholder="CTK-9F8A7B6C5D" />
+
+    <label>URL de Conexión (/exec de Google Sheets):</label>
+    <input type="text" id="cfg-exec" placeholder="https://script.google.com/macros/s/.../exec" />
+
+    <button class="btn btn-azul" onclick="guardarConfigCelular()">Guardar en mi Celular ✔</button>
+  </div>
+
+  <!-- PANTALLA 2: GENERADOR DIARIO DE QR -->
+  <div id="vista-operacion" style="display:none;">
+    <h2 id="titulo-op">Generar QR de Evaluación</h2>
+    <p class="ayuda" id="sub-op"></p>
+
+    <label id="lbl-num-ot">Número de Orden (OT):</label>
+    <input type="text" id="inp-ot" placeholder="Ej. 5001" />
+
+    <button class="btn btn-verde" onclick="generarQR()">📱 Generar Código QR</button>
+
+    <div id="caja-qr">
+      <div id="qrcode"></div>
+      <a id="link-directo" class="link-prueba" target="_blank">🔗 Abrir encuesta directamente (Modo Prueba en PC)</a>
+    </div>
+
+    <button class="btn btn-gris" onclick="editarConfig()">⚙️ Cambiar configuración del teléfono</button>
+  </div>
+</div>
+
+<script>
+  async function sha256(mensaje) {
+    const msgBuffer = new TextEncoder().encode(mensaje);
+    const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
+    const hashArray = Array.from(new Uint8Array(hashBuffer));
+    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  function cargarVista() {
+    const cfg = JSON.parse(localStorage.getItem("cottech_movil_cfg") || "null");
+    if (!cfg) {
+      document.getElementById("vista-config").style.display = "block";
+      document.getElementById("vista-operacion").style.display = "none";
+    } else {
+      document.getElementById("vista-config").style.display = "none";
+      document.getElementById("vista-operacion").style.display = "block";
+      document.getElementById("titulo-op").innerText = `${cfg.emp} · Generar QR`;
+      document.getElementById("sub-op").innerText = `${cfg.rol} activo: ${cfg.id}`;
+      document.getElementById("lbl-num-ot").innerText = `Número de ${cfg.tx}:`;
+    }
+  }
+
+  function guardarConfigCelular() {
+    const emp = document.getElementById("cfg-emp").value.trim() || "Cottech";
+    const rol = document.getElementById("cfg-rol").value.trim() || "Técnico";
+    const tx = document.getElementById("cfg-tx").value.trim() || "OT";
+    const id = document.getElementById("cfg-id").value.trim().toUpperCase();
+    const llave = document.getElementById("cfg-llave").value.trim();
+    const execUrl = document.getElementById("cfg-exec").value.trim();
+
+    if (!id || !llave || !execUrl.endsWith("/exec")) {
+      return alert("Completa tu Código, tu Llave Secreta y la URL terminada en /exec.");
+    }
+    localStorage.setItem("cottech_movil_cfg", JSON.stringify({ emp, rol, tx, id, llave, execUrl }));
+    cargarVista();
+  }
+
+  function editarConfig() {
+    const cfg = JSON.parse(localStorage.getItem("cottech_movil_cfg") || "{}");
+    document.getElementById("cfg-emp").value = cfg.emp || "Cottech";
+    document.getElementById("cfg-rol").value = cfg.rol || "Técnico";
+    document.getElementById("cfg-tx").value = cfg.tx || "OT";
+    document.getElementById("cfg-id").value = cfg.id || "";
+    document.getElementById("cfg-llave").value = cfg.llave || "";
+    document.getElementById("cfg-exec").value = cfg.execUrl || "";
+    document.getElementById("vista-config").style.display = "block";
+    document.getElementById("vista-operacion").style.display = "none";
+  }
+
+  async function generarQR() {
+    const cfg = JSON.parse(localStorage.getItem("cottech_movil_cfg"));
+    const ot = document.getElementById("inp-ot").value.trim();
+    if (!ot) return alert(`Ingresa el número de ${cfg.tx}.`);
+
+    const ts = Date.now();
+    const firma = await sha256(`${cfg.id}|${ot}|${ts}|${cfg.llave}`);
+
+    // Construye la URL hacia index.html en la misma carpeta o servidor
+    const baseUrl = window.location.href.replace(/tecnico\.html.*$/, "index.html");
+    const params = new URLSearchParams({
+      tec: cfg.id,
+      ot: ot,
+      ts: ts,
+      sig: firma,
+      emp: cfg.emp,
+      rol: cfg.rol,
+      tx: cfg.tx,
+      k: cfg.execUrl
+    });
+    const urlFinal = `${baseUrl}?${params.toString()}`;
+
+    const contenedorQR = document.getElementById("qrcode");
+    contenedorQR.innerHTML = "";
+    new QRCode(contenedorQR, { text: urlFinal, width: 210, height: 210 });
+
+    const link = document.getElementById("link-directo");
+    link.href = urlFinal;
+    document.getElementById("caja-qr").style.display = "flex";
+  }
+
+  cargarVista();
+</script>
+</body>
+</html>
