@@ -14,9 +14,15 @@
     .card {
       width: 100%; max-width: 430px; background: #1e293b;
       border: 1px solid #334155; border-radius: 14px; padding: 20px;
+      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
     }
     h2 { margin: 0 0 6px 0; color: #38bdf8; font-size: 18px; }
     p.ayuda { margin: 0 0 14px 0; font-size: 12px; color: #94a3b8; }
+    .banner-ok {
+      background: #064e3b; border: 1px solid #10b981; color: #a7f3d0;
+      padding: 8px 12px; border-radius: 8px; font-size: 12px; margin-bottom: 12px;
+      display: none;
+    }
     label { display: block; font-size: 12px; font-weight: bold; margin: 10px 0 4px 0; color: #cbd5e1; }
     input {
       width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #475569;
@@ -28,7 +34,7 @@
     }
     .btn-verde { background: #10b981; color: #0f172a; }
     .btn-azul { background: #2563eb; color: white; }
-    .btn-gris { background: #334155; color: #cbd5e1; font-size: 12px; padding: 8px; margin-top: 10px; }
+    .btn-gris { background: #334155; color: #cbd5e1; font-size: 12px; padding: 8px; margin-top: 12px; }
     #caja-qr {
       margin-top: 16px; background: white; padding: 16px; border-radius: 12px;
       display: none; flex-direction: column; align-items: center;
@@ -42,24 +48,28 @@
 <body>
 
 <div class="card">
-  <!-- PANTALLA 1: VINCULACIÓN ÚNICA DEL CELULAR -->
-  <div id="vista-config">
-    <h2>⚙️ Configuración del Personal</h2>
-    <p class="ayuda">Ingresa estos datos una sola vez. Quedarán guardados en tu teléfono.</p>
+  <div id="aviso-autoconfig" class="banner-ok">
+    ✅ ¡Teléfono vinculado automáticamente! Tus credenciales ya quedaron guardadas en este navegador.
+  </div>
 
-    <label>Nombre de la Empresa (Ej. Cottech):</label>
+  <!-- PANTALLA 1: VINCULACIÓN MANUAL (SOLO SI ENTRA SIN ENLACE AUTO-CONFIGURADO) -->
+  <div id="vista-config" style="display:none;">
+    <h2>⚙️ Configuración del Personal</h2>
+    <p class="ayuda">Ingresa estos datos una sola vez. Quedarán guardados en tu navegador.</p>
+
+    <label>Nombre de la Empresa:</label>
     <input type="text" id="cfg-emp" value="Cottech" />
 
-    <label>Tu Rol (Ej. Técnico, Entrenador, Vendedor):</label>
+    <label>Tu Rol:</label>
     <input type="text" id="cfg-rol" value="Técnico" />
 
-    <label>Nombre del Documento (Ej. OT, Sesión, Ticket):</label>
+    <label>Nombre del Documento (OT / Sesión / Ticket):</label>
     <input type="text" id="cfg-tx" value="OT" />
 
     <label>Tu Código de Personal (Ej. TÉC01):</label>
     <input type="text" id="cfg-id" placeholder="TÉC01" />
 
-    <label>Tu Llave Secreta (Copiada del programa de PC):</label>
+    <label>Tu Llave Secreta:</label>
     <input type="text" id="cfg-llave" placeholder="CTK-9F8A7B6C5D" />
 
     <label>URL de Conexión (/exec de Google Sheets):</label>
@@ -74,16 +84,16 @@
     <p class="ayuda" id="sub-op"></p>
 
     <label id="lbl-num-ot">Número de Orden (OT):</label>
-    <input type="text" id="inp-ot" placeholder="Ej. 5001" />
+    <input type="text" id="inp-ot" placeholder="Ej. 5502" />
 
     <button class="btn btn-verde" onclick="generarQR()">📱 Generar Código QR</button>
 
     <div id="caja-qr">
       <div id="qrcode"></div>
-      <a id="link-directo" class="link-prueba" target="_blank">🔗 Abrir encuesta directamente (Modo Prueba en PC)</a>
+      <a id="link-directo" class="link-prueba" target="_blank">🔗 Abrir encuesta directamente (Modo Prueba)</a>
     </div>
 
-    <button class="btn btn-gris" onclick="editarConfig()">⚙️ Cambiar configuración del teléfono</button>
+    <button class="btn btn-gris" onclick="editarConfig()">⚙️ Ver / Cambiar configuración guardada</button>
   </div>
 </div>
 
@@ -95,16 +105,44 @@
     return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
   }
 
+  // 1. Verificar si el enlace de WhatsApp trae auto-configuración
+  function verificarAutoConfigURL() {
+    const p = new URLSearchParams(window.location.search);
+    const idUrl = p.get("id");
+    const llaveUrl = p.get("llave");
+    const execParam = p.get("exec");
+
+    if (idUrl && llaveUrl && execParam) {
+      const execUrl = execParam.startsWith("http")
+        ? execParam
+        : `https://script.google.com/macros/s/${execParam}/exec`;
+
+      const nuevaCfg = {
+        emp: p.get("emp") || "Cottech",
+        rol: p.get("rol") || "Técnico",
+        tx: p.get("tx") || "OT",
+        id: idUrl.trim().toUpperCase(),
+        llave: llaveUrl.trim(),
+        execUrl: execUrl.trim()
+      };
+      localStorage.setItem("cottech_movil_cfg", JSON.stringify(nuevaCfg));
+      // Limpia los parámetros de la barra de direcciones por seguridad
+      window.history.replaceState({}, document.title, window.location.pathname);
+      document.getElementById("aviso-autoconfig").style.display = "block";
+    }
+  }
+
   function cargarVista() {
+    verificarAutoConfigURL();
     const cfg = JSON.parse(localStorage.getItem("cottech_movil_cfg") || "null");
-    if (!cfg) {
+    if (!cfg || !cfg.id || !cfg.llave || !cfg.execUrl) {
       document.getElementById("vista-config").style.display = "block";
       document.getElementById("vista-operacion").style.display = "none";
     } else {
       document.getElementById("vista-config").style.display = "none";
       document.getElementById("vista-operacion").style.display = "block";
       document.getElementById("titulo-op").innerText = `${cfg.emp} · Generar QR`;
-      document.getElementById("sub-op").innerText = `${cfg.rol} activo: ${cfg.id}`;
+      document.getElementById("sub-op").innerText = `${cfg.rol} vinculado: ${cfg.id} (Llave guardada ✔)`;
       document.getElementById("lbl-num-ot").innerText = `Número de ${cfg.tx}:`;
     }
   }
@@ -144,8 +182,10 @@
     const ts = Date.now();
     const firma = await sha256(`${cfg.id}|${ot}|${ts}|${cfg.llave}`);
 
-    // Construye la URL hacia index.html en la misma carpeta o servidor
-    const baseUrl = window.location.href.replace(/tecnico\.html.*$/, "index.html");
+    const matchId = cfg.execUrl.match(/\/s\/([a-zA-Z0-9-_]+)\/exec/);
+    const kCorto = matchId ? matchId[1] : cfg.execUrl;
+
+    const baseUrl = window.location.origin + window.location.pathname.replace(/tecnico\.html.*$/, "index.html");
     const params = new URLSearchParams({
       tec: cfg.id,
       ot: ot,
@@ -154,13 +194,18 @@
       emp: cfg.emp,
       rol: cfg.rol,
       tx: cfg.tx,
-      k: cfg.execUrl
+      k: kCorto
     });
     const urlFinal = `${baseUrl}?${params.toString()}`;
 
     const contenedorQR = document.getElementById("qrcode");
     contenedorQR.innerHTML = "";
-    new QRCode(contenedorQR, { text: urlFinal, width: 210, height: 210 });
+    new QRCode(contenedorQR, {
+      text: urlFinal,
+      width: 220,
+      height: 220,
+      correctLevel: QRCode.CorrectLevel.L
+    });
 
     const link = document.getElementById("link-directo");
     link.href = urlFinal;
