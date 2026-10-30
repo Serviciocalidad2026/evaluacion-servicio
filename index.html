@@ -208,6 +208,12 @@
       ? apiKeyId
       : `https://script.google.com/macros/s/${apiKeyId}/exec`;
 
+    let clientId = localStorage.getItem("calidad_client_uid");
+    if (!clientId) {
+      clientId = "CLI-" + Math.random().toString(36).substring(2, 10).toUpperCase() + "-" + Date.now().toString(36).toUpperCase();
+      localStorage.setItem("calidad_client_uid", clientId);
+    }
+
     const payload = {
       accion: "REGISTRAR_ENCUESTA",
       tecnico: tecnico,
@@ -219,7 +225,7 @@
       causaRaiz: csatElegido <= 3 ? document.getElementById("select-causa").value : "Ninguna (Atención Óptima)",
       navegando: funcionandoElegido,
       comentario: document.getElementById("txt-comentario").value.trim(),
-      fingerprint: navigator.userAgent.substring(0, 80)
+      fingerprint: clientId
     };
 
     try {
