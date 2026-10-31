@@ -11,7 +11,7 @@
       display: flex; justify-content: center;
     }
     .card {
-      width: 100%; max-width: 460px; background: #1e293b;
+      width: 100%; max-width: 470px; background: #1e293b;
       border: 1px solid #334155; border-radius: 14px; padding: 22px;
       box-shadow: 0 10px 25px rgba(0,0,0,0.4);
     }
@@ -30,14 +30,12 @@
     .explicacion-p { font-size: 12px; color: #94a3b8; margin: 0 0 12px 0; line-height: 1.35; }
 
     .estrellas { display: flex; justify-content: space-between; gap: 6px; }
-    .btn-star, .btn-star-extra {
-      flex: 1; padding: 10px 0; font-size: 18px; font-weight: bold;
+    .btn-star {
+      flex: 1; padding: 10px 0; font-size: 17px; font-weight: bold;
       background: #1e293b; color: #64748b; border: 1px solid #334155;
       border-radius: 8px; cursor: pointer; transition: 0.15s;
     }
-    .btn-star.activo, .btn-star-extra.activo {
-      background: #f59e0b; color: #0f172a; border-color: #fbbf24;
-    }
+    .btn-star.activo { background: #f59e0b; color: #0f172a; border-color: #fbbf24; }
 
     .fila-sino { display: flex; gap: 10px; }
     .btn-sino {
@@ -77,67 +75,9 @@
 <div class="card" id="contenedor-encuesta">
   <div class="badge" id="badge-info">Cargando datos...</div>
   <h1 id="titulo-empresa">Evaluación de Servicio</h1>
-  <div class="sub">Responda estas preguntas breves. Toma menos de 30 segundos.</div>
+  <div class="sub" id="sub-encuesta">Responda estas preguntas breves. Toma menos de 30 segundos.</div>
 
-  <!-- PREGUNTA 1: CSAT -->
-  <div class="bloque-pregunta">
-    <p class="titulo-p" id="lbl-csat">1. ¿Qué tan satisfecho está con la atención recibida?</p>
-    <p class="explicacion-p">Evalúe únicamente el desempeño de la persona que le atendió hoy (1 = Muy bajo, 5 = Excelente).</p>
-    <div class="estrellas">
-      <button type="button" class="btn-star" onclick="seleccionarCsat(1)">1 ★</button>
-      <button type="button" class="btn-star" onclick="seleccionarCsat(2)">2 ★</button>
-      <button type="button" class="btn-star" onclick="seleccionarCsat(3)">3 ★</button>
-      <button type="button" class="btn-star" onclick="seleccionarCsat(4)">4 ★</button>
-      <button type="button" class="btn-star" onclick="seleccionarCsat(5)">5 ★</button>
-    </div>
-  </div>
-
-  <!-- PREGUNTA CONDICIONAL: CAUSA RAÍZ + OPCIÓN "OTROS / SUGERENCIA" -->
-  <div class="bloque-pregunta oculto" id="bloque-causa">
-    <p class="titulo-p">¿Cuál fue el aspecto principal por mejorar?</p>
-    <p class="explicacion-p">Seleccione el motivo principal o elija "Otros" para escribir su situación.</p>
-    <select id="select-causa" onchange="alCambiarCausa()">
-      <option value="">-- Seleccione un aspecto --</option>
-      <option value="Puntualidad">Puntualidad (Cumplimiento del horario)</option>
-      <option value="Limpieza del área">Limpieza del área (Orden al finalizar)</option>
-      <option value="Trato del personal">Trato del personal (Respeto brindado)</option>
-      <option value="Funcionamiento del servicio">Funcionamiento del servicio (Pruebas finales)</option>
-      <option value="Claridad de la información">Claridad de la información (Explicación brindada)</option>
-      <option value="OTRO">Otros / Sugerencia (Especificar motivo)</option>
-    </select>
-    <input type="text" id="txt-causa-otro" class="input-otro oculto" maxlength="120" placeholder="Escriba aquí el aspecto por mejorar o sugerencia..." />
-  </div>
-
-  <!-- PREGUNTA 2: SERVICIO FUNCIONANDO -->
-  <div class="bloque-pregunta">
-    <p class="titulo-p">2. ¿El servicio solicitado quedó funcionando?</p>
-    <p class="explicacion-p">Indique si su solicitud quedó completada al finalizar la atención.</p>
-    <div class="fila-sino">
-      <button type="button" class="btn-sino" id="btn-si" onclick="seleccionarFuncionando('Sí')">Sí, funciona</button>
-      <button type="button" class="btn-sino" id="btn-no" onclick="seleccionarFuncionando('No')">No funciona</button>
-    </div>
-  </div>
-
-  <!-- PREGUNTA 3: NPS -->
-  <div class="bloque-pregunta">
-    <p class="titulo-p" id="lbl-nps">3. ¿Recomendaría nuestra empresa a otra persona?</p>
-    <p class="explicacion-p">Califique su confianza en la empresa de 0 (Nada probable) a 10 (Totalmente probable).</p>
-    <div class="grid-nps" id="grupo-nps"></div>
-  </div>
-
-  <!-- PREGUNTA ADICIONAL DINÁMICA (CONFIGURADA POR EL ENCARGADO SIN CÓDIGO) -->
-  <div class="bloque-pregunta oculto" id="bloque-extra">
-    <p class="titulo-p" id="lbl-extra-titulo">4. Pregunta adicional</p>
-    <p class="explicacion-p" id="lbl-extra-sub">Responda según su experiencia de hoy.</p>
-    <div id="contenedor-input-extra"></div>
-  </div>
-
-  <!-- COMENTARIO OPCIONAL -->
-  <div class="bloque-pregunta">
-    <p class="titulo-p" id="lbl-comentario">4. Comentario adicional (Opcional)</p>
-    <p class="explicacion-p">Si desea agregar una observación puntual, escríbala aquí.</p>
-    <textarea id="txt-comentario" rows="2" placeholder="Escriba su comentario..."></textarea>
-  </div>
+  <div id="contenedor-preguntas"></div>
 
   <button type="button" class="btn-enviar" id="btn-submit" onclick="enviarEvaluacion()">Enviar Evaluación ✔</button>
 </div>
@@ -148,165 +88,252 @@
   const ot = (params.get("ot") || "").trim();
   const ts = params.get("ts") || "";
   const sig = params.get("sig") || "";
-  const emp = params.get("emp") || "Mi Empresa";
-  const rol = params.get("rol") || "Empleado";
-  const tx = params.get("tx") || "Servicio";
+  let emp = params.get("emp") || "Mi Empresa";
+  let rol = params.get("rol") || "Empleado";
+  let tx = params.get("tx") || "Servicio";
   const apiKeyId = params.get("k") || "";
-
-  let pqTexto = (params.get("pq") || "").trim();
-  let pqTipo = (params.get("pt") || "NONE").trim().toUpperCase();
-  let pqOpciones = (params.get("po") || "").trim();
 
   const urlWebhook = apiKeyId.startsWith("http")
     ? apiKeyId
     : `https://script.google.com/macros/s/${apiKeyId}/exec`;
 
-  let csatElegido = null;
-  let npsElegido = null;
-  let funcionandoElegido = "Sí";
-  let extraRespuesta = "";
-
-  document.getElementById("titulo-empresa").innerText = "Evaluación · " + emp;
-  document.getElementById("badge-info").innerText = `${rol}: ${tecnico || "N/A"}  |  ${tx} #${ot || "N/A"}`;
-  document.getElementById("lbl-csat").innerText = `1. ¿Qué tan satisfecho está con la atención del ${rol}?`;
-  document.getElementById("lbl-nps").innerText = `3. ¿Recomendaría a ${emp} a otra persona?`;
-
-  const contenedorNps = document.getElementById("grupo-nps");
-  for (let i = 0; i <= 10; i++) {
-    const b = document.createElement("button");
-    b.type = "button";
-    b.className = "btn-nps";
-    b.innerText = i;
-    b.onclick = () => seleccionarNps(i, b);
-    contenedorNps.appendChild(b);
-  }
-
-  function seleccionarCsat(valor) {
-    csatElegido = valor;
-    document.querySelectorAll(".btn-star").forEach((b, idx) => b.classList.toggle("activo", idx + 1 <= valor));
-    const bloqueCausa = document.getElementById("bloque-causa");
-    if (valor <= 3) {
-      bloqueCausa.classList.remove("oculto");
-    } else {
-      bloqueCausa.classList.add("oculto");
-      document.getElementById("select-causa").value = "";
-      document.getElementById("txt-causa-otro").classList.add("oculto");
-      document.getElementById("txt-causa-otro").value = "";
+  // Encuesta por defecto si aún no se ha personalizado en la nube
+  const ENCUESTA_POR_DEFECTO = [
+    {
+      id: "CSAT",
+      titulo: "¿Qué tan satisfecho está con la atención del {rol}?",
+      explicacion: "Evalúe únicamente el desempeño de la persona que le atendió hoy (1 = Muy bajo, 5 = Excelente).",
+      tipo: "ESTRELLAS_5",
+      opciones: ""
+    },
+    {
+      id: "CAUSA",
+      titulo: "¿Cuál fue el aspecto principal por mejorar?",
+      explicacion: "Seleccione el motivo principal o elija 'Otros' para escribir su situación.",
+      tipo: "OPCIONES_OTRO",
+      opciones: "Puntualidad, Limpieza del área, Trato del personal, Funcionamiento del servicio, Claridad de la información"
+    },
+    {
+      id: "RESUELTO",
+      titulo: "¿El servicio solicitado quedó funcionando?",
+      explicacion: "Indique si su solicitud quedó completada al finalizar la atención.",
+      tipo: "SINO",
+      opciones: ""
+    },
+    {
+      id: "NPS",
+      titulo: "¿Recomendaría a {empresa} a otra persona?",
+      explicacion: "Califique su confianza en la empresa de 0 (Nada probable) a 10 (Totalmente probable).",
+      tipo: "ESCALA_10",
+      opciones: ""
+    },
+    {
+      id: "COMENTARIO",
+      titulo: "Comentario adicional (Opcional)",
+      explicacion: "Si desea agregar una observación puntual, escríbala aquí.",
+      tipo: "TEXTO",
+      opciones: ""
     }
+  ];
+
+  let preguntasActivas = JSON.parse(JSON.stringify(ENCUESTA_POR_DEFECTO));
+  let respuestasUsuario = {};
+
+  function actualizarEncabezado() {
+    document.getElementById("titulo-empresa").innerText = "Evaluación · " + emp;
+    document.getElementById("badge-info").innerText = `${rol}: ${tecnico || "N/A"}  |  ${tx} #${ot || "N/A"}`;
   }
 
-  function alCambiarCausa() {
-    const val = document.getElementById("select-causa").value;
-    const inputOtro = document.getElementById("txt-causa-otro");
-    if (val === "OTRO") {
-      inputOtro.classList.remove("oculto");
-      inputOtro.focus();
-    } else {
-      inputOtro.classList.add("oculto");
-      inputOtro.value = "";
-    }
+  function reemplazarVariables(texto) {
+    return String(texto || "")
+      .replace(/\{rol\}/gi, rol)
+      .replace(/\{empresa\}/gi, emp)
+      .replace(/\{tx\}/gi, tx);
   }
 
-  function seleccionarFuncionando(valor) {
-    funcionandoElegido = valor;
-    document.getElementById("btn-si").classList.toggle("activo-si", valor === "Sí");
-    document.getElementById("btn-no").classList.toggle("activo-no", valor === "No");
-  }
-  seleccionarFuncionando("Sí");
-
-  function seleccionarNps(valor, btn) {
-    npsElegido = valor;
-    document.querySelectorAll(".btn-nps").forEach(b => b.classList.remove("activo"));
-    btn.classList.add("activo");
-  }
-
-  function renderizarPreguntaExtra(texto, tipo, opcionesStr) {
-    const bloque = document.getElementById("bloque-extra");
-    const cont = document.getElementById("contenedor-input-extra");
-    if (!texto || !tipo || tipo === "NONE" || tipo === "DESACTIVADA") {
-      bloque.classList.add("oculto");
-      document.getElementById("lbl-comentario").innerText = "4. Comentario adicional (Opcional)";
-      return;
-    }
-
-    bloque.classList.remove("oculto");
-    document.getElementById("lbl-extra-titulo").innerText = "4. " + texto;
-    document.getElementById("lbl-comentario").innerText = "5. Comentario adicional (Opcional)";
+  function construirFormulario() {
+    actualizarEncabezado();
+    const cont = document.getElementById("contenedor-preguntas");
     cont.innerHTML = "";
-    extraRespuesta = "";
+    respuestasUsuario = {};
 
-    if (tipo === "SINO") {
-      cont.innerHTML = `
-        <div class="fila-sino">
-          <button type="button" class="btn-sino" id="btn-ex-si" onclick="elegirExtraSiNo('Sí')">Sí</button>
-          <button type="button" class="btn-sino" id="btn-ex-no" onclick="elegirExtraSiNo('No')">No</button>
-        </div>`;
-    } else if (tipo === "ESTRELLAS") {
-      let html = `<div class="estrellas">`;
-      for (let s = 1; s <= 5; s++) {
-        html += `<button type="button" class="btn-star-extra" onclick="elegirExtraEstrella(${s})">${s} ★</button>`;
+    let numVisible = 1;
+    preguntasActivas.forEach((p, idx) => {
+      const clave = p.id || ("P_" + idx);
+      const esCausaCondicional = (clave === "CAUSA");
+
+      const div = document.createElement("div");
+      div.className = "bloque-pregunta" + (esCausaCondicional ? " oculto" : "");
+      div.id = "bloque-" + clave;
+
+      const prefijoNum = esCausaCondicional ? "↳ " : (numVisible++ + ". ");
+      const tituloLimpio = reemplazarVariables(p.titulo);
+      const expLimpia = reemplazarVariables(p.explicacion);
+
+      let htmlControl = "";
+
+      if (p.tipo === "ESTRELLAS_5") {
+        htmlControl = `<div class="estrellas" id="ctrl-${clave}">`;
+        for (let s = 1; s <= 5; s++) {
+          htmlControl += `<button type="button" class="btn-star" onclick="elegirEstrella('${clave}', ${s})">${s} ★</button>`;
+        }
+        htmlControl += `</div>`;
+      } else if (p.tipo === "ESCALA_10") {
+        htmlControl = `<div class="grid-nps" id="ctrl-${clave}">`;
+        for (let n = 0; n <= 10; n++) {
+          htmlControl += `<button type="button" class="btn-nps" onclick="elegirEscala10('${clave}', ${n}, this)">${n}</button>`;
+        }
+        htmlControl += `</div>`;
+      } else if (p.tipo === "SINO") {
+        htmlControl = `
+          <div class="fila-sino" id="ctrl-${clave}">
+            <button type="button" class="btn-sino" id="si-${clave}" onclick="elegirSiNo('${clave}', 'Sí')">Sí</button>
+            <button type="button" class="btn-sino" id="no-${clave}" onclick="elegirSiNo('${clave}', 'No')">No</button>
+          </div>`;
+      } else if (p.tipo === "OPCIONES" || p.tipo === "OPCIONES_OTRO") {
+        const listaOp = String(p.opciones || "").split(",").map(x => x.trim()).filter(Boolean);
+        htmlControl = `<select id="sel-${clave}" onchange="elegirOpcion('${clave}', '${p.tipo}')">
+          <option value="">-- Seleccione una opción --</option>`;
+        listaOp.forEach(op => {
+          htmlControl += `<option value="${op}">${op}</option>`;
+        });
+        if (p.tipo === "OPCIONES_OTRO") {
+          htmlControl += `<option value="OTRO">Otros / Sugerencia (Especificar motivo)</option>`;
+        }
+        htmlControl += `</select>`;
+        if (p.tipo === "OPCIONES_OTRO") {
+          htmlControl += `<input type="text" id="otro-${clave}" class="input-otro oculto" maxlength="130" placeholder="Escriba aquí su motivo o sugerencia..." oninput="actualizarTextoOtro('${clave}')" />`;
+        }
+      } else {
+        htmlControl = `<textarea id="txt-${clave}" rows="2" placeholder="Escriba aquí su respuesta..." oninput="respuestasUsuario['${clave}'] = this.value.trim()"></textarea>`;
       }
-      html += `</div>`;
-      cont.innerHTML = html;
-    } else if (tipo === "OPCIONES") {
-      const lista = opcionesStr.split(",").map(x => x.trim()).filter(Boolean);
-      let html = `<select id="sel-extra-op" onchange="extraRespuesta = this.value"><option value="">-- Seleccione una opción --</option>`;
-      lista.forEach(op => { html += `<option value="${op}">${op}</option>`; });
-      html += `</select>`;
-      cont.innerHTML = html;
-    } else {
-      cont.innerHTML = `<input type="text" id="inp-extra-txt" maxlength="150" placeholder="Escriba su respuesta..." oninput="extraRespuesta = this.value.trim()" />`;
-    }
+
+      div.innerHTML = `
+        <p class="titulo-p">${prefijoNum}${tituloLimpio}</p>
+        <p class="explicacion-p">${expLimpia}</p>
+        ${htmlControl}
+      `;
+      cont.appendChild(div);
+
+      if (clave === "RESUELTO" && p.tipo === "SINO") {
+        elegirSiNo("RESUELTO", "Sí");
+      }
+    });
   }
 
-  window.elegirExtraSiNo = function(val) {
-    extraRespuesta = val;
-    document.getElementById("btn-ex-si").classList.toggle("activo-si", val === "Sí");
-    document.getElementById("btn-ex-no").classList.toggle("activo-no", val === "No");
+  window.elegirEstrella = function(clave, valor) {
+    respuestasUsuario[clave] = valor;
+    const grupo = document.getElementById("ctrl-" + clave);
+    if (grupo) {
+      grupo.querySelectorAll(".btn-star").forEach((b, idx) => b.classList.toggle("activo", idx + 1 <= valor));
+    }
+    if (clave === "CSAT") {
+      const bloqueCausa = document.getElementById("bloque-CAUSA");
+      if (bloqueCausa) {
+        if (valor <= 3) {
+          bloqueCausa.classList.remove("oculto");
+        } else {
+          bloqueCausa.classList.add("oculto");
+          respuestasUsuario["CAUSA"] = "Ninguna (Atención Óptima)";
+        }
+      }
+    }
   };
 
-  window.elegirExtraEstrella = function(val) {
-    extraRespuesta = val + " ★";
-    document.querySelectorAll(".btn-star-extra").forEach((b, idx) => b.classList.toggle("activo", idx + 1 <= val));
+  window.elegirEscala10 = function(clave, valor, btn) {
+    respuestasUsuario[clave] = valor;
+    const grupo = document.getElementById("ctrl-" + clave);
+    if (grupo) {
+      grupo.querySelectorAll(".btn-nps").forEach(b => b.classList.remove("activo"));
+    }
+    btn.classList.add("activo");
   };
 
-  // Renderizar primero si viene en el enlace y luego sincronizar con el servidor por si el gerente la actualizó
-  renderizarPreguntaExtra(pqTexto, pqTipo, pqOpciones);
+  window.elegirSiNo = function(clave, valor) {
+    respuestasUsuario[clave] = valor;
+    const bSi = document.getElementById("si-" + clave);
+    const bNo = document.getElementById("no-" + clave);
+    if (bSi) bSi.classList.toggle("activo-si", valor === "Sí");
+    if (bNo) bNo.classList.toggle("activo-no", valor === "No");
+  };
+
+  window.elegirOpcion = function(clave, tipo) {
+    const sel = document.getElementById("sel-" + clave);
+    const inpOtro = document.getElementById("otro-" + clave);
+    if (!sel) return;
+    if (sel.value === "OTRO" && inpOtro) {
+      inpOtro.classList.remove("oculto");
+      inpOtro.focus();
+      respuestasUsuario[clave] = inpOtro.value.trim() ? ("Otros: " + inpOtro.value.trim()) : "";
+    } else {
+      if (inpOtro) {
+        inpOtro.classList.add("oculto");
+        inpOtro.value = "";
+      }
+      respuestasUsuario[clave] = sel.value;
+    }
+  };
+
+  window.actualizarTextoOtro = function(clave) {
+    const inpOtro = document.getElementById("otro-" + clave);
+    if (inpOtro) {
+      const txt = inpOtro.value.trim();
+      respuestasUsuario[clave] = txt ? ("Otros: " + txt) : "";
+    }
+  };
+
+  // Dibujar de inmediato y luego sincronizar con las preguntas personalizadas del encargado
+  construirFormulario();
   if (apiKeyId) {
     fetch(urlWebhook + "?accion=CONFIG")
       .then(r => r.json())
       .then(cfg => {
-        if (cfg && cfg.preguntaExtraTipo) {
-          pqTexto = cfg.preguntaExtraTexto || "";
-          pqTipo = cfg.preguntaExtraTipo || "NONE";
-          pqOpciones = cfg.preguntaExtraOpciones || "";
-          renderizarPreguntaExtra(pqTexto, pqTipo, pqOpciones);
+        if (cfg && Array.isArray(cfg.encuesta) && cfg.encuesta.length > 0) {
+          preguntasActivas = cfg.encuesta;
+          if (cfg.empresa) emp = cfg.empresa;
+          if (cfg.rolSingular) rol = cfg.rolSingular;
+          if (cfg.txCorto) tx = cfg.txCorto;
+          construirFormulario();
         }
       })
       .catch(() => {});
   }
 
   async function enviarEvaluacion() {
-    if (!csatElegido) return alert("Por favor seleccione las estrellas en la pregunta 1.");
+    let csatVal = 5;
+    let npsVal = 10;
+    let causaVal = "Ninguna (Atención Óptima)";
+    let resueltoVal = "Sí";
+    let comentarioVal = "";
+    let extrasLista = [];
 
-    let causaFinal = "Ninguna (Atención Óptima)";
-    if (csatElegido <= 3) {
-      const selCausa = document.getElementById("select-causa").value;
-      if (!selCausa) return alert("Por favor seleccione el aspecto principal por mejorar.");
-      if (selCausa === "OTRO") {
-        const txtOtro = document.getElementById("txt-causa-otro").value.trim();
-        if (!txtOtro) return alert("Por favor escriba el motivo o sugerencia en la casilla 'Otros'.");
-        causaFinal = "Otros: " + txtOtro;
-      } else {
-        causaFinal = selCausa;
+    for (let i = 0; i < preguntasActivas.length; i++) {
+      const p = preguntasActivas[i];
+      const clave = p.id || ("P_" + i);
+      const bloque = document.getElementById("bloque-" + clave);
+      if (bloque && bloque.classList.contains("oculto")) continue;
+
+      const resp = respuestasUsuario[clave];
+      const esOpcional = (clave === "COMENTARIO" || p.tipo === "TEXTO" && p.titulo.toLowerCase().includes("opcional"));
+
+      if (!esOpcional && (resp === undefined || resp === null || resp === "")) {
+        return alert(`Por favor responda la pregunta: "${reemplazarVariables(p.titulo)}"`);
       }
-    }
 
-    if (npsElegido === null) return alert("Por favor seleccione un número de 0 a 10 en la pregunta 3.");
-
-    const bloqueExtraVisible = !document.getElementById("bloque-extra").classList.contains("oculto");
-    if (bloqueExtraVisible && !extraRespuesta) {
-      return alert("Por favor responda la pregunta 4.");
+      if (clave === "CSAT") {
+        csatVal = Number(resp) || 5;
+      } else if (clave === "CAUSA") {
+        causaVal = String(resp || "Ninguna (Atención Óptima)");
+      } else if (clave === "RESUELTO") {
+        resueltoVal = String(resp || "Sí");
+      } else if (clave === "NPS") {
+        npsVal = (resp !== undefined && resp !== "") ? Number(resp) : 10;
+      } else if (clave === "COMENTARIO") {
+        comentarioVal = String(resp || "");
+      } else if (resp !== undefined && resp !== "") {
+        const valFormateado = (p.tipo === "ESTRELLAS_5") ? `${resp} ★` : resp;
+        extrasLista.push(`${reemplazarVariables(p.titulo)}: ${valFormateado}`);
+      }
     }
 
     if (!apiKeyId) return alert("Este enlace QR no contiene la dirección del servidor.");
@@ -327,12 +354,12 @@
       ot: ot,
       ts: Number(ts),
       sig: sig,
-      csat: csatElegido,
-      nps: npsElegido,
-      causaRaiz: causaFinal,
-      navegando: funcionandoElegido,
-      respuestaExtra: extraRespuesta || "N/A",
-      comentario: document.getElementById("txt-comentario").value.trim(),
+      csat: csatVal,
+      nps: npsVal,
+      causaRaiz: causaVal,
+      navegando: resueltoVal,
+      respuestaExtra: extrasLista.length > 0 ? extrasLista.join(" | ") : "N/A",
+      comentario: comentarioVal,
       fingerprint: clientId
     };
 
