@@ -28,17 +28,17 @@
     }
     .titulo-p { font-size: 14px; font-weight: 700; color: #f8fafc; margin: 0 0 4px 0; }
     .explicacion-p { font-size: 12px; color: #94a3b8; margin: 0 0 12px 0; line-height: 1.35; }
-    
-    /* Estrellas CSAT */
+
     .estrellas { display: flex; justify-content: space-between; gap: 6px; }
-    .btn-star {
+    .btn-star, .btn-star-extra {
       flex: 1; padding: 10px 0; font-size: 18px; font-weight: bold;
       background: #1e293b; color: #64748b; border: 1px solid #334155;
       border-radius: 8px; cursor: pointer; transition: 0.15s;
     }
-    .btn-star.activo { background: #f59e0b; color: #0f172a; border-color: #fbbf24; }
+    .btn-star.activo, .btn-star-extra.activo {
+      background: #f59e0b; color: #0f172a; border-color: #fbbf24;
+    }
 
-    /* Botones Sí / No */
     .fila-sino { display: flex; gap: 10px; }
     .btn-sino {
       flex: 1; padding: 10px; font-size: 14px; font-weight: bold;
@@ -48,7 +48,6 @@
     .btn-sino.activo-si { background: #10b981; color: #0f172a; border-color: #34d399; }
     .btn-sino.activo-no { background: #ef4444; color: #ffffff; border-color: #f87171; }
 
-    /* Escala NPS 0-10 */
     .grid-nps { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
     .btn-nps {
       padding: 9px 0; font-size: 13px; font-weight: bold;
@@ -57,11 +56,12 @@
     }
     .btn-nps.activo { background: #38bdf8; color: #0f172a; border-color: #7dd3fc; }
 
-    select, textarea {
+    select, textarea, input[type="text"] {
       width: 100%; background: #1e293b; color: #ffffff;
       border: 1px solid #475569; border-radius: 8px; padding: 10px;
       font-size: 13px;
     }
+    .input-otro { margin-top: 10px; border-color: #f59e0b !important; }
     .oculto { display: none; }
     .btn-enviar {
       width: 100%; padding: 13px; font-size: 15px; font-weight: bold;
@@ -77,13 +77,13 @@
 <div class="card" id="contenedor-encuesta">
   <div class="badge" id="badge-info">Cargando datos...</div>
   <h1 id="titulo-empresa">Evaluación de Servicio</h1>
-  <div class="sub">Responda estas 4 preguntas breves. Toma menos de 30 segundos.</div>
+  <div class="sub">Responda estas preguntas breves. Toma menos de 30 segundos.</div>
 
-  <!-- PREGUNTA 1: CSAT (1 solo objetivo: desempeño del personal) -->
+  <!-- PREGUNTA 1: CSAT -->
   <div class="bloque-pregunta">
-    <p class="titulo-p" id="lbl-csat">1. ¿Qué tan satisfecho está con la atención del personal?</p>
+    <p class="titulo-p" id="lbl-csat">1. ¿Qué tan satisfecho está con la atención recibida?</p>
     <p class="explicacion-p">Evalúe únicamente el desempeño de la persona que le atendió hoy (1 = Muy bajo, 5 = Excelente).</p>
-    <div class="estrellas" id="grupo-csat">
+    <div class="estrellas">
       <button type="button" class="btn-star" onclick="seleccionarCsat(1)">1 ★</button>
       <button type="button" class="btn-star" onclick="seleccionarCsat(2)">2 ★</button>
       <button type="button" class="btn-star" onclick="seleccionarCsat(3)">3 ★</button>
@@ -92,21 +92,23 @@
     </div>
   </div>
 
-  <!-- PREGUNTA CONDICIONAL: CAUSA RAÍZ (Opciones de 1 solo concepto, sin "y") -->
+  <!-- PREGUNTA CONDICIONAL: CAUSA RAÍZ + OPCIÓN "OTROS / SUGERENCIA" -->
   <div class="bloque-pregunta oculto" id="bloque-causa">
     <p class="titulo-p">¿Cuál fue el aspecto principal por mejorar?</p>
-    <p class="explicacion-p">Seleccione el motivo principal de su calificación.</p>
-    <select id="select-causa">
+    <p class="explicacion-p">Seleccione el motivo principal o elija "Otros" para escribir su situación.</p>
+    <select id="select-causa" onchange="alCambiarCausa()">
       <option value="">-- Seleccione un aspecto --</option>
       <option value="Puntualidad">Puntualidad (Cumplimiento del horario)</option>
       <option value="Limpieza del área">Limpieza del área (Orden al finalizar)</option>
       <option value="Trato del personal">Trato del personal (Respeto brindado)</option>
       <option value="Funcionamiento del servicio">Funcionamiento del servicio (Pruebas finales)</option>
       <option value="Claridad de la información">Claridad de la información (Explicación brindada)</option>
+      <option value="OTRO">Otros / Sugerencia (Especificar motivo)</option>
     </select>
+    <input type="text" id="txt-causa-otro" class="input-otro oculto" maxlength="120" placeholder="Escriba aquí el aspecto por mejorar o sugerencia..." />
   </div>
 
-  <!-- PREGUNTA 2: RESOLUCIÓN (1 solo objetivo: servicio funcionando) -->
+  <!-- PREGUNTA 2: SERVICIO FUNCIONANDO -->
   <div class="bloque-pregunta">
     <p class="titulo-p">2. ¿El servicio solicitado quedó funcionando?</p>
     <p class="explicacion-p">Indique si su solicitud quedó completada al finalizar la atención.</p>
@@ -116,16 +118,23 @@
     </div>
   </div>
 
-  <!-- PREGUNTA 3: NPS (1 solo objetivo: recomendar a la empresa) -->
+  <!-- PREGUNTA 3: NPS -->
   <div class="bloque-pregunta">
     <p class="titulo-p" id="lbl-nps">3. ¿Recomendaría nuestra empresa a otra persona?</p>
     <p class="explicacion-p">Califique su confianza en la empresa de 0 (Nada probable) a 10 (Totalmente probable).</p>
     <div class="grid-nps" id="grupo-nps"></div>
   </div>
 
-  <!-- PREGUNTA 4: COMENTARIO BREVE -->
+  <!-- PREGUNTA ADICIONAL DINÁMICA (CONFIGURADA POR EL ENCARGADO SIN CÓDIGO) -->
+  <div class="bloque-pregunta oculto" id="bloque-extra">
+    <p class="titulo-p" id="lbl-extra-titulo">4. Pregunta adicional</p>
+    <p class="explicacion-p" id="lbl-extra-sub">Responda según su experiencia de hoy.</p>
+    <div id="contenedor-input-extra"></div>
+  </div>
+
+  <!-- COMENTARIO OPCIONAL -->
   <div class="bloque-pregunta">
-    <p class="titulo-p">4. Comentario adicional (Opcional)</p>
+    <p class="titulo-p" id="lbl-comentario">4. Comentario adicional (Opcional)</p>
     <p class="explicacion-p">Si desea agregar una observación puntual, escríbala aquí.</p>
     <textarea id="txt-comentario" rows="2" placeholder="Escriba su comentario..."></textarea>
   </div>
@@ -139,22 +148,29 @@
   const ot = (params.get("ot") || "").trim();
   const ts = params.get("ts") || "";
   const sig = params.get("sig") || "";
-  const emp = params.get("emp") || "Cottech";
-  const rol = params.get("rol") || "Técnico";
-  const tx = params.get("tx") || "OT";
+  const emp = params.get("emp") || "Mi Empresa";
+  const rol = params.get("rol") || "Empleado";
+  const tx = params.get("tx") || "Servicio";
   const apiKeyId = params.get("k") || "";
+
+  let pqTexto = (params.get("pq") || "").trim();
+  let pqTipo = (params.get("pt") || "NONE").trim().toUpperCase();
+  let pqOpciones = (params.get("po") || "").trim();
+
+  const urlWebhook = apiKeyId.startsWith("http")
+    ? apiKeyId
+    : `https://script.google.com/macros/s/${apiKeyId}/exec`;
 
   let csatElegido = null;
   let npsElegido = null;
   let funcionandoElegido = "Sí";
+  let extraRespuesta = "";
 
-  // Personalizar textos según el rubro
   document.getElementById("titulo-empresa").innerText = "Evaluación · " + emp;
   document.getElementById("badge-info").innerText = `${rol}: ${tecnico || "N/A"}  |  ${tx} #${ot || "N/A"}`;
   document.getElementById("lbl-csat").innerText = `1. ¿Qué tan satisfecho está con la atención del ${rol}?`;
   document.getElementById("lbl-nps").innerText = `3. ¿Recomendaría a ${emp} a otra persona?`;
 
-  // Crear botones NPS 0 a 10
   const contenedorNps = document.getElementById("grupo-nps");
   for (let i = 0; i <= 10; i++) {
     const b = document.createElement("button");
@@ -167,15 +183,27 @@
 
   function seleccionarCsat(valor) {
     csatElegido = valor;
-    const botones = document.querySelectorAll(".btn-star");
-    botones.forEach((b, idx) => b.classList.toggle("activo", idx + 1 <= valor));
-    // Mostrar pregunta de causa raíz si la calificación es de 1 a 3 estrellas
+    document.querySelectorAll(".btn-star").forEach((b, idx) => b.classList.toggle("activo", idx + 1 <= valor));
     const bloqueCausa = document.getElementById("bloque-causa");
     if (valor <= 3) {
       bloqueCausa.classList.remove("oculto");
     } else {
       bloqueCausa.classList.add("oculto");
       document.getElementById("select-causa").value = "";
+      document.getElementById("txt-causa-otro").classList.add("oculto");
+      document.getElementById("txt-causa-otro").value = "";
+    }
+  }
+
+  function alCambiarCausa() {
+    const val = document.getElementById("select-causa").value;
+    const inputOtro = document.getElementById("txt-causa-otro");
+    if (val === "OTRO") {
+      inputOtro.classList.remove("oculto");
+      inputOtro.focus();
+    } else {
+      inputOtro.classList.add("oculto");
+      inputOtro.value = "";
     }
   }
 
@@ -192,27 +220,106 @@
     btn.classList.add("activo");
   }
 
+  function renderizarPreguntaExtra(texto, tipo, opcionesStr) {
+    const bloque = document.getElementById("bloque-extra");
+    const cont = document.getElementById("contenedor-input-extra");
+    if (!texto || !tipo || tipo === "NONE" || tipo === "DESACTIVADA") {
+      bloque.classList.add("oculto");
+      document.getElementById("lbl-comentario").innerText = "4. Comentario adicional (Opcional)";
+      return;
+    }
+
+    bloque.classList.remove("oculto");
+    document.getElementById("lbl-extra-titulo").innerText = "4. " + texto;
+    document.getElementById("lbl-comentario").innerText = "5. Comentario adicional (Opcional)";
+    cont.innerHTML = "";
+    extraRespuesta = "";
+
+    if (tipo === "SINO") {
+      cont.innerHTML = `
+        <div class="fila-sino">
+          <button type="button" class="btn-sino" id="btn-ex-si" onclick="elegirExtraSiNo('Sí')">Sí</button>
+          <button type="button" class="btn-sino" id="btn-ex-no" onclick="elegirExtraSiNo('No')">No</button>
+        </div>`;
+    } else if (tipo === "ESTRELLAS") {
+      let html = `<div class="estrellas">`;
+      for (let s = 1; s <= 5; s++) {
+        html += `<button type="button" class="btn-star-extra" onclick="elegirExtraEstrella(${s})">${s} ★</button>`;
+      }
+      html += `</div>`;
+      cont.innerHTML = html;
+    } else if (tipo === "OPCIONES") {
+      const lista = opcionesStr.split(",").map(x => x.trim()).filter(Boolean);
+      let html = `<select id="sel-extra-op" onchange="extraRespuesta = this.value"><option value="">-- Seleccione una opción --</option>`;
+      lista.forEach(op => { html += `<option value="${op}">${op}</option>`; });
+      html += `</select>`;
+      cont.innerHTML = html;
+    } else {
+      cont.innerHTML = `<input type="text" id="inp-extra-txt" maxlength="150" placeholder="Escriba su respuesta..." oninput="extraRespuesta = this.value.trim()" />`;
+    }
+  }
+
+  window.elegirExtraSiNo = function(val) {
+    extraRespuesta = val;
+    document.getElementById("btn-ex-si").classList.toggle("activo-si", val === "Sí");
+    document.getElementById("btn-ex-no").classList.toggle("activo-no", val === "No");
+  };
+
+  window.elegirExtraEstrella = function(val) {
+    extraRespuesta = val + " ★";
+    document.querySelectorAll(".btn-star-extra").forEach((b, idx) => b.classList.toggle("activo", idx + 1 <= val));
+  };
+
+  // Renderizar primero si viene en el enlace y luego sincronizar con el servidor por si el gerente la actualizó
+  renderizarPreguntaExtra(pqTexto, pqTipo, pqOpciones);
+  if (apiKeyId) {
+    fetch(urlWebhook + "?accion=CONFIG")
+      .then(r => r.json())
+      .then(cfg => {
+        if (cfg && cfg.preguntaExtraTipo) {
+          pqTexto = cfg.preguntaExtraTexto || "";
+          pqTipo = cfg.preguntaExtraTipo || "NONE";
+          pqOpciones = cfg.preguntaExtraOpciones || "";
+          renderizarPreguntaExtra(pqTexto, pqTipo, pqOpciones);
+        }
+      })
+      .catch(() => {});
+  }
+
   async function enviarEvaluacion() {
     if (!csatElegido) return alert("Por favor seleccione las estrellas en la pregunta 1.");
-    if (csatElegido <= 3 && !document.getElementById("select-causa").value) {
-      return alert("Por favor seleccione el aspecto principal por mejorar.");
+
+    let causaFinal = "Ninguna (Atención Óptima)";
+    if (csatElegido <= 3) {
+      const selCausa = document.getElementById("select-causa").value;
+      if (!selCausa) return alert("Por favor seleccione el aspecto principal por mejorar.");
+      if (selCausa === "OTRO") {
+        const txtOtro = document.getElementById("txt-causa-otro").value.trim();
+        if (!txtOtro) return alert("Por favor escriba el motivo o sugerencia en la casilla 'Otros'.");
+        causaFinal = "Otros: " + txtOtro;
+      } else {
+        causaFinal = selCausa;
+      }
     }
+
     if (npsElegido === null) return alert("Por favor seleccione un número de 0 a 10 en la pregunta 3.");
+
+    const bloqueExtraVisible = !document.getElementById("bloque-extra").classList.contains("oculto");
+    if (bloqueExtraVisible && !extraRespuesta) {
+      return alert("Por favor responda la pregunta 4.");
+    }
+
     if (!apiKeyId) return alert("Este enlace QR no contiene la dirección del servidor.");
-
-    const btn = document.getElementById("btn-submit");
-    btn.disabled = true;
-    btn.innerText = "Enviando respuesta...";
-
-    const urlWebhook = apiKeyId.startsWith("http")
-      ? apiKeyId
-      : `https://script.google.com/macros/s/${apiKeyId}/exec`;
 
     let clientId = localStorage.getItem("calidad_client_uid");
     if (!clientId) {
       clientId = "CLI-" + Math.random().toString(36).substring(2, 10).toUpperCase() + "-" + Date.now().toString(36).toUpperCase();
       localStorage.setItem("calidad_client_uid", clientId);
     }
+
+    const btn = document.getElementById("btn-submit");
+    btn.disabled = true;
+    btn.innerText = "Enviando respuesta...";
 
     const payload = {
       accion: "REGISTRAR_ENCUESTA",
@@ -222,8 +329,9 @@
       sig: sig,
       csat: csatElegido,
       nps: npsElegido,
-      causaRaiz: csatElegido <= 3 ? document.getElementById("select-causa").value : "Ninguna (Atención Óptima)",
+      causaRaiz: causaFinal,
       navegando: funcionandoElegido,
+      respuestaExtra: extraRespuesta || "N/A",
       comentario: document.getElementById("txt-comentario").value.trim(),
       fingerprint: clientId
     };
