@@ -3,35 +3,47 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Evaluación de Calidad del Servicio</title>
+  <title>Evaluación de Calidad Técnica y de Producto</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
     body {
-      margin: 0; padding: 18px; background: #0f172a; color: #f8fafc;
+      margin: 0; padding: 16px; background: #0f172a; color: #f8fafc;
       display: flex; justify-content: center;
     }
     .card {
-      width: 100%; max-width: 470px; background: #1e293b;
+      width: 100%; max-width: 500px; background: #1e293b;
       border: 1px solid #334155; border-radius: 14px; padding: 22px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
+      box-shadow: 0 10px 25px rgba(0,0,0,0.45);
     }
     .badge {
       display: inline-block; background: #0f172a; color: #38bdf8;
       border: 1px solid #1e40af; padding: 5px 10px; border-radius: 8px;
       font-size: 12px; font-weight: 600; margin-bottom: 10px;
     }
-    h1 { font-size: 19px; margin: 0 0 4px 0; color: #ffffff; }
-    .sub { font-size: 13px; color: #94a3b8; margin-bottom: 18px; }
+    h1 { font-size: 19px; margin: 0 0 8px 0; color: #ffffff; }
+    .aviso-confidencial {
+      background: #0f172a; border-left: 4px solid #38bdf8;
+      padding: 10px 12px; border-radius: 6px; font-size: 12px;
+      color: #cbd5e1; line-height: 1.45; margin-bottom: 16px;
+    }
+    .seccion-titulo {
+      font-size: 12px; font-weight: 800; color: #4ade80;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin: 16px 0 8px 0; border-bottom: 1px solid #334155; padding-bottom: 4px;
+    }
     .bloque-pregunta {
       background: #0f172a; border: 1px solid #334155;
-      border-radius: 10px; padding: 14px; margin-bottom: 14px;
+      border-radius: 10px; padding: 13px; margin-bottom: 12px;
     }
-    .titulo-p { font-size: 14px; font-weight: 700; color: #f8fafc; margin: 0 0 4px 0; }
-    .explicacion-p { font-size: 12px; color: #94a3b8; margin: 0 0 12px 0; line-height: 1.35; }
+    .titulo-p { font-size: 13.5px; font-weight: 700; color: #f8fafc; margin: 0 0 4px 0; }
+    .explicacion-p { font-size: 11.5px; color: #94a3b8; margin: 0 0 10px 0; line-height: 1.35; }
+
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+    @media (max-width: 420px) { .grid-2 { grid-template-columns: 1fr; } }
 
     .estrellas { display: flex; justify-content: space-between; gap: 6px; }
     .btn-star {
-      flex: 1; padding: 10px 0; font-size: 17px; font-weight: bold;
+      flex: 1; padding: 9px 0; font-size: 16px; font-weight: bold;
       background: #1e293b; color: #64748b; border: 1px solid #334155;
       border-radius: 8px; cursor: pointer; transition: 0.15s;
     }
@@ -39,7 +51,7 @@
 
     .fila-sino { display: flex; gap: 10px; }
     .btn-sino {
-      flex: 1; padding: 10px; font-size: 14px; font-weight: bold;
+      flex: 1; padding: 10px; font-size: 13.5px; font-weight: bold;
       background: #1e293b; color: #cbd5e1; border: 1px solid #334155;
       border-radius: 8px; cursor: pointer;
     }
@@ -56,7 +68,7 @@
 
     select, textarea, input[type="text"] {
       width: 100%; background: #1e293b; color: #ffffff;
-      border: 1px solid #475569; border-radius: 8px; padding: 10px;
+      border: 1px solid #475569; border-radius: 8px; padding: 9px;
       font-size: 13px;
     }
     .input-otro { margin-top: 10px; border-color: #f59e0b !important; }
@@ -64,22 +76,162 @@
     .btn-enviar {
       width: 100%; padding: 13px; font-size: 15px; font-weight: bold;
       background: #2563eb; color: white; border: none; border-radius: 10px;
-      cursor: pointer; margin-top: 6px;
+      cursor: pointer; margin-top: 8px;
     }
     .btn-enviar:disabled { background: #475569; cursor: not-allowed; }
-    .mensaje-final { text-align: center; padding: 20px 10px; }
+    .mensaje-final { text-align: center; padding: 24px 10px; }
   </style>
 </head>
 <body>
 
 <div class="card" id="contenedor-encuesta">
-  <div class="badge" id="badge-info">Cargando datos...</div>
-  <h1 id="titulo-empresa">Evaluación de Servicio</h1>
-  <div class="sub" id="sub-encuesta">Responda estas preguntas breves. Toma menos de 30 segundos.</div>
+  <div class="badge" id="badge-info">Cargando orden...</div>
+  <h1>Evaluación de Servicio Técnico y Producto</h1>
 
-  <div id="contenedor-preguntas"></div>
+  <div class="aviso-confidencial">
+    <strong>Propósito y Confidencialidad:</strong> Esta encuesta tiene como objetivo evaluar el desempeño del técnico, el acabado de la instalación y la calidad física del producto entregado. Sus respuestas son <strong>estrictamente confidenciales</strong> y se utilizan únicamente con fines estadísticos de mejora continua.
+  </div>
 
-  <button type="button" class="btn-enviar" id="btn-submit" onclick="enviarEvaluacion()">Enviar Evaluación ✔</button>
+  <!-- SECCIÓN I: PERFIL DEMOGRÁFICO -->
+  <div class="seccion-titulo">I. Información General del Cliente</div>
+  <div class="bloque-pregunta">
+    <div class="grid-2">
+      <div>
+        <p class="titulo-p">Sexo</p>
+        <select id="dem-sexo">
+          <option value="">-- Seleccione --</option>
+          <option value="Masculino">Masculino</option>
+          <option value="Femenino">Femenino</option>
+          <option value="Prefiero no indicarlo">Prefiero no indicarlo</option>
+        </select>
+      </div>
+      <div>
+        <p class="titulo-p">Rango de Edad</p>
+        <select id="dem-edad">
+          <option value="">-- Seleccione --</option>
+          <option value="18 - 25 años">18 - 25 años</option>
+          <option value="26 - 35 años">26 - 35 años</option>
+          <option value="36 - 45 años">36 - 45 años</option>
+          <option value="46 - 60 años">46 - 60 años</option>
+          <option value="Más de 60 años">Más de 60 años</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="grid-2" style="margin-top:10px;">
+      <div>
+        <p class="titulo-p">Tipo de Ubicación</p>
+        <select id="dem-ubicacion">
+          <option value="">-- Seleccione --</option>
+          <option value="Residencial">Residencial</option>
+          <option value="Comercial / Negocio">Comercial / Negocio</option>
+          <option value="Corporativo / Institución">Corporativo / Institución</option>
+        </select>
+      </div>
+      <div>
+        <p class="titulo-p">Lugar de Residencia / Zona</p>
+        <input type="text" id="dem-zona" maxlength="80" placeholder="Ej. Colonia o sector..." />
+      </div>
+    </div>
+  </div>
+
+  <!-- SECCIÓN II: ATRIBUTOS DEL TÉCNICO, TANGIBLES Y CONFIABILIDAD -->
+  <div class="seccion-titulo">II. Evaluación del Técnico, Instalación y Producto</div>
+
+  <!-- 1. Atención del Técnico -->
+  <div class="bloque-pregunta">
+    <p class="titulo-p">1. ¿Qué tan satisfecho está con el trato brindado por el técnico?</p>
+    <p class="explicacion-p">Evalúe la cortesía y disposición del técnico durante la visita (1 = Muy bajo, 5 = Excelente).</p>
+    <div class="estrellas" id="stars-tecnico">
+      <button type="button" class="btn-star" onclick="setStar('tecnico', 1)">1 ★</button>
+      <button type="button" class="btn-star" onclick="setStar('tecnico', 2)">2 ★</button>
+      <button type="button" class="btn-star" onclick="setStar('tecnico', 3)">3 ★</button>
+      <button type="button" class="btn-star" onclick="setStar('tecnico', 4)">4 ★</button>
+      <button type="button" class="btn-star" onclick="setStar('tecnico', 5)">5 ★</button>
+    </div>
+  </div>
+
+  <!-- 2. Elementos Tangibles: Acabado de la Instalación -->
+  <div class="bloque-pregunta">
+    <p class="titulo-p">2. ¿Cómo califica el acabado estético de la instalación realizada?</p>
+    <p class="explicacion-p">Evalúe la presentación visual, fijación de componentes y orden del área intervenida.</p>
+    <div class="estrellas" id="stars-acabado">
+      <button type="button" class="btn-star" onclick="setStar('acabado', 1)">1 ★</button>
+      <button type="button" class="btn-star" onclick="setStar('acabado', 2)">2 ★</button>
+      <button type="button" class="btn-star" onclick="setStar('acabado', 3)">3 ★</button>
+      <button type="button" class="btn-star" onclick="setStar('acabado', 4)">4 ★</button>
+      <button type="button" class="btn-star" onclick="setStar('acabado', 5)">5 ★</button>
+    </div>
+  </div>
+
+  <!-- 3. Elementos Tangibles: Calidad del Producto -->
+  <div class="bloque-pregunta">
+    <p class="titulo-p">3. ¿Cómo evalúa la calidad física del producto instalado?</p>
+    <p class="explicacion-p">Califique el estado físico, materiales y apariencia de los equipos suministrados.</p>
+    <div class="estrellas" id="stars-producto">
+      <button type="button" class="btn-star" onclick="setStar('producto', 1)">1 ★</button>
+      <button type="button" class="btn-star" onclick="setStar('producto', 2)">2 ★</button>
+      <button type="button" class="btn-star" onclick="setStar('producto', 3)">3 ★</button>
+      <button type="button" class="btn-star" onclick="setStar('producto', 4)">4 ★</button>
+      <button type="button" class="btn-star" onclick="setStar('producto', 5)">5 ★</button>
+    </div>
+  </div>
+
+  <!-- 4. Confiabilidad: Cumplimiento del Horario -->
+  <div class="bloque-pregunta">
+    <p class="titulo-p">4. ¿Cómo califica el cumplimiento del horario acordado para la visita?</p>
+    <p class="explicacion-p">Evalúe la puntualidad en la llegada y entrega del trabajo técnico.</p>
+    <div class="estrellas" id="stars-horario">
+      <button type="button" class="btn-star" onclick="setStar('horario', 1)">1 ★</button>
+      <button type="button" class="btn-star" onclick="setStar('horario', 2)">2 ★</button>
+      <button type="button" class="btn-star" onclick="setStar('horario', 3)">3 ★</button>
+      <button type="button" class="btn-star" onclick="setStar('horario', 4)">4 ★</button>
+      <button type="button" class="btn-star" onclick="setStar('horario', 5)">5 ★</button>
+    </div>
+  </div>
+
+  <!-- CONDICIONAL: CAUSA RAÍZ (SI CUALQUIER PREGUNTA DE ESTRELLAS ES <= 3) -->
+  <div class="bloque-pregunta oculto" id="bloque-causa">
+    <p class="titulo-p">↳ ¿Cuál fue el aspecto principal por mejorar?</p>
+    <p class="explicacion-p">Seleccione la causa principal de su calificación o elija "Otros" para detallarla.</p>
+    <select id="select-causa" onchange="alCambiarCausa()">
+      <option value="">-- Seleccione un aspecto --</option>
+      <option value="Acabado estético de la instalación">Acabado estético de la instalación (Cableado / Fijación)</option>
+      <option value="Calidad o estado del producto">Calidad o estado físico del producto entregado</option>
+      <option value="Puntualidad en el horario">Puntualidad en el horario de visita</option>
+      <option value="Orden en el área de trabajo">Orden dejado en el área al finalizar</option>
+      <option value="Trato del técnico">Trato brindado por el técnico</option>
+      <option value="Claridad en la explicación de uso">Claridad en la explicación sobre el uso del equipo</option>
+      <option value="OTRO">Otros / Sugerencia (Especificar motivo)</option>
+    </select>
+    <input type="text" id="txt-causa-otro" class="input-otro oculto" maxlength="130" placeholder="Escriba aquí el aspecto por mejorar..." />
+  </div>
+
+  <!-- 5. Confiabilidad: Funcionamiento desde la primera prueba -->
+  <div class="bloque-pregunta">
+    <p class="titulo-p">5. ¿El producto instalado funcionó correctamente desde la primera prueba?</p>
+    <p class="explicacion-p">Indique si el servicio quedó operativo sin presentar fallas al momento de la entrega.</p>
+    <div class="fila-sino">
+      <button type="button" class="btn-sino activo-si" id="btn-si" onclick="setFuncionando('Sí')">Sí, funcionó al 100%</button>
+      <button type="button" class="btn-sino" id="btn-no" onclick="setFuncionando('No')">No, presentó fallas</button>
+    </div>
+  </div>
+
+  <!-- 6. Recomendación Global (NPS) -->
+  <div class="bloque-pregunta">
+    <p class="titulo-p">6. ¿Qué tan probable es que recomiende nuestro servicio técnico a otra persona?</p>
+    <p class="explicacion-p">Seleccione de 0 (Nada probable) a 10 (Totalmente probable).</p>
+    <div class="grid-nps" id="grupo-nps"></div>
+  </div>
+
+  <!-- 7. Observaciones opcionales -->
+  <div class="bloque-pregunta">
+    <p class="titulo-p">7. Observaciones adicionales (Opcional)</p>
+    <p class="explicacion-p">Si desea agregar algún detalle sobre el producto o la instalación, escríbalo aquí.</p>
+    <textarea id="txt-comentario" rows="2" placeholder="Escriba su comentario..."></textarea>
+  </div>
+
+  <button type="button" class="btn-enviar" id="btn-submit" onclick="enviarEvaluacion()">Enviar Evaluación Confidencial ✔</button>
 </div>
 
 <script>
@@ -88,252 +240,99 @@
   const ot = (params.get("ot") || "").trim();
   const ts = params.get("ts") || "";
   const sig = params.get("sig") || "";
-  let emp = params.get("emp") || "Mi Empresa";
-  let rol = params.get("rol") || "Empleado";
-  let tx = params.get("tx") || "Servicio";
   const apiKeyId = params.get("k") || "";
 
   const urlWebhook = apiKeyId.startsWith("http")
     ? apiKeyId
     : `https://script.google.com/macros/s/${apiKeyId}/exec`;
 
-  // Encuesta por defecto si aún no se ha personalizado en la nube
-  const ENCUESTA_POR_DEFECTO = [
-    {
-      id: "CSAT",
-      titulo: "¿Qué tan satisfecho está con la atención del {rol}?",
-      explicacion: "Evalúe únicamente el desempeño de la persona que le atendió hoy (1 = Muy bajo, 5 = Excelente).",
-      tipo: "ESTRELLAS_5",
-      opciones: ""
-    },
-    {
-      id: "CAUSA",
-      titulo: "¿Cuál fue el aspecto principal por mejorar?",
-      explicacion: "Seleccione el motivo principal o elija 'Otros' para escribir su situación.",
-      tipo: "OPCIONES_OTRO",
-      opciones: "Puntualidad, Limpieza del área, Trato del personal, Funcionamiento del servicio, Claridad de la información"
-    },
-    {
-      id: "RESUELTO",
-      titulo: "¿El servicio solicitado quedó funcionando?",
-      explicacion: "Indique si su solicitud quedó completada al finalizar la atención.",
-      tipo: "SINO",
-      opciones: ""
-    },
-    {
-      id: "NPS",
-      titulo: "¿Recomendaría a {empresa} a otra persona?",
-      explicacion: "Califique su confianza en la empresa de 0 (Nada probable) a 10 (Totalmente probable).",
-      tipo: "ESCALA_10",
-      opciones: ""
-    },
-    {
-      id: "COMENTARIO",
-      titulo: "Comentario adicional (Opcional)",
-      explicacion: "Si desea agregar una observación puntual, escríbala aquí.",
-      tipo: "TEXTO",
-      opciones: ""
-    }
-  ];
+  document.getElementById("badge-info").innerText = `Técnico Asignado: ${tecnico || "N/A"}  |  Orden #${ot || "N/A"}`;
 
-  let preguntasActivas = JSON.parse(JSON.stringify(ENCUESTA_POR_DEFECTO));
-  let respuestasUsuario = {};
+  let calificaciones = { tecnico: null, acabado: null, producto: null, horario: null };
+  let funcionandoElegido = "Sí";
+  let npsElegido = null;
 
-  function actualizarEncabezado() {
-    document.getElementById("titulo-empresa").innerText = "Evaluación · " + emp;
-    document.getElementById("badge-info").innerText = `${rol}: ${tecnico || "N/A"}  |  ${tx} #${ot || "N/A"}`;
+  const contenedorNps = document.getElementById("grupo-nps");
+  for (let i = 0; i <= 10; i++) {
+    const b = document.createElement("button");
+    b.type = "button";
+    b.className = "btn-nps";
+    b.innerText = i;
+    b.onclick = () => {
+      npsElegido = i;
+      document.querySelectorAll(".btn-nps").forEach(x => x.classList.remove("activo"));
+      b.classList.add("activo");
+    };
+    contenedorNps.appendChild(b);
   }
 
-  function reemplazarVariables(texto) {
-    return String(texto || "")
-      .replace(/\{rol\}/gi, rol)
-      .replace(/\{empresa\}/gi, emp)
-      .replace(/\{tx\}/gi, tx);
+  function setStar(clave, valor) {
+    calificaciones[clave] = valor;
+    const grupo = document.getElementById("stars-" + clave);
+    grupo.querySelectorAll(".btn-star").forEach((b, idx) => b.classList.toggle("activo", idx + 1 <= valor));
+
+    // Mostrar causa raíz si cualquiera de las 4 dimensiones tiene 3 estrellas o menos
+    const valoresActuales = Object.values(calificaciones).filter(v => v !== null);
+    const hayBaja = valoresActuales.some(v => v <= 3);
+    const bloqueCausa = document.getElementById("bloque-causa");
+    if (hayBaja) {
+      bloqueCausa.classList.remove("oculto");
+    } else {
+      bloqueCausa.classList.add("oculto");
+      document.getElementById("select-causa").value = "";
+      document.getElementById("txt-causa-otro").classList.add("oculto");
+      document.getElementById("txt-causa-otro").value = "";
+    }
   }
 
-  function construirFormulario() {
-    actualizarEncabezado();
-    const cont = document.getElementById("contenedor-preguntas");
-    cont.innerHTML = "";
-    respuestasUsuario = {};
-
-    let numVisible = 1;
-    preguntasActivas.forEach((p, idx) => {
-      const clave = p.id || ("P_" + idx);
-      const esCausaCondicional = (clave === "CAUSA");
-
-      const div = document.createElement("div");
-      div.className = "bloque-pregunta" + (esCausaCondicional ? " oculto" : "");
-      div.id = "bloque-" + clave;
-
-      const prefijoNum = esCausaCondicional ? "↳ " : (numVisible++ + ". ");
-      const tituloLimpio = reemplazarVariables(p.titulo);
-      const expLimpia = reemplazarVariables(p.explicacion);
-
-      let htmlControl = "";
-
-      if (p.tipo === "ESTRELLAS_5") {
-        htmlControl = `<div class="estrellas" id="ctrl-${clave}">`;
-        for (let s = 1; s <= 5; s++) {
-          htmlControl += `<button type="button" class="btn-star" onclick="elegirEstrella('${clave}', ${s})">${s} ★</button>`;
-        }
-        htmlControl += `</div>`;
-      } else if (p.tipo === "ESCALA_10") {
-        htmlControl = `<div class="grid-nps" id="ctrl-${clave}">`;
-        for (let n = 0; n <= 10; n++) {
-          htmlControl += `<button type="button" class="btn-nps" onclick="elegirEscala10('${clave}', ${n}, this)">${n}</button>`;
-        }
-        htmlControl += `</div>`;
-      } else if (p.tipo === "SINO") {
-        htmlControl = `
-          <div class="fila-sino" id="ctrl-${clave}">
-            <button type="button" class="btn-sino" id="si-${clave}" onclick="elegirSiNo('${clave}', 'Sí')">Sí</button>
-            <button type="button" class="btn-sino" id="no-${clave}" onclick="elegirSiNo('${clave}', 'No')">No</button>
-          </div>`;
-      } else if (p.tipo === "OPCIONES" || p.tipo === "OPCIONES_OTRO") {
-        const listaOp = String(p.opciones || "").split(",").map(x => x.trim()).filter(Boolean);
-        htmlControl = `<select id="sel-${clave}" onchange="elegirOpcion('${clave}', '${p.tipo}')">
-          <option value="">-- Seleccione una opción --</option>`;
-        listaOp.forEach(op => {
-          htmlControl += `<option value="${op}">${op}</option>`;
-        });
-        if (p.tipo === "OPCIONES_OTRO") {
-          htmlControl += `<option value="OTRO">Otros / Sugerencia (Especificar motivo)</option>`;
-        }
-        htmlControl += `</select>`;
-        if (p.tipo === "OPCIONES_OTRO") {
-          htmlControl += `<input type="text" id="otro-${clave}" class="input-otro oculto" maxlength="130" placeholder="Escriba aquí su motivo o sugerencia..." oninput="actualizarTextoOtro('${clave}')" />`;
-        }
-      } else {
-        htmlControl = `<textarea id="txt-${clave}" rows="2" placeholder="Escriba aquí su respuesta..." oninput="respuestasUsuario['${clave}'] = this.value.trim()"></textarea>`;
-      }
-
-      div.innerHTML = `
-        <p class="titulo-p">${prefijoNum}${tituloLimpio}</p>
-        <p class="explicacion-p">${expLimpia}</p>
-        ${htmlControl}
-      `;
-      cont.appendChild(div);
-
-      if (clave === "RESUELTO" && p.tipo === "SINO") {
-        elegirSiNo("RESUELTO", "Sí");
-      }
-    });
-  }
-
-  window.elegirEstrella = function(clave, valor) {
-    respuestasUsuario[clave] = valor;
-    const grupo = document.getElementById("ctrl-" + clave);
-    if (grupo) {
-      grupo.querySelectorAll(".btn-star").forEach((b, idx) => b.classList.toggle("activo", idx + 1 <= valor));
-    }
-    if (clave === "CSAT") {
-      const bloqueCausa = document.getElementById("bloque-CAUSA");
-      if (bloqueCausa) {
-        if (valor <= 3) {
-          bloqueCausa.classList.remove("oculto");
-        } else {
-          bloqueCausa.classList.add("oculto");
-          respuestasUsuario["CAUSA"] = "Ninguna (Atención Óptima)";
-        }
-      }
-    }
-  };
-
-  window.elegirEscala10 = function(clave, valor, btn) {
-    respuestasUsuario[clave] = valor;
-    const grupo = document.getElementById("ctrl-" + clave);
-    if (grupo) {
-      grupo.querySelectorAll(".btn-nps").forEach(b => b.classList.remove("activo"));
-    }
-    btn.classList.add("activo");
-  };
-
-  window.elegirSiNo = function(clave, valor) {
-    respuestasUsuario[clave] = valor;
-    const bSi = document.getElementById("si-" + clave);
-    const bNo = document.getElementById("no-" + clave);
-    if (bSi) bSi.classList.toggle("activo-si", valor === "Sí");
-    if (bNo) bNo.classList.toggle("activo-no", valor === "No");
-  };
-
-  window.elegirOpcion = function(clave, tipo) {
-    const sel = document.getElementById("sel-" + clave);
-    const inpOtro = document.getElementById("otro-" + clave);
-    if (!sel) return;
-    if (sel.value === "OTRO" && inpOtro) {
+  function alCambiarCausa() {
+    const sel = document.getElementById("select-causa").value;
+    const inpOtro = document.getElementById("txt-causa-otro");
+    if (sel === "OTRO") {
       inpOtro.classList.remove("oculto");
       inpOtro.focus();
-      respuestasUsuario[clave] = inpOtro.value.trim() ? ("Otros: " + inpOtro.value.trim()) : "";
     } else {
-      if (inpOtro) {
-        inpOtro.classList.add("oculto");
-        inpOtro.value = "";
-      }
-      respuestasUsuario[clave] = sel.value;
+      inpOtro.classList.add("oculto");
+      inpOtro.value = "";
     }
-  };
+  }
 
-  window.actualizarTextoOtro = function(clave) {
-    const inpOtro = document.getElementById("otro-" + clave);
-    if (inpOtro) {
-      const txt = inpOtro.value.trim();
-      respuestasUsuario[clave] = txt ? ("Otros: " + txt) : "";
-    }
-  };
-
-  // Dibujar de inmediato y luego sincronizar con las preguntas personalizadas del encargado
-  construirFormulario();
-  if (apiKeyId) {
-    fetch(urlWebhook + "?accion=CONFIG")
-      .then(r => r.json())
-      .then(cfg => {
-        if (cfg && Array.isArray(cfg.encuesta) && cfg.encuesta.length > 0) {
-          preguntasActivas = cfg.encuesta;
-          if (cfg.empresa) emp = cfg.empresa;
-          if (cfg.rolSingular) rol = cfg.rolSingular;
-          if (cfg.txCorto) tx = cfg.txCorto;
-          construirFormulario();
-        }
-      })
-      .catch(() => {});
+  function setFuncionando(valor) {
+    funcionandoElegido = valor;
+    document.getElementById("btn-si").classList.toggle("activo-si", valor === "Sí");
+    document.getElementById("btn-no").classList.toggle("activo-no", valor === "No");
   }
 
   async function enviarEvaluacion() {
-    let csatVal = 5;
-    let npsVal = 10;
-    let causaVal = "Ninguna (Atención Óptima)";
-    let resueltoVal = "Sí";
-    let comentarioVal = "";
-    let extrasLista = [];
+    const sexo = document.getElementById("dem-sexo").value;
+    const edad = document.getElementById("dem-edad").value;
+    const ubicacion = document.getElementById("dem-ubicacion").value;
+    const zona = document.getElementById("dem-zona").value.trim();
 
-    for (let i = 0; i < preguntasActivas.length; i++) {
-      const p = preguntasActivas[i];
-      const clave = p.id || ("P_" + i);
-      const bloque = document.getElementById("bloque-" + clave);
-      if (bloque && bloque.classList.contains("oculto")) continue;
+    if (!sexo || !edad || !ubicacion || !zona) {
+      return alert("Por favor complete los 4 datos generales de la Sección I (Sexo, Edad, Tipo de Ubicación y Zona).");
+    }
 
-      const resp = respuestasUsuario[clave];
-      const esOpcional = (clave === "COMENTARIO" || p.tipo === "TEXTO" && p.titulo.toLowerCase().includes("opcional"));
+    if (!calificaciones.tecnico || !calificaciones.acabado || !calificaciones.producto || !calificaciones.horario) {
+      return alert("Por favor califique con estrellas las preguntas 1, 2, 3 y 4.");
+    }
 
-      if (!esOpcional && (resp === undefined || resp === null || resp === "")) {
-        return alert(`Por favor responda la pregunta: "${reemplazarVariables(p.titulo)}"`);
+    let causaFinal = "Ninguna (Atención Óptima)";
+    const hayBaja = Object.values(calificaciones).some(v => v <= 3);
+    if (hayBaja) {
+      const selCausa = document.getElementById("select-causa").value;
+      if (!selCausa) return alert("Por favor seleccione el aspecto principal por mejorar.");
+      if (selCausa === "OTRO") {
+        const txtOtro = document.getElementById("txt-causa-otro").value.trim();
+        if (!txtOtro) return alert("Por favor escriba el motivo en la casilla 'Otros'.");
+        causaFinal = "Otros: " + txtOtro;
+      } else {
+        causaFinal = selCausa;
       }
+    }
 
-      if (clave === "CSAT") {
-        csatVal = Number(resp) || 5;
-      } else if (clave === "CAUSA") {
-        causaVal = String(resp || "Ninguna (Atención Óptima)");
-      } else if (clave === "RESUELTO") {
-        resueltoVal = String(resp || "Sí");
-      } else if (clave === "NPS") {
-        npsVal = (resp !== undefined && resp !== "") ? Number(resp) : 10;
-      } else if (clave === "COMENTARIO") {
-        comentarioVal = String(resp || "");
-      } else if (resp !== undefined && resp !== "") {
-        const valFormateado = (p.tipo === "ESTRELLAS_5") ? `${resp} ★` : resp;
-        extrasLista.push(`${reemplazarVariables(p.titulo)}: ${valFormateado}`);
-      }
+    if (npsElegido === null) {
+      return alert("Por favor seleccione un puntaje de 0 a 10 en la pregunta 6.");
     }
 
     if (!apiKeyId) return alert("Este enlace QR no contiene la dirección del servidor.");
@@ -344,9 +343,12 @@
       localStorage.setItem("calidad_client_uid", clientId);
     }
 
+    // Promedio general de las 4 dimensiones para el indicador CSAT global (redondeado a 1 decimal)
+    const csatPromedio = Number(((calificaciones.tecnico + calificaciones.acabado + calificaciones.producto + calificaciones.horario) / 4).toFixed(1));
+
     const btn = document.getElementById("btn-submit");
     btn.disabled = true;
-    btn.innerText = "Enviando respuesta...";
+    btn.innerText = "Enviando evaluación...";
 
     const payload = {
       accion: "REGISTRAR_ENCUESTA",
@@ -354,12 +356,19 @@
       ot: ot,
       ts: Number(ts),
       sig: sig,
-      csat: csatVal,
-      nps: npsVal,
-      causaRaiz: causaVal,
-      navegando: resueltoVal,
-      respuestaExtra: extrasLista.length > 0 ? extrasLista.join(" | ") : "N/A",
-      comentario: comentarioVal,
+      csat: csatPromedio,
+      csatTecnico: calificaciones.tecnico,
+      csatAcabado: calificaciones.acabado,
+      csatProducto: calificaciones.producto,
+      csatHorario: calificaciones.horario,
+      nps: npsElegido,
+      causaRaiz: causaFinal,
+      navegando: funcionandoElegido,
+      sexo: sexo,
+      edad: edad,
+      ubicacion: ubicacion,
+      zona: zona,
+      comentario: document.getElementById("txt-comentario").value.trim(),
       fingerprint: clientId
     };
 
@@ -373,18 +382,18 @@
       if (resJson.status === "success") {
         document.getElementById("contenedor-encuesta").innerHTML = `
           <div class="mensaje-final">
-            <h1 style="color:#4ade80;font-size:22px;">¡Muchas gracias!</h1>
+            <h1 style="color:#4ade80;font-size:22px;">¡Muchas gracias por su tiempo!</h1>
             <p style="color:#cbd5e1;font-size:14px;">${resJson.message}</p>
           </div>`;
       } else {
         alert("Aviso: " + resJson.message);
         btn.disabled = false;
-        btn.innerText = "Enviar Evaluación ✔";
+        btn.innerText = "Enviar Evaluación Confidencial ✔";
       }
     } catch (err) {
       alert("Error de conexión al enviar la encuesta.");
       btn.disabled = false;
-      btn.innerText = "Enviar Evaluación ✔";
+      btn.innerText = "Enviar Evaluación Confidencial ✔";
     }
   }
 </script>
