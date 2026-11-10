@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Evaluación de Calidad Técnica y de Producto</title>
+  <title>Evaluación de Calidad del Servicio Técnico</title>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
     body {
@@ -33,6 +33,10 @@
     }
     .bloque-pregunta {
       background: #0f172a; border: 1px solid #334155;
+      border-radius: 10px; padding: 13px; margin-bottom: 12px;
+    }
+    .bloque-alerta {
+      background: #0f172a; border: 1px solid #ef4444;
       border-radius: 10px; padding: 13px; margin-bottom: 12px;
     }
     .titulo-p { font-size: 13.5px; font-weight: 700; color: #f8fafc; margin: 0 0 4px 0; }
@@ -86,10 +90,10 @@
 
 <div class="card" id="contenedor-encuesta">
   <div class="badge" id="badge-info">Cargando orden...</div>
-  <h1>Evaluación de Servicio Técnico y Producto</h1>
+  <h1>Evaluación de Servicio Técnico e Instalación</h1>
 
   <div class="aviso-confidencial">
-    <strong>Propósito y Confidencialidad:</strong> Esta encuesta tiene como objetivo evaluar el desempeño del técnico, el acabado de la instalación y la calidad física del producto entregado. Sus respuestas son <strong>estrictamente confidenciales</strong> y se utilizan únicamente con fines estadísticos de mejora continua.
+    <strong>Propósito y Confidencialidad:</strong> Esta encuesta tiene como objetivo evaluar el desempeño del técnico, el acabado de la instalación y el funcionamiento del servicio entregado. Sus respuestas son <strong>estrictamente confidenciales</strong> y se utilizan únicamente para mejora continua.
   </div>
 
   <!-- SECCIÓN I: PERFIL DEMOGRÁFICO -->
@@ -118,25 +122,22 @@
       </div>
     </div>
 
-    <div class="grid-2" style="margin-top:10px;">
-      <div>
-        <p class="titulo-p">Tipo de Ubicación</p>
-        <select id="dem-ubicacion">
-          <option value="">-- Seleccione --</option>
-          <option value="Residencial">Residencial</option>
-          <option value="Comercial / Negocio">Comercial / Negocio</option>
-          <option value="Corporativo / Institución">Corporativo / Institución</option>
-        </select>
-      </div>
-      <div>
-        <p class="titulo-p">Lugar de Residencia / Zona</p>
-        <input type="text" id="dem-zona" maxlength="80" placeholder="Ej. Colonia o sector..." />
-      </div>
+    <div style="margin-top:10px;">
+      <p class="titulo-p">Zona de Residencia / Sector</p>
+      <select id="dem-zona">
+        <option value="">-- Seleccione su zona o sector --</option>
+        <option value="Zona Norte (Ej. El Carrizal, Torocagua, Salida al Norte)">Zona Norte (Ej. El Carrizal, Col. Torocagua, Salida al Norte)</option>
+        <option value="Zona Oriente (Ej. Col. Kennedy, Hato de Enmedio, Res. Plaza)">Zona Oriente (Ej. Col. Kennedy, Hato de Enmedio, Res. Plaza)</option>
+        <option value="Zona Sur (Ej. Las Uvas, Loarque, Salida al Sur)">Zona Sur (Ej. Las Uvas, Loarque, Col. América, Salida al Sur)</option>
+        <option value="Zona Occidente / Comayagüela (Ej. Miraflores, La Granja, Las Colinas)">Zona Occidente / Comayagüela (Ej. Miraflores, La Granja, Las Colinas)</option>
+        <option value="Zona Centro (Ej. Bulevar Morazán, Col. Palmira, Barrio El Centro)">Zona Centro (Ej. Bulevar Morazán, Col. Palmira, Barrio El Centro)</option>
+        <option value="Zonas Aledañas (Ej. El Hatillo, Santa Lucía, Valle de Ángeles, Mateo)">Zonas Aledañas (Ej. El Hatillo, Santa Lucía, Valle de Ángeles, Mateo)</option>
+      </select>
     </div>
   </div>
 
-  <!-- SECCIÓN II: ATRIBUTOS DEL TÉCNICO, TANGIBLES Y CONFIABILIDAD -->
-  <div class="seccion-titulo">II. Evaluación del Técnico, Instalación y Producto</div>
+  <!-- SECCIÓN II: EVALUACIÓN DEL TÉCNICO E INSTALACIÓN -->
+  <div class="seccion-titulo">II. Evaluación del Técnico e Instalación</div>
 
   <!-- 1. Atención del Técnico -->
   <div class="bloque-pregunta">
@@ -164,22 +165,9 @@
     </div>
   </div>
 
-  <!-- 3. Elementos Tangibles: Calidad del Producto -->
+  <!-- 3. Confiabilidad: Cumplimiento del Horario -->
   <div class="bloque-pregunta">
-    <p class="titulo-p">3. ¿Cómo evalúa la calidad física del producto instalado?</p>
-    <p class="explicacion-p">Califique el estado físico, materiales y apariencia de los equipos suministrados.</p>
-    <div class="estrellas" id="stars-producto">
-      <button type="button" class="btn-star" onclick="setStar('producto', 1)">1 ★</button>
-      <button type="button" class="btn-star" onclick="setStar('producto', 2)">2 ★</button>
-      <button type="button" class="btn-star" onclick="setStar('producto', 3)">3 ★</button>
-      <button type="button" class="btn-star" onclick="setStar('producto', 4)">4 ★</button>
-      <button type="button" class="btn-star" onclick="setStar('producto', 5)">5 ★</button>
-    </div>
-  </div>
-
-  <!-- 4. Confiabilidad: Cumplimiento del Horario -->
-  <div class="bloque-pregunta">
-    <p class="titulo-p">4. ¿Cómo califica el cumplimiento del horario acordado para la visita?</p>
+    <p class="titulo-p">3. ¿Cómo califica el cumplimiento del horario acordado para la visita?</p>
     <p class="explicacion-p">Evalúe la puntualidad en la llegada y entrega del trabajo técnico.</p>
     <div class="estrellas" id="stars-horario">
       <button type="button" class="btn-star" onclick="setStar('horario', 1)">1 ★</button>
@@ -190,14 +178,13 @@
     </div>
   </div>
 
-  <!-- CONDICIONAL: CAUSA RAÍZ (SI CUALQUIER PREGUNTA DE ESTRELLAS ES <= 3) -->
+  <!-- CONDICIONAL: CAUSA RAÍZ (SI PREGUNTA 1, 2 O 3 ES <= 3 ESTRELLAS) -->
   <div class="bloque-pregunta oculto" id="bloque-causa">
-    <p class="titulo-p">↳ ¿Cuál fue el aspecto principal por mejorar?</p>
-    <p class="explicacion-p">Seleccione la causa principal de su calificación o elija "Otros" para detallarla.</p>
+    <p class="titulo-p">↳ ¿Cuál fue el aspecto principal por mejorar en la atención o instalación?</p>
+    <p class="explicacion-p">Seleccione el motivo principal de su calificación o elija "Otros" para escribirlo.</p>
     <select id="select-causa" onchange="alCambiarCausa()">
       <option value="">-- Seleccione un aspecto --</option>
       <option value="Acabado estético de la instalación">Acabado estético de la instalación (Cableado / Fijación)</option>
-      <option value="Calidad o estado del producto">Calidad o estado físico del producto entregado</option>
       <option value="Puntualidad en el horario">Puntualidad en el horario de visita</option>
       <option value="Orden en el área de trabajo">Orden dejado en el área al finalizar</option>
       <option value="Trato del técnico">Trato brindado por el técnico</option>
@@ -207,9 +194,9 @@
     <input type="text" id="txt-causa-otro" class="input-otro oculto" maxlength="130" placeholder="Escriba aquí el aspecto por mejorar..." />
   </div>
 
-  <!-- 5. Confiabilidad: Funcionamiento desde la primera prueba -->
+  <!-- 4. Confiabilidad: Funcionamiento desde la primera prueba -->
   <div class="bloque-pregunta">
-    <p class="titulo-p">5. ¿El producto instalado funcionó correctamente desde la primera prueba?</p>
+    <p class="titulo-p">4. ¿El producto instalado funcionó correctamente desde la primera prueba?</p>
     <p class="explicacion-p">Indique si el servicio quedó operativo sin presentar fallas al momento de la entrega.</p>
     <div class="fila-sino">
       <button type="button" class="btn-sino activo-si" id="btn-si" onclick="setFuncionando('Sí')">Sí, funcionó al 100%</button>
@@ -217,17 +204,33 @@
     </div>
   </div>
 
-  <!-- 6. Recomendación Global (NPS) -->
+  <!-- CONDICIONAL: CAUSA DE FALLA EN PRIMERA PRUEBA (SI SELECCIONA "NO, PRESENTÓ FALLAS") -->
+  <div class="bloque-alerta oculto" id="bloque-falla">
+    <p class="titulo-p" style="color:#fca5a5;">↳ ¿Cuál fue la causa de la falla presentada en la prueba?</p>
+    <p class="explicacion-p">Seleccione la falla detectada o elija la opción para escribirla manualmente.</p>
+    <select id="select-falla" onchange="alCambiarFalla()">
+      <option value="">-- Seleccione la causa de la falla --</option>
+      <option value="El equipo no encendió o no inició">El equipo no encendió o no inició correctamente</option>
+      <option value="Falla de señal o conectividad inestable">Falla de señal o conectividad inestable</option>
+      <option value="Defecto físico en el equipo o accesorios">Defecto físico en el equipo o accesorios</option>
+      <option value="Configuración incompleta del sistema">Configuración incompleta del sistema</option>
+      <option value="Problema en el cableado o conectores">Problema en el cableado o conectores instalados</option>
+      <option value="OTRO_FALLA">Otros (Escribir la causa de la falla)</option>
+    </select>
+    <input type="text" id="txt-falla-otro" class="input-otro oculto" maxlength="130" placeholder="Describa aquí la falla que presentó el equipo..." />
+  </div>
+
+  <!-- 5. Recomendación Global (NPS) -->
   <div class="bloque-pregunta">
-    <p class="titulo-p">6. ¿Qué tan probable es que recomiende nuestro servicio técnico a otra persona?</p>
+    <p class="titulo-p">5. ¿Qué tan probable es que recomiende nuestro servicio técnico a otra persona?</p>
     <p class="explicacion-p">Seleccione de 0 (Nada probable) a 10 (Totalmente probable).</p>
     <div class="grid-nps" id="grupo-nps"></div>
   </div>
 
-  <!-- 7. Observaciones opcionales -->
+  <!-- 6. Observaciones opcionales -->
   <div class="bloque-pregunta">
-    <p class="titulo-p">7. Observaciones adicionales (Opcional)</p>
-    <p class="explicacion-p">Si desea agregar algún detalle sobre el producto o la instalación, escríbalo aquí.</p>
+    <p class="titulo-p">6. Observaciones adicionales (Opcional)</p>
+    <p class="explicacion-p">Si desea agregar algún detalle adicional sobre la visita, escríbalo aquí.</p>
     <textarea id="txt-comentario" rows="2" placeholder="Escriba su comentario..."></textarea>
   </div>
 
@@ -248,7 +251,7 @@
 
   document.getElementById("badge-info").innerText = `Técnico Asignado: ${tecnico || "N/A"}  |  Orden #${ot || "N/A"}`;
 
-  let calificaciones = { tecnico: null, acabado: null, producto: null, horario: null };
+  let calificaciones = { tecnico: null, acabado: null, horario: null };
   let funcionandoElegido = "Sí";
   let npsElegido = null;
 
@@ -271,7 +274,6 @@
     const grupo = document.getElementById("stars-" + clave);
     grupo.querySelectorAll(".btn-star").forEach((b, idx) => b.classList.toggle("activo", idx + 1 <= valor));
 
-    // Mostrar causa raíz si cualquiera de las 4 dimensiones tiene 3 estrellas o menos
     const valoresActuales = Object.values(calificaciones).filter(v => v !== null);
     const hayBaja = valoresActuales.some(v => v <= 3);
     const bloqueCausa = document.getElementById("bloque-causa");
@@ -301,20 +303,41 @@
     funcionandoElegido = valor;
     document.getElementById("btn-si").classList.toggle("activo-si", valor === "Sí");
     document.getElementById("btn-no").classList.toggle("activo-no", valor === "No");
+
+    const bloqueFalla = document.getElementById("bloque-falla");
+    if (valor === "No") {
+      bloqueFalla.classList.remove("oculto");
+    } else {
+      bloqueFalla.classList.add("oculto");
+      document.getElementById("select-falla").value = "";
+      document.getElementById("txt-falla-otro").classList.add("oculto");
+      document.getElementById("txt-falla-otro").value = "";
+    }
+  }
+
+  function alCambiarFalla() {
+    const sel = document.getElementById("select-falla").value;
+    const inpFallaOtro = document.getElementById("txt-falla-otro");
+    if (sel === "OTRO_FALLA") {
+      inpFallaOtro.classList.remove("oculto");
+      inpFallaOtro.focus();
+    } else {
+      inpFallaOtro.classList.add("oculto");
+      inpFallaOtro.value = "";
+    }
   }
 
   async function enviarEvaluacion() {
     const sexo = document.getElementById("dem-sexo").value;
     const edad = document.getElementById("dem-edad").value;
-    const ubicacion = document.getElementById("dem-ubicacion").value;
-    const zona = document.getElementById("dem-zona").value.trim();
+    const zona = document.getElementById("dem-zona").value;
 
-    if (!sexo || !edad || !ubicacion || !zona) {
-      return alert("Por favor complete los 4 datos generales de la Sección I (Sexo, Edad, Tipo de Ubicación y Zona).");
+    if (!sexo || !edad || !zona) {
+      return alert("Por favor seleccione Sexo, Rango de Edad y Zona de Residencia en la Sección I.");
     }
 
-    if (!calificaciones.tecnico || !calificaciones.acabado || !calificaciones.producto || !calificaciones.horario) {
-      return alert("Por favor califique con estrellas las preguntas 1, 2, 3 y 4.");
+    if (!calificaciones.tecnico || !calificaciones.acabado || !calificaciones.horario) {
+      return alert("Por favor califique con estrellas las preguntas 1, 2 y 3.");
     }
 
     let causaFinal = "Ninguna (Atención Óptima)";
@@ -331,8 +354,27 @@
       }
     }
 
+    let causaFallaFinal = "Sin fallas";
+    if (funcionandoElegido === "No") {
+      const selFalla = document.getElementById("select-falla").value;
+      if (!selFalla) return alert("Por favor seleccione la causa de la falla en la pregunta 4.");
+      if (selFalla === "OTRO_FALLA") {
+        const txtFalla = document.getElementById("txt-falla-otro").value.trim();
+        if (!txtFalla) return alert("Por favor escriba la causa de la falla.");
+        causaFallaFinal = "Falla (Otros): " + txtFalla;
+      } else {
+        causaFallaFinal = selFalla;
+      }
+      // Si el cliente puso estrellas altas pero reportó falla en 1ª prueba, registramos la falla también como causa raíz
+      if (causaFinal.startsWith("Ninguna")) {
+        causaFinal = causaFallaFinal.startsWith("Falla (Otros):")
+          ? ("Otros: " + causaFallaFinal.replace("Falla (Otros):", "").trim())
+          : causaFallaFinal;
+      }
+    }
+
     if (npsElegido === null) {
-      return alert("Por favor seleccione un puntaje de 0 a 10 en la pregunta 6.");
+      return alert("Por favor seleccione un puntaje de 0 a 10 en la pregunta 5.");
     }
 
     if (!apiKeyId) return alert("Este enlace QR no contiene la dirección del servidor.");
@@ -343,8 +385,7 @@
       localStorage.setItem("calidad_client_uid", clientId);
     }
 
-    // Promedio general de las 4 dimensiones para el indicador CSAT global (redondeado a 1 decimal)
-    const csatPromedio = Number(((calificaciones.tecnico + calificaciones.acabado + calificaciones.producto + calificaciones.horario) / 4).toFixed(1));
+    const csatPromedio = Number(((calificaciones.tecnico + calificaciones.acabado + calificaciones.horario) / 3).toFixed(1));
 
     const btn = document.getElementById("btn-submit");
     btn.disabled = true;
@@ -359,14 +400,14 @@
       csat: csatPromedio,
       csatTecnico: calificaciones.tecnico,
       csatAcabado: calificaciones.acabado,
-      csatProducto: calificaciones.producto,
+      csatProducto: calificaciones.acabado,
       csatHorario: calificaciones.horario,
       nps: npsElegido,
       causaRaiz: causaFinal,
       navegando: funcionandoElegido,
+      ubicacion: causaFallaFinal,
       sexo: sexo,
       edad: edad,
-      ubicacion: ubicacion,
       zona: zona,
       comentario: document.getElementById("txt-comentario").value.trim(),
       fingerprint: clientId
