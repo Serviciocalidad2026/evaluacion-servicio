@@ -3,117 +3,211 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Generador QR · Servicio Técnico</title>
+  <title>App Operativa · Técnico de Campo</title>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode"></script>
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
-    body {
-      margin: 0; padding: 18px; background: #0f172a; color: #f8fafc;
-      display: flex; justify-content: center;
-    }
-    .card {
-      width: 100%; max-width: 430px; background: #1e293b;
-      border: 1px solid #334155; border-radius: 14px; padding: 20px;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.4);
-    }
-    h2 { margin: 0 0 6px 0; color: #38bdf8; font-size: 18px; }
-    p.ayuda { margin: 0 0 14px 0; font-size: 12px; color: #94a3b8; }
-    .banner-ok {
-      background: #064e3b; border: 1px solid #10b981; color: #a7f3d0;
-      padding: 8px 12px; border-radius: 8px; font-size: 12px; margin-bottom: 12px;
-      display: none;
-    }
-    label { display: block; font-size: 12px; font-weight: bold; margin: 10px 0 4px 0; color: #cbd5e1; }
-    input {
-      width: 100%; padding: 10px; border-radius: 8px; border: 1px solid #475569;
-      background: #0f172a; color: white; font-size: 14px;
-    }
-    .btn {
-      width: 100%; padding: 12px; border: none; border-radius: 8px;
-      font-weight: bold; font-size: 14px; cursor: pointer; margin-top: 14px;
-    }
+    body { margin: 0; padding: 14px; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; }
+    .card { width: 100%; max-width: 460px; background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.45); }
+    h2 { margin: 0 0 4px 0; color: #38bdf8; font-size: 17px; }
+    p.ayuda { margin: 0 0 12px 0; font-size: 12px; color: #94a3b8; }
+    .panel-jornada { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 12px; margin-bottom: 14px; }
+    .estado-gps { font-size: 12px; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .bloque { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 13px; margin-bottom: 12px; }
+    label { display: block; font-size: 12px; font-weight: bold; margin: 8px 0 4px 0; color: #cbd5e1; }
+    input, select, textarea { width: 100%; padding: 9px; border-radius: 8px; border: 1px solid #475569; background: #1e293b; color: white; font-size: 13px; }
+    .fila-input-cam { display: flex; gap: 6px; }
+    .btn { width: 100%; padding: 11px; border: none; border-radius: 8px; font-weight: bold; font-size: 13.5px; cursor: pointer; margin-top: 10px; }
+    .btn-cam { width: auto; padding: 0 12px; margin-top: 0; background: #0284c7; color: white; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
     .btn-verde { background: #10b981; color: #0f172a; }
     .btn-azul { background: #2563eb; color: white; }
-    .btn-gris { background: #334155; color: #cbd5e1; font-size: 12px; padding: 8px; margin-top: 12px; }
-    #caja-qr {
-      margin-top: 16px; background: white; padding: 18px; border-radius: 12px;
-      display: none; flex-direction: column; align-items: center;
-    }
-    .leyenda-qr {
-      margin-top: 10px; font-size: 12px; color: #0f172a; font-weight: 700; text-align: center;
-    }
+    .btn-rojo { background: #ef4444; color: white; }
+    .btn-amarillo { background: #f59e0b; color: #0f172a; }
+    .btn-gris { background: #334155; color: #cbd5e1; font-size: 12px; padding: 8px; }
+    .reloj-ot { font-size: 20px; font-weight: 800; color: #fde047; text-align: center; padding: 8px; background: #1e293b; border-radius: 8px; margin: 8px 0; border: 1px solid #f59e0b; }
+    #caja-qr { margin-top: 12px; background: white; padding: 16px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; }
+    #reader-mac { width: 100%; margin-top: 8px; border-radius: 8px; overflow: hidden; display: none; }
+    .oculto { display: none !important; }
   </style>
 </head>
 <body>
 
 <div class="card">
-  <div id="aviso-autoconfig" class="banner-ok">
-    ✅ ¡Teléfono vinculado automáticamente! Tus credenciales ya quedaron guardadas en este navegador.
-  </div>
-
-  <!-- PANTALLA 1: VINCULACIÓN MANUAL -->
-  <div id="vista-config" style="display:none;">
-    <h2>⚙️ Configuración del Técnico</h2>
-    <p class="ayuda">Ingresa estos datos una sola vez. Quedarán guardados en tu navegador.</p>
-
-    <label>Tu Código de Técnico (Ej. TEC01):</label>
-    <input type="text" id="cfg-id" placeholder="TEC01" />
-
-    <label>Tu Llave Secreta:</label>
-    <input type="text" id="cfg-llave" placeholder="CTK-9F8A7B6C5D" />
-
-    <label>Enlace de Conexión del Sistema:</label>
+  <!-- 1. CONFIGURACIÓN INICIAL DEL TÉCNICO -->
+  <div id="vista-config" class="oculto">
+    <h2>⚙️ Vinculación de App del Técnico</h2>
+    <p class="ayuda">Configura tus credenciales o abre el enlace automático enviado por tu supervisor.</p>
+    <label>Código y Nombre (Ej. TEC-01 - Fernando Ortez):</label>
+    <input type="text" id="cfg-id" placeholder="TEC-01" />
+    <label>Nombre del Técnico:</label>
+    <input type="text" id="cfg-nombre" placeholder="Fernando Ortez" />
+    <label>Credencial Secreta:</label>
+    <input type="text" id="cfg-llave" placeholder="CTK-..." />
+    <label>Enlace del Servidor (Apps Script /exec):</label>
     <input type="text" id="cfg-exec" placeholder="https://script.google.com/macros/s/.../exec" />
-
-    <button class="btn btn-azul" onclick="guardarConfigCelular()">Guardar en mi Celular ✔</button>
+    <label>Enlace GPS Tiempo Real (Firebase DB - Opcional):</label>
+    <input type="text" id="cfg-fb" placeholder="https://tu-proyecto-default-rtdb.firebaseio.com" />
+    <button class="btn btn-azul" onclick="guardarConfigCelular()">Guardar Configuración ✔</button>
   </div>
 
-  <!-- PANTALLA 2: GENERADOR DE QR (SIN ENLACE DE MODO PRUEBA) -->
-  <div id="vista-operacion" style="display:none;">
-    <h2 id="titulo-op">Servicio Técnico · Generar QR</h2>
-    <p class="ayuda" id="sub-op"></p>
+  <!-- 2. PANEL OPERATIVO PRINCIPAL -->
+  <div id="vista-operacion" class="oculto">
+    <h2 id="titulo-tec">Técnico Activo</h2>
+    <p class="ayuda" id="sub-bodega">Sincronizando bodega virtual...</p>
 
-    <label id="lbl-num-ot">Número de OT:</label>
-    <input type="text" id="inp-ot" placeholder="Ej. 15612" />
-
-    <button class="btn btn-verde" onclick="generarQR()">📱 Generar Código QR</button>
-
-    <div id="caja-qr">
-      <div id="qrcode"></div>
-      <div class="leyenda-qr" id="txt-orden-qr">Muestre este código QR al cliente para evaluar el servicio</div>
+    <!-- CONTROL DE JORNADA LABORAL Y GPS CADA 30 SEGUNDOS -->
+    <div class="panel-jornada">
+      <div class="estado-gps">
+        <span id="lbl-estado-jornada" style="color:#94a3b8;">⚪ Jornada No Iniciada (GPS Apagado)</span>
+        <span id="lbl-ultimo-gps" style="font-size:11px;color:#38bdf8;"></span>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button id="btn-iniciar-dia" class="btn btn-verde" style="margin-top:0;" onclick="iniciarJornadaLaboral()">🟢 Iniciar Jornada</button>
+        <button id="btn-fin-dia" class="btn btn-rojo oculto" style="margin-top:0;" onclick="finalizarJornadaLaboral()">🔴 Finalizar Día Laboral</button>
+      </div>
     </div>
 
-    <button class="btn btn-gris" onclick="editarConfig()">⚙️ Ver / Cambiar configuración guardada</button>
+    <!-- ETAPA A: ABRIR ORDEN Y PONERSE "EN SITIO" -->
+    <div id="etapa-1-inicio" class="bloque">
+      <label>Número de Orden de Trabajo (OT):</label>
+      <input type="text" id="inp-ot" placeholder="Ej. 15612" />
+
+      <label>Tipo de Servicio a Realizar:</label>
+      <select id="sel-tipo-servicio">
+        <option value="INSTALACION">Instalación</option>
+        <option value="REPARACION">Reparación / Soporte</option>
+      </select>
+
+      <button class="btn btn-azul" onclick="iniciarTrabajoEnSitio()">📍 Iniciar Trabajo en Sitio (Activar Cronómetro)</button>
+    </div>
+
+    <!-- ETAPA B: EN SITIO (CRONÓMETRO CORRIENDO + BITÁCORA + ESCÁNER MAC + BODEGA) -->
+    <div id="etapa-2-bitacora" class="bloque oculto">
+      <div style="font-size:13px;font-weight:bold;color:#4ade80;" id="lbl-ot-activa">OT Activa</div>
+      <div class="reloj-ot" id="reloj-transcurrido">⏱️ 00:00 min en sitio</div>
+
+      <!-- ESCÁNER DE CÁMARA PARA MAC / CÓDIGO DE BARRAS -->
+      <div id="reader-mac"></div>
+
+      <label>Movimiento de Equipo en Bodega:</label>
+      <select id="sel-tipo-equipo" onchange="alCambiarMovimientoEquipo()">
+        <option value="INSTALADO">Equipo Nuevo Instalado</option>
+        <option value="REEMPLAZO">Reemplazo de Equipo (Nuevo + Retiro de Dañado)</option>
+        <option value="SIN_EQUIPO">Sin uso de equipo serializado</option>
+      </select>
+
+      <div id="bloque-mac-nuevo">
+        <label>Equipo Utilizado (Selecciona de tu Bodega o Escanea MAC):</label>
+        <select id="sel-bodega-eq" onchange="alElegirEquipoBodega()">
+          <option value="">-- Seleccionar de mi bodega o escanear abajo --</option>
+        </select>
+        <div class="fila-input-cam" style="margin-top:6px;">
+          <input type="text" id="inp-mac-nuevo" placeholder="MAC / Serie Equipo Nuevo + Modelo" />
+          <button type="button" class="btn-cam" onclick="abrirEscanerCamara('inp-mac-nuevo')">📷 MAC</button>
+        </div>
+      </div>
+
+      <div id="bloque-mac-malo" class="oculto">
+        <label style="color:#fca5a5;">MAC / Serie del Equipo Dañado Retirado ("Malo"):</label>
+        <div class="fila-input-cam">
+          <input type="text" id="inp-mac-malo" placeholder="MAC del equipo dañado retirado..." />
+          <button type="button" class="btn-cam" onclick="abrirEscanerCamara('inp-mac-malo')">📷 MAC</button>
+        </div>
+      </div>
+
+      <label>Material Utilizado (Código / Material de tu Bodega):</label>
+      <div class="fila-input-cam">
+        <select id="sel-bodega-mat" style="flex:2;">
+          <option value="MAT-FIBRA - Cable Drop Fibra Óptica (m)">MAT-FIBRA - Cable Drop Fibra (m)</option>
+          <option value="MAT-CON - Conector Rápido APC (u)">MAT-CON - Conector Rápido APC (u)</option>
+          <option value="MAT-ROS - Roseta Óptica (u)">MAT-ROS - Roseta Óptica (u)</option>
+          <option value="MAT-UTP - Cable UTP Cat6 (m)">MAT-UTP - Cable UTP Cat6 (m)</option>
+        </select>
+        <input type="number" id="inp-cant-mat" placeholder="Cant." value="1" min="0" style="flex:1;" />
+      </div>
+
+      <label>Fotografía de Evidencia / Instalación (Se comprime automático):</label>
+      <input type="file" id="inp-foto" accept="image/*" capture="environment" onchange="comprimirFotoSeleccionada(this)" />
+
+      <label>Observaciones de Bitácora Técnica:</label>
+      <textarea id="inp-bitacora-obs" rows="2" placeholder="Detalle del trabajo realizado..."></textarea>
+
+      <button class="btn btn-verde" onclick="pasarAPantallaQR()">Siguiente: Guardar Bitácora y Mostrar QR al Cliente →</button>
+      <button class="btn btn-rojo" onclick="abrirModalNoRealizada()">⚠️ La OT NO se pudo realizar (Justificar y Cerrar)</button>
+    </div>
+
+    <!-- MODAL SI LA OT NO SE PUDO REALIZAR -->
+    <div id="etapa-no-realizada" class="bloque oculto" style="border-color:#ef4444;">
+      <h2 style="color:#f87171;">⚠️ Justificación de OT No Realizada</h2>
+      <label>Motivo por el cual no se realizó la OT:</label>
+      <select id="sel-motivo-no">
+        <option value="Cliente ausente en el domicilio">Cliente ausente en el domicilio</option>
+        <option value="Ductería interna obstruida">Ductería interna obstruida / Sin paso</option>
+        <option value="Falta de postería o red externa">Falta de postería o disponibilidad técnica</option>
+        <option value="Cliente solicitó reprogramar o cancelar">Cliente solicitó reprogramar o cancelar</option>
+        <option value="Otro motivo">Otro motivo (Detallar abajo)</option>
+      </select>
+      <label>Explicación detallada:</label>
+      <textarea id="txt-justificacion-no" rows="2" placeholder="Explique por qué no se pudo ejecutar..."></textarea>
+      <button class="btn btn-rojo" onclick="confirmarCierreNoRealizada()">Confirmar y Cerrar OT Sin QR ✔</button>
+      <button class="btn btn-gris" onclick="cancelarNoRealizada()">← Volver a la Bitácora</button>
+    </div>
+
+    <!-- ETAPA C: MOSTRAR QR O ENVIAR URL CORTA (EL TIEMPO SIGUE CONTANDO HASTA DARLE "OT TERMINADA") -->
+    <div id="etapa-3-qr" class="bloque oculto">
+      <div class="reloj-ot" id="reloj-transcurrido-qr">⏱️ 00:00 min (Sigue corriendo hasta cerrar OT)</div>
+      <p class="ayuda" style="text-align:center;color:#fde047;">
+        1. Pídale al cliente que escanee el código QR o envíele el enlace corto por WhatsApp.<br>
+        2. Una vez entregada la encuesta, presione <strong>"Finalizar y OT Terminada"</strong> para detener el reloj.
+      </p>
+
+      <div id="caja-qr">
+        <div id="qrcode"></div>
+        <div style="color:#0f172a;font-weight:bold;font-size:12px;margin-top:8px;" id="lbl-pie-qr"></div>
+      </div>
+
+      <button class="btn btn-amarillo" id="btn-wa-corto" onclick="enviarUrlCortaWhatsApp()">📲 Copiar / Enviar Enlace Corto por WhatsApp</button>
+      <button class="btn btn-verde" style="margin-top:14px;padding:14px;font-size:15px;" onclick="finalizarOrdenPorCompleto()">✅ Siguiente y OT Terminada (Detener Tiempo)</button>
+    </div>
+
+    <button class="btn btn-gris" onclick="editarConfig()">⚙️ Configuración del Técnico</button>
   </div>
 </div>
 
 <script>
+  let jornadaActiva = false;
+  let timerGps30s = null;
+  let wakeLockObj = null;
+  let ultimaLat = 14.0818, ultimaLng = -87.2068;
+
+  // Variables de la OT activa
+  let otInicioMs = null;
+  let timerRelojOt = null;
+  let urlEncuestaActual = "";
+  let urlCortaActual = "";
+  let fotoBase64Comprimida = "";
+  let html5QrScanner = null;
+  let bodegaEquiposLocal = [];
+
   async function sha256(mensaje) {
     const msgBuffer = new TextEncoder().encode(mensaje);
     const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
-    const hashArray = Array.from(new Uint8Array(hashBuffer));
-    return hashArray.map(b => b.toString(16).padStart(2, "0")).join("");
+    return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
   }
 
   function verificarAutoConfigURL() {
     const p = new URLSearchParams(window.location.search);
-    const idUrl = p.get("id");
-    const llaveUrl = p.get("llave");
-    const execParam = p.get("exec");
-
-    if (idUrl && llaveUrl && execParam) {
-      const execUrl = execParam.startsWith("http")
-        ? execParam
-        : `https://script.google.com/macros/s/${execParam}/exec`;
-
+    if (p.get("id") && p.get("llave") && p.get("exec")) {
       const nuevaCfg = {
-        id: idUrl.trim().toUpperCase(),
-        llave: llaveUrl.trim(),
-        execUrl: execUrl.trim()
+        id: p.get("id").trim().toUpperCase(),
+        nombre: p.get("nom") || p.get("id").trim().toUpperCase(),
+        llave: p.get("llave").trim(),
+        execUrl: p.get("exec").trim(),
+        fbUrl: (p.get("fb") || "").trim()
       };
       localStorage.setItem("cottech_movil_cfg", JSON.stringify(nuevaCfg));
       window.history.replaceState({}, document.title, window.location.pathname);
-      document.getElementById("aviso-autoconfig").style.display = "block";
     }
   }
 
@@ -121,44 +215,243 @@
     verificarAutoConfigURL();
     const cfg = JSON.parse(localStorage.getItem("cottech_movil_cfg") || "null");
     if (!cfg || !cfg.id || !cfg.llave || !cfg.execUrl) {
-      document.getElementById("vista-config").style.display = "block";
-      document.getElementById("vista-operacion").style.display = "none";
+      document.getElementById("vista-config").classList.remove("oculto");
+      document.getElementById("vista-operacion").classList.add("oculto");
     } else {
-      document.getElementById("vista-config").style.display = "none";
-      document.getElementById("vista-operacion").style.display = "block";
-      document.getElementById("sub-op").innerText = `Técnico vinculado: ${cfg.id} (Credencial activa ✔)`;
+      document.getElementById("vista-config").classList.add("oculto");
+      document.getElementById("vista-operacion").classList.remove("oculto");
+      document.getElementById("titulo-tec").innerText = `👷 ${cfg.id} - ${cfg.nombre || "Técnico"}`;
+      sincronizarMiBodega();
     }
   }
 
   function guardarConfigCelular() {
     const id = document.getElementById("cfg-id").value.trim().toUpperCase();
+    const nombre = document.getElementById("cfg-nombre").value.trim() || id;
     const llave = document.getElementById("cfg-llave").value.trim();
     const execUrl = document.getElementById("cfg-exec").value.trim();
-
-    if (!id || !llave || !execUrl.startsWith("https://")) {
-      return alert("Completa tu Código, tu Llave Secreta y el Enlace de Conexión.");
-    }
-    localStorage.setItem("cottech_movil_cfg", JSON.stringify({ id, llave, execUrl }));
+    const fbUrl = document.getElementById("cfg-fb").value.trim();
+    if (!id || !llave || !execUrl.startsWith("https://")) return alert("Completa Código, Llave y Enlace del Servidor.");
+    localStorage.setItem("cottech_movil_cfg", JSON.stringify({ id, nombre, llave, execUrl, fbUrl }));
     cargarVista();
   }
 
   function editarConfig() {
     const cfg = JSON.parse(localStorage.getItem("cottech_movil_cfg") || "{}");
     document.getElementById("cfg-id").value = cfg.id || "";
+    document.getElementById("cfg-nombre").value = cfg.nombre || "";
     document.getElementById("cfg-llave").value = cfg.llave || "";
     document.getElementById("cfg-exec").value = cfg.execUrl || "";
-    document.getElementById("vista-config").style.display = "block";
-    document.getElementById("vista-operacion").style.display = "none";
+    document.getElementById("cfg-fb").value = cfg.fbUrl || "";
+    document.getElementById("vista-config").classList.remove("oculto");
+    document.getElementById("vista-operacion").classList.add("oculto");
   }
 
-  async function generarQR() {
+  async function sincronizarMiBodega() {
+    const cfg = JSON.parse(localStorage.getItem("cottech_movil_cfg") || "{}");
+    if (!cfg.execUrl) return;
+    try {
+      const r = await fetch(cfg.execUrl + `?accion=BODEGA_TEC&tec=${encodeURIComponent(cfg.id)}`);
+      const data = await r.json();
+      if (data && Array.isArray(data.equipos)) {
+        bodegaEquiposLocal = data.equipos;
+        const selEq = document.getElementById("sel-bodega-eq");
+        selEq.innerHTML = `<option value="">-- Seleccionar equipo de mi bodega (${bodegaEquiposLocal.length} disp.) --</option>`;
+        bodegaEquiposLocal.forEach(eq => {
+          selEq.innerHTML += `<option value="${eq.mac} (${eq.modelo})">${eq.modelo} | MAC: ${eq.mac}</option>`;
+        });
+      }
+      if (data && Array.isArray(data.materiales) && data.materiales.length > 0) {
+        const selMat = document.getElementById("sel-bodega-mat");
+        selMat.innerHTML = "";
+        data.materiales.forEach(m => {
+          selMat.innerHTML += `<option value="${m.codigo} - ${m.nombre}">${m.codigo} - ${m.nombre} (Saldo: ${m.saldo})</option>`;
+        });
+      }
+      document.getElementById("sub-bodega").innerText = `📦 Bodega sincronizada: ${bodegaEquiposLocal.length} equipo(s) asignados.`;
+    } catch (e) {
+      document.getElementById("sub-bodega").innerText = "📦 Bodega lista en modo local.";
+    }
+  }
+
+  function alElegirEquipoBodega() {
+    const v = document.getElementById("sel-bodega-eq").value;
+    if (v) document.getElementById("inp-mac-nuevo").value = v;
+  }
+
+  function alCambiarMovimientoEquipo() {
+    const t = document.getElementById("sel-tipo-equipo").value;
+    document.getElementById("bloque-mac-nuevo").classList.toggle("oculto", t === "SIN_EQUIPO");
+    document.getElementById("bloque-mac-malo").classList.toggle("oculto", t !== "REEMPLAZO");
+  }
+
+  // =========================================================================
+  // JORNADA LABORAL Y PULSO GPS CADA 30 SEGUNDOS (CON WAKE LOCK)
+  // =========================================================================
+  async function iniciarJornadaLaboral() {
+    jornadaActiva = true;
+    document.getElementById("btn-iniciar-dia").classList.add("oculto");
+    document.getElementById("btn-fin-dia").classList.remove("oculto");
+    document.getElementById("lbl-estado-jornada").innerText = "🟢 En Jornada Activa (GPS cada 30s)";
+    document.getElementById("lbl-estado-jornada").style.color = "#4ade80";
+
+    if ("wakeLock" in navigator) {
+      try { wakeLockObj = await navigator.wakeLock.request("screen"); } catch (e) {}
+    }
+
+    enviarPulsoGpsAhora("EN_RUTA");
+    if (timerGps30s) clearInterval(timerGps30s);
+    timerGps30s = setInterval(() => {
+      const estadoActual = otInicioMs ? ("EN_SITIO_OT_" + document.getElementById("inp-ot").value.trim()) : "EN_RUTA";
+      enviarPulsoGpsAhora(estadoActual);
+    }, 30000);
+  }
+
+  async function finalizarJornadaLaboral() {
+    if (otInicioMs) return alert("Primero termina o cierra la OT que tienes activa en sitio.");
+    if (!confirm("¿Confirmas que ya finalizaste tu día laboral? Se apagará el rastreo GPS.")) return;
+
+    jornadaActiva = false;
+    if (timerGps30s) clearInterval(timerGps30s);
+    if (wakeLockObj) { try { await wakeLockObj.release(); } catch (e) {} }
+
+    await enviarPulsoGpsAhora("FUERA_DE_TURNO");
+    document.getElementById("btn-iniciar-dia").classList.remove("oculto");
+    document.getElementById("btn-fin-dia").classList.add("oculto");
+    document.getElementById("lbl-estado-jornada").innerText = "⚪ Jornada Finalizada (GPS Apagado)";
+    document.getElementById("lbl-estado-jornada").style.color = "#94a3b8";
+  }
+
+  function enviarPulsoGpsAhora(estadoReporte) {
+    const cfg = JSON.parse(localStorage.getItem("cottech_movil_cfg") || "{}");
+    if (!navigator.geolocation) return;
+
+    navigator.geolocation.getCurrentPosition(async pos => {
+      ultimaLat = Number(pos.coords.latitude.toFixed(6));
+      ultimaLng = Number(pos.coords.longitude.toFixed(6));
+      const ahoraStr = new Date().toLocaleTimeString();
+      document.getElementById("lbl-ultimo-gps").innerText = `📡 ${ahoraStr}`;
+
+      const paqueteGps = {
+        id: cfg.id,
+        nombre: cfg.nombre || cfg.id,
+        lat: ultimaLat,
+        lng: ultimaLng,
+        estado: estadoReporte,
+        otActiva: otInicioMs ? document.getElementById("inp-ot").value.trim() : "",
+        timestampMs: Date.now(),
+        hora: new Date().toISOString()
+      };
+
+      // 1. Si tiene Firebase configurado, sobrescribe en tiempo real (< 100ms)
+      if (cfg.fbUrl && cfg.fbUrl.startsWith("https://")) {
+        const baseFb = cfg.fbUrl.replace(/\/$/, "");
+        fetch(`${baseFb}/ubicaciones/${cfg.id}.json`, {
+          method: "PUT",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify(paqueteGps)
+        }).catch(() => {});
+      }
+
+      // 2. En eventos importantes (Inicio/Fin de turno o Inicio de OT), respalda también en Apps Script
+      if (estadoReporte === "FUERA_DE_TURNO" || estadoReporte.startsWith("EN_SITIO")) {
+        fetch(cfg.execUrl, {
+          method: "POST",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({ accion: "ACTUALIZAR_GPS_ESTADO", ...paqueteGps })
+        }).catch(() => {});
+      }
+    }, () => {}, { enableHighAccuracy: true, maximumAge: 15000, timeout: 10000 });
+  }
+
+  // =========================================================================
+  // FLUJO DE LA OT: CRONÓMETRO CONTINUO HASTA "OT TERMINADA"
+  // =========================================================================
+  function iniciarTrabajoEnSitio() {
+    const ot = document.getElementById("inp-ot").value.trim();
+    if (!ot) return alert("Ingresa el número de OT antes de iniciar en sitio.");
+    if (!jornadaActiva) iniciarJornadaLaboral();
+
+    otInicioMs = Date.now();
+    const tipo = document.getElementById("sel-tipo-servicio").value;
+    document.getElementById("lbl-ot-activa").innerText = `🔧 Trabajando en Sitio: OT #${ot} (${tipo})`;
+
+    document.getElementById("etapa-1-inicio").classList.add("oculto");
+    document.getElementById("etapa-2-bitacora").classList.remove("oculto");
+
+    if (timerRelojOt) clearInterval(timerRelojOt);
+    timerRelojOt = setInterval(actualizarRelojesOt, 1000);
+    enviarPulsoGpsAhora("EN_SITIO_OT_" + ot);
+  }
+
+  function actualizarRelojesOt() {
+    if (!otInicioMs) return;
+    const segTotales = Math.floor((Date.now() - otInicioMs) / 1000);
+    const min = String(Math.floor(segTotales / 60)).padStart(2, "0");
+    const seg = String(segTotales % 60).padStart(2, "0");
+    document.getElementById("reloj-transcurrido").innerText = `⏱️ ${min}:${seg} min en sitio`;
+    document.getElementById("reloj-transcurrido-qr").innerText = `⏱️ ${min}:${seg} min (Sigue contando hasta cerrar OT)`;
+  }
+
+  // Escáner de cámara para leer MAC o Serie
+  function abrirEscanerCamara(inputIdDestino) {
+    const divReader = document.getElementById("reader-mac");
+    divReader.style.display = "block";
+    if (html5QrScanner) { try { html5QrScanner.clear(); } catch (e) {} }
+
+    html5QrScanner = new Html5Qrcode("reader-mac");
+    html5QrScanner.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 250, height: 110 } },
+      decodedText => {
+        document.getElementById(inputIdDestino).value = decodedText.trim().toUpperCase();
+        html5QrScanner.stop().then(() => { divReader.style.display = "none"; });
+      },
+      () => {}
+    ).catch(() => {
+      alert("No se pudo acceder a la cámara. Verifica los permisos del navegador.");
+      divReader.style.display = "none";
+    });
+  }
+
+  // Compresión de fotografía a ~100KB para no llenar la nube
+  function comprimirFotoSeleccionada(input) {
+    if (!input.files || !input.files[0]) return;
+    const reader = new FileReader();
+    reader.onload = function(e) {
+      const img = new Image();
+      img.onload = function() {
+        const canvas = document.createElement("canvas");
+        const maxW = 900;
+        const scale = Math.min(1, maxW / img.width);
+        canvas.width = Math.round(img.width * scale);
+        canvas.height = Math.round(img.height * scale);
+        const ctx = canvas.getContext("2d");
+        ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+        fotoBase64Comprimida = canvas.toDataURL("image/jpeg", 0.65);
+      };
+      img.src = e.target.result;
+    };
+    reader.readAsDataURL(input.files[0]);
+  }
+
+  async function pasarAPantallaQR() {
     const cfg = JSON.parse(localStorage.getItem("cottech_movil_cfg"));
     const ot = document.getElementById("inp-ot").value.trim();
-    if (!ot) return alert("Ingresa el número de OT.");
+    const tipoServ = document.getElementById("sel-tipo-servicio").value;
+    const movEq = document.getElementById("sel-tipo-equipo").value;
+    const macNuevo = document.getElementById("inp-mac-nuevo").value.trim();
+    const macMalo = document.getElementById("inp-mac-malo").value.trim();
+
+    if (movEq !== "SIN_EQUIPO" && !macNuevo) {
+      return alert("Ingresa o escanea la MAC del equipo utilizado.");
+    }
+    if (movEq === "REEMPLAZO" && !macMalo) {
+      return alert("En un reemplazo es obligatorio escanear o escribir la MAC del equipo dañado ('Malo').");
+    }
 
     const ts = Date.now();
     const firma = await sha256(`${cfg.id}|${ot}|${ts}|${cfg.llave}`);
-
     const matchId = cfg.execUrl.match(/\/s\/([a-zA-Z0-9-_]+)\/exec/);
     const kCorto = matchId ? matchId[1] : cfg.execUrl;
 
@@ -166,24 +459,155 @@
     const params = new URLSearchParams({
       tec: cfg.id,
       ot: ot,
+      tipo: tipoServ,
       ts: ts,
       sig: firma,
       k: kCorto
     });
-    const urlFinal = `${baseUrl}?${params.toString()}`;
+    urlEncuestaActual = `${baseUrl}?${params.toString()}`;
+    urlCortaActual = urlEncuestaActual;
 
     const contenedorQR = document.getElementById("qrcode");
     contenedorQR.innerHTML = "";
-    new QRCode(contenedorQR, {
-      text: urlFinal,
-      width: 220,
-      height: 220,
-      correctLevel: QRCode.CorrectLevel.L
-    });
+    new QRCode(contenedorQR, { text: urlEncuestaActual, width: 215, height: 215, correctLevel: QRCode.CorrectLevel.L });
+    document.getElementById("lbl-pie-qr").innerText = `OT #${ot} (${tipoServ}) · Escanee para evaluar`;
 
-    document.getElementById("txt-orden-qr").innerText = `Orden #${ot} · Escanee con la cámara de su celular`;
-    document.getElementById("caja-qr").style.display = "flex";
+    document.getElementById("etapa-2-bitacora").classList.add("oculto");
+    document.getElementById("etapa-3-qr").classList.remove("oculto");
+
+    // Acortar enlace automáticamente en segundo plano para WhatsApp
+    fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(urlEncuestaActual)}`)
+      .then(r => r.json())
+      .then(d => { if (d && d.shorturl) urlCortaActual = d.shorturl; })
+      .catch(() => {});
   }
+
+  function enviarUrlCortaWhatsApp() {
+    const ot = document.getElementById("inp-ot").value.trim();
+    const link = urlCortaActual || urlEncuestaActual;
+    const msg = `Hola, gracias por permitirnos atender su solicitud técnica (Orden #${ot}). Por favor ayúdenos evaluando el servicio recibido en este enlace corto y confidencial: ${link}`;
+    navigator.clipboard.writeText(msg).catch(() => {});
+    window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
+  }
+
+  async function finalizarOrdenPorCompleto() {
+    const cfg = JSON.parse(localStorage.getItem("cottech_movil_cfg"));
+    const ot = document.getElementById("inp-ot").value.trim();
+    const minTranscurridos = Math.max(1, Math.round((Date.now() - otInicioMs) / 60000));
+
+    if (timerRelojOt) clearInterval(timerRelojOt);
+    otInicioMs = null;
+
+    const payloadCierre = {
+      accion: "CERRAR_BITACORA_OT",
+      tecnico: cfg.id,
+      nombreTecnico: cfg.nombre || cfg.id,
+      ot: ot,
+      tipoServicio: document.getElementById("sel-tipo-servicio").value,
+      estadoOt: "TERMINADA",
+      minutosEnSitio: minTranscurridos,
+      tipoMovimientoEquipo: document.getElementById("sel-tipo-equipo").value,
+      macEquipoNuevo: document.getElementById("inp-mac-nuevo").value.trim(),
+      macEquipoDañado: document.getElementById("inp-mac-malo").value.trim(),
+      materialUtilizado: document.getElementById("sel-bodega-mat").value,
+      cantidadMaterial: Number(document.getElementById("inp-cant-mat").value) || 0,
+      observaciones: document.getElementById("inp-bitacora-obs").value.trim(),
+      fotoBase64: fotoBase64Comprimida,
+      lat: ultimaLat,
+      lng: ultimaLng,
+      cierreMs: Date.now()
+    };
+
+    enviarConColaSegura(cfg.execUrl, payloadCierre);
+    enviarPulsoGpsAhora("EN_RUTA");
+
+    // Limpiar para la siguiente OT
+    document.getElementById("inp-ot").value = "";
+    document.getElementById("inp-mac-nuevo").value = "";
+    document.getElementById("inp-mac-malo").value = "";
+    document.getElementById("inp-bitacora-obs").value = "";
+    fotoBase64Comprimida = "";
+    document.getElementById("etapa-3-qr").classList.add("oculto");
+    document.getElementById("etapa-1-inicio").classList.remove("oculto");
+    alert(`✅ OT #${ot} finalizada en ${minTranscurridos} min. El sistema monitoreará la recepción de la encuesta del cliente.`);
+    sincronizarMiBodega();
+  }
+
+  function abrirModalNoRealizada() {
+    document.getElementById("etapa-2-bitacora").classList.add("oculto");
+    document.getElementById("etapa-no-realizada").classList.remove("oculto");
+  }
+
+  function cancelarNoRealizada() {
+    document.getElementById("etapa-no-realizada").classList.add("oculto");
+    document.getElementById("etapa-2-bitacora").classList.remove("oculto");
+  }
+
+  function confirmarCierreNoRealizada() {
+    const cfg = JSON.parse(localStorage.getItem("cottech_movil_cfg"));
+    const ot = document.getElementById("inp-ot").value.trim();
+    const motivo = document.getElementById("sel-motivo-no").value;
+    const detalle = document.getElementById("txt-justificacion-no").value.trim();
+    if (!detalle) return alert("Explica brevemente la justificación por la que no se realizó.");
+
+    const minTranscurridos = Math.max(1, Math.round((Date.now() - otInicioMs) / 60000));
+    if (timerRelojOt) clearInterval(timerRelojOt);
+    otInicioMs = null;
+
+    const payloadNo = {
+      accion: "CERRAR_BITACORA_OT",
+      tecnico: cfg.id,
+      nombreTecnico: cfg.nombre || cfg.id,
+      ot: ot,
+      tipoServicio: document.getElementById("sel-tipo-servicio").value,
+      estadoOt: "NO_REALIZADA",
+      minutosEnSitio: minTranscurridos,
+      tipoMovimientoEquipo: "SIN_EQUIPO",
+      macEquipoNuevo: "N/A",
+      macEquipoDañado: "N/A",
+      materialUtilizado: "Ninguno",
+      cantidadMaterial: 0,
+      observaciones: `[NO REALIZADA - ${motivo}]: ${detalle}`,
+      fotoBase64: fotoBase64Comprimida,
+      lat: ultimaLat,
+      lng: ultimaLng,
+      cierreMs: Date.now()
+    };
+
+    enviarConColaSegura(cfg.execUrl, payloadNo);
+    enviarPulsoGpsAhora("EN_RUTA");
+    document.getElementById("inp-ot").value = "";
+    document.getElementById("txt-justificacion-no").value = "";
+    document.getElementById("etapa-no-realizada").classList.add("oculto");
+    document.getElementById("etapa-1-inicio").classList.remove("oculto");
+    alert(`⚪ OT #${ot} cerrada como NO REALIZADA (Sin QR).`);
+  }
+
+  // Cola anti-caídas si hay mala señal móvil
+  async function enviarConColaSegura(url, payload) {
+    try {
+      await fetch(url, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify(payload)
+      });
+    } catch (e) {
+      const pendientes = JSON.parse(localStorage.getItem("cola_ot_pendientes") || "[]");
+      pendientes.push({ url, payload });
+      localStorage.setItem("cola_ot_pendientes", JSON.stringify(pendientes));
+    }
+  }
+
+  setInterval(async () => {
+    const pendientes = JSON.parse(localStorage.getItem("cola_ot_pendientes") || "[]");
+    if (pendientes.length === 0) return;
+    const item = pendientes[0];
+    try {
+      await fetch(item.url, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: JSON.stringify(item.payload) });
+      pendientes.shift();
+      localStorage.setItem("cola_ot_pendientes", JSON.stringify(pendientes));
+    } catch (e) {}
+  }, 10000);
 
   cargarVista();
 </script>
