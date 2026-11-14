@@ -9,23 +9,28 @@
   <style>
     * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
     body { margin: 0; padding: 14px; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; }
-    .card { width: 100%; max-width: 460px; background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.45); }
+    .card { width: 100%; max-width: 470px; background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.45); }
     h2 { margin: 0 0 4px 0; color: #38bdf8; font-size: 17px; }
     p.ayuda { margin: 0 0 12px 0; font-size: 12px; color: #94a3b8; }
     .panel-jornada { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 12px; margin-bottom: 14px; }
     .estado-gps { font-size: 12px; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
     .bloque { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 13px; margin-bottom: 12px; }
-    label { display: block; font-size: 12px; font-weight: bold; margin: 8px 0 4px 0; color: #cbd5e1; }
-    input, select, textarea { width: 100%; padding: 9px; border-radius: 8px; border: 1px solid #475569; background: #1e293b; color: white; font-size: 13px; }
-    .fila-input-cam { display: flex; gap: 6px; }
+    .sub-caja { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-top: 10px; }
+    .titulo-sec { font-size: 12px; font-weight: 800; color: #38bdf8; text-transform: uppercase; margin: 0 0 6px 0; }
+    label { display: block; font-size: 12px; font-weight: bold; margin: 7px 0 4px 0; color: #cbd5e1; }
+    input, select, textarea { width: 100%; padding: 9px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: white; font-size: 13px; }
+    .fila-input-cam { display: flex; gap: 6px; align-items: center; }
     .btn { width: 100%; padding: 11px; border: none; border-radius: 8px; font-weight: bold; font-size: 13.5px; cursor: pointer; margin-top: 10px; }
-    .btn-cam { width: auto; padding: 0 12px; margin-top: 0; background: #0284c7; color: white; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
+    .btn-sm { padding: 8px 12px; font-size: 12.5px; margin-top: 8px; }
+    .btn-cam { width: auto; padding: 9px 12px; margin-top: 0; background: #0284c7; color: white; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
     .btn-verde { background: #10b981; color: #0f172a; }
     .btn-azul { background: #2563eb; color: white; }
     .btn-rojo { background: #ef4444; color: white; }
     .btn-amarillo { background: #f59e0b; color: #0f172a; }
     .btn-gris { background: #334155; color: #cbd5e1; font-size: 12px; padding: 8px; }
-    .reloj-ot { font-size: 20px; font-weight: 800; color: #fde047; text-align: center; padding: 8px; background: #1e293b; border-radius: 8px; margin: 8px 0; border: 1px solid #f59e0b; }
+    .carrito-box { background: #0f172a; border: 1px dashed #38bdf8; border-radius: 8px; padding: 10px; margin-top: 12px; }
+    .item-carrito { display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 6px 10px; border-radius: 6px; margin-bottom: 5px; font-size: 12px; border-left: 3px solid #10b981; }
+    .btn-quitar { background: #dc2626; color: white; border: none; border-radius: 4px; padding: 2px 7px; cursor: pointer; font-weight: bold; font-size: 11px; }
     #caja-qr { margin-top: 12px; background: white; padding: 16px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; }
     #reader-mac { width: 100%; margin-top: 8px; border-radius: 8px; overflow: hidden; display: none; }
     .oculto { display: none !important; }
@@ -34,20 +39,18 @@
 <body>
 
 <div class="card">
-  <!-- 1. CONFIGURACIÓN INICIAL DEL TÉCNICO -->
+  <!-- 1. CONFIGURACIÓN INICIAL -->
   <div id="vista-config" class="oculto">
     <h2>⚙️ Vinculación de App del Técnico</h2>
     <p class="ayuda">Configura tus credenciales o abre el enlace automático enviado por tu supervisor.</p>
-    <label>Código y Nombre (Ej. TEC-01 - Fernando Ortez):</label>
+    <label>Código del Técnico (Ej. TEC-01):</label>
     <input type="text" id="cfg-id" placeholder="TEC-01" />
     <label>Nombre del Técnico:</label>
     <input type="text" id="cfg-nombre" placeholder="Fernando Ortez" />
     <label>Credencial Secreta:</label>
     <input type="text" id="cfg-llave" placeholder="CTK-..." />
-    <label>Enlace del Servidor (Apps Script /exec):</label>
+    <label>Enlace del Servidor:</label>
     <input type="text" id="cfg-exec" placeholder="https://script.google.com/macros/s/.../exec" />
-    <label>Enlace GPS Tiempo Real (Firebase DB - Opcional):</label>
-    <input type="text" id="cfg-fb" placeholder="https://tu-proyecto-default-rtdb.firebaseio.com" />
     <button class="btn btn-azul" onclick="guardarConfigCelular()">Guardar Configuración ✔</button>
   </div>
 
@@ -56,19 +59,18 @@
     <h2 id="titulo-tec">Técnico Activo</h2>
     <p class="ayuda" id="sub-bodega">Sincronizando bodega virtual...</p>
 
-    <!-- CONTROL DE JORNADA LABORAL Y GPS CADA 30 SEGUNDOS -->
     <div class="panel-jornada">
       <div class="estado-gps">
         <span id="lbl-estado-jornada" style="color:#94a3b8;">⚪ Jornada No Iniciada (GPS Apagado)</span>
         <span id="lbl-ultimo-gps" style="font-size:11px;color:#38bdf8;"></span>
       </div>
       <div style="display:flex; gap:8px;">
-        <button id="btn-iniciar-dia" class="btn btn-verde" style="margin-top:0;" onclick="iniciarJornadaLaboral()">🟢 Iniciar Jornada</button>
+        <button id="btn-iniciar-dia" class="btn btn-verde" style="margin-top:0;" onclick="iniciarJornadaLaboral()">🟢 Iniciar Jornada Laboral</button>
         <button id="btn-fin-dia" class="btn btn-rojo oculto" style="margin-top:0;" onclick="finalizarJornadaLaboral()">🔴 Finalizar Día Laboral</button>
       </div>
     </div>
 
-    <!-- ETAPA A: ABRIR ORDEN Y PONERSE "EN SITIO" -->
+    <!-- ETAPA A: INICIAR TRABAJO EN SITIO -->
     <div id="etapa-1-inicio" class="bloque">
       <label>Número de Orden de Trabajo (OT):</label>
       <input type="text" id="inp-ot" placeholder="Ej. 15612" />
@@ -76,58 +78,74 @@
       <label>Tipo de Servicio a Realizar:</label>
       <select id="sel-tipo-servicio">
         <option value="INSTALACION">Instalación</option>
-        <option value="REPARACION">Reparación / Soporte</option>
+        <option value="REPARACION">Reparación / Servicio</option>
       </select>
 
-      <button class="btn btn-azul" onclick="iniciarTrabajoEnSitio()">📍 Iniciar Trabajo en Sitio (Activar Cronómetro)</button>
+      <button class="btn btn-azul" onclick="iniciarTrabajoEnSitio()">📍 Iniciar Trabajo en Sitio</button>
     </div>
 
-    <!-- ETAPA B: EN SITIO (CRONÓMETRO CORRIENDO + BITÁCORA + ESCÁNER MAC + BODEGA) -->
+    <!-- ETAPA B: BITÁCORA CON CARRITO DE EQUIPOS ÚNICOS (MAC) Y CONSUMIBLES (CANTIDADES) -->
     <div id="etapa-2-bitacora" class="bloque oculto">
-      <div style="font-size:13px;font-weight:bold;color:#4ade80;" id="lbl-ot-activa">OT Activa</div>
-      <div class="reloj-ot" id="reloj-transcurrido">⏱️ 00:00 min en sitio</div>
+      <div style="font-size:14px;font-weight:bold;color:#4ade80;margin-bottom:6px;" id="lbl-ot-activa">🔧 Trabajando en Sitio</div>
 
-      <!-- ESCÁNER DE CÁMARA PARA MAC / CÓDIGO DE BARRAS -->
       <div id="reader-mac"></div>
 
-      <label>Movimiento de Equipo en Bodega:</label>
-      <select id="sel-tipo-equipo" onchange="alCambiarMovimientoEquipo()">
-        <option value="INSTALADO">Equipo Nuevo Instalado</option>
-        <option value="REEMPLAZO">Reemplazo de Equipo (Nuevo + Retiro de Dañado)</option>
-        <option value="SIN_EQUIPO">Sin uso de equipo serializado</option>
-      </select>
+      <!-- SECCIÓN 1 DEL CARRITO: EQUIPOS ÚNICOS (CON MAC) -->
+      <div class="sub-caja">
+        <p class="titulo-sec">1. Equipos Únicos Serializados (Con MAC)</p>
+        <label>Tipo de Movimiento del Equipo:</label>
+        <select id="sel-tipo-equipo" onchange="alCambiarMovimientoEquipo()">
+          <option value="INSTALADO">Instalación de Equipo (De mi Bodega Virtual)</option>
+          <option value="REEMPLAZO">Reemplazo de Equipo (Nuevo + Retiro de "Malo")</option>
+        </select>
 
-      <div id="bloque-mac-nuevo">
-        <label>Equipo Utilizado (Selecciona de tu Bodega o Escanea MAC):</label>
+        <label>Buscar en mi Bodega Virtual o Escanear MAC:</label>
         <select id="sel-bodega-eq" onchange="alElegirEquipoBodega()">
-          <option value="">-- Seleccionar de mi bodega o escanear abajo --</option>
+          <option value="">-- Seleccionar equipo de mi bodega --</option>
         </select>
         <div class="fila-input-cam" style="margin-top:6px;">
           <input type="text" id="inp-mac-nuevo" placeholder="MAC / Serie Equipo Nuevo + Modelo" />
           <button type="button" class="btn-cam" onclick="abrirEscanerCamara('inp-mac-nuevo')">📷 MAC</button>
         </div>
+
+        <div id="bloque-mac-malo" class="oculto">
+          <label style="color:#fca5a5;">MAC / Serie del Equipo Dañado Retirado ("Malo"):</label>
+          <div class="fila-input-cam">
+            <input type="text" id="inp-mac-malo" placeholder="MAC del equipo dañado retirado..." />
+            <button type="button" class="btn-cam" onclick="abrirEscanerCamara('inp-mac-malo')">📷 MAC</button>
+          </div>
+        </div>
+
+        <button type="button" class="btn btn-azul btn-sm" onclick="agregarEquipoAlCarrito()">➕ Agregar Equipo Único al Carrito</button>
       </div>
 
-      <div id="bloque-mac-malo" class="oculto">
-        <label style="color:#fca5a5;">MAC / Serie del Equipo Dañado Retirado ("Malo"):</label>
+      <!-- SECCIÓN 2 DEL CARRITO: CONSUMIBLES / MATERIALES POR CANTIDAD -->
+      <div class="sub-caja">
+        <p class="titulo-sec" style="color:#fde047;">2. Materiales y Consumibles (Por Cantidad)</p>
+        <label>Buscar Consumible en mi Bodega Virtual (Ej. Grapas, Fibra, Conectores):</label>
         <div class="fila-input-cam">
-          <input type="text" id="inp-mac-malo" placeholder="MAC del equipo dañado retirado..." />
-          <button type="button" class="btn-cam" onclick="abrirEscanerCamara('inp-mac-malo')">📷 MAC</button>
+          <select id="sel-bodega-mat" style="flex:2.2;">
+            <option value="CONS-GRAPA - Grapas de Fijación (u)">CONS-GRAPA - Grapas de Fijación (u)</option>
+            <option value="MAT-FIBRA - Cable Drop Fibra Óptica (m)">MAT-FIBRA - Cable Drop Fibra (m)</option>
+            <option value="MAT-CON - Conector Rápido APC (u)">MAT-CON - Conector Rápido APC (u)</option>
+            <option value="MAT-ROS - Roseta Óptica (u)">MAT-ROS - Roseta Óptica (u)</option>
+            <option value="MAT-TENS - Tensor Metálico Drop (u)">MAT-TENS - Tensor Metálico Drop (u)</option>
+            <option value="MAT-UTP - Cable UTP Cat6 (m)">MAT-UTP - Cable UTP Cat6 (m)</option>
+          </select>
+          <input type="number" id="inp-cant-mat" placeholder="Cant." value="10" min="1" style="flex:0.8;" />
+        </div>
+        <button type="button" class="btn btn-amarillo btn-sm" onclick="agregarConsumibleAlCarrito()">➕ Agregar Consumible al Carrito</button>
+      </div>
+
+      <!-- VISTA DEL CARRITO DE LA OT -->
+      <div class="carrito-box">
+        <div style="font-size:12px;font-weight:bold;color:#38bdf8;margin-bottom:6px;">🛒 Carrito de Equipos y Consumibles de esta OT:</div>
+        <div id="lista-carrito-visual">
+          <div style="font-size:11.5px;color:#64748b;">Aún no has agregado equipos ni consumibles a esta orden.</div>
         </div>
       </div>
 
-      <label>Material Utilizado (Código / Material de tu Bodega):</label>
-      <div class="fila-input-cam">
-        <select id="sel-bodega-mat" style="flex:2;">
-          <option value="MAT-FIBRA - Cable Drop Fibra Óptica (m)">MAT-FIBRA - Cable Drop Fibra (m)</option>
-          <option value="MAT-CON - Conector Rápido APC (u)">MAT-CON - Conector Rápido APC (u)</option>
-          <option value="MAT-ROS - Roseta Óptica (u)">MAT-ROS - Roseta Óptica (u)</option>
-          <option value="MAT-UTP - Cable UTP Cat6 (m)">MAT-UTP - Cable UTP Cat6 (m)</option>
-        </select>
-        <input type="number" id="inp-cant-mat" placeholder="Cant." value="1" min="0" style="flex:1;" />
-      </div>
-
-      <label>Fotografía de Evidencia / Instalación (Se comprime automático):</label>
+      <label>Fotografía de Evidencia / Instalación:</label>
       <input type="file" id="inp-foto" accept="image/*" capture="environment" onchange="comprimirFotoSeleccionada(this)" />
 
       <label>Observaciones de Bitácora Técnica:</label>
@@ -154,12 +172,11 @@
       <button class="btn btn-gris" onclick="cancelarNoRealizada()">← Volver a la Bitácora</button>
     </div>
 
-    <!-- ETAPA C: MOSTRAR QR O ENVIAR URL CORTA (EL TIEMPO SIGUE CONTANDO HASTA DARLE "OT TERMINADA") -->
+    <!-- ETAPA C: MOSTRAR QR O ENVIAR URL CORTA (SIN RELOJ EN PANTALLA) -->
     <div id="etapa-3-qr" class="bloque oculto">
-      <div class="reloj-ot" id="reloj-transcurrido-qr">⏱️ 00:00 min (Sigue corriendo hasta cerrar OT)</div>
-      <p class="ayuda" style="text-align:center;color:#fde047;">
+      <p class="ayuda" style="text-align:center;color:#fde047;font-size:12.5px;">
         1. Pídale al cliente que escanee el código QR o envíele el enlace corto por WhatsApp.<br>
-        2. Una vez entregada la encuesta, presione <strong>"Finalizar y OT Terminada"</strong> para detener el reloj.
+        2. Una vez entregada la encuesta, presione <strong>"Siguiente y OT Terminada"</strong>.
       </p>
 
       <div id="caja-qr">
@@ -168,7 +185,7 @@
       </div>
 
       <button class="btn btn-amarillo" id="btn-wa-corto" onclick="enviarUrlCortaWhatsApp()">📲 Copiar / Enviar Enlace Corto por WhatsApp</button>
-      <button class="btn btn-verde" style="margin-top:14px;padding:14px;font-size:15px;" onclick="finalizarOrdenPorCompleto()">✅ Siguiente y OT Terminada (Detener Tiempo)</button>
+      <button class="btn btn-verde" style="margin-top:14px;padding:14px;font-size:15px;" onclick="finalizarOrdenPorCompleto()">✅ Siguiente y OT Terminada</button>
     </div>
 
     <button class="btn btn-gris" onclick="editarConfig()">⚙️ Configuración del Técnico</button>
@@ -181,14 +198,16 @@
   let wakeLockObj = null;
   let ultimaLat = 14.0818, ultimaLng = -87.2068;
 
-  // Variables de la OT activa
   let otInicioMs = null;
-  let timerRelojOt = null;
   let urlEncuestaActual = "";
   let urlCortaActual = "";
   let fotoBase64Comprimida = "";
   let html5QrScanner = null;
   let bodegaEquiposLocal = [];
+
+  // Carrito de la OT actual
+  let carritoEquipos = [];
+  let carritoConsumibles = [];
 
   async function sha256(mensaje) {
     const msgBuffer = new TextEncoder().encode(mensaje);
@@ -204,7 +223,7 @@
         nombre: p.get("nom") || p.get("id").trim().toUpperCase(),
         llave: p.get("llave").trim(),
         execUrl: p.get("exec").trim(),
-        fbUrl: (p.get("fb") || "").trim()
+        fbUrl: (p.get("fb") || "https://cottech-52da5-default-rtdb.firebaseio.com").trim()
       };
       localStorage.setItem("cottech_movil_cfg", JSON.stringify(nuevaCfg));
       window.history.replaceState({}, document.title, window.location.pathname);
@@ -230,9 +249,11 @@
     const nombre = document.getElementById("cfg-nombre").value.trim() || id;
     const llave = document.getElementById("cfg-llave").value.trim();
     const execUrl = document.getElementById("cfg-exec").value.trim();
-    const fbUrl = document.getElementById("cfg-fb").value.trim();
     if (!id || !llave || !execUrl.startsWith("https://")) return alert("Completa Código, Llave y Enlace del Servidor.");
-    localStorage.setItem("cottech_movil_cfg", JSON.stringify({ id, nombre, llave, execUrl, fbUrl }));
+    localStorage.setItem("cottech_movil_cfg", JSON.stringify({
+      id, nombre, llave, execUrl,
+      fbUrl: "https://cottech-52da5-default-rtdb.firebaseio.com"
+    }));
     cargarVista();
   }
 
@@ -242,7 +263,6 @@
     document.getElementById("cfg-nombre").value = cfg.nombre || "";
     document.getElementById("cfg-llave").value = cfg.llave || "";
     document.getElementById("cfg-exec").value = cfg.execUrl || "";
-    document.getElementById("cfg-fb").value = cfg.fbUrl || "";
     document.getElementById("vista-config").classList.remove("oculto");
     document.getElementById("vista-operacion").classList.add("oculto");
   }
@@ -265,12 +285,12 @@
         const selMat = document.getElementById("sel-bodega-mat");
         selMat.innerHTML = "";
         data.materiales.forEach(m => {
-          selMat.innerHTML += `<option value="${m.codigo} - ${m.nombre}">${m.codigo} - ${m.nombre} (Saldo: ${m.saldo})</option>`;
+          selMat.innerHTML += `<option value="${m.codigo} - ${m.nombre}">${m.codigo} - ${m.nombre} (Mi Saldo: ${m.saldo})</option>`;
         });
       }
-      document.getElementById("sub-bodega").innerText = `📦 Bodega sincronizada: ${bodegaEquiposLocal.length} equipo(s) asignados.`;
+      document.getElementById("sub-bodega").innerText = `📦 Mi Bodega Digital: ${bodegaEquiposLocal.length} equipo(s) únicos con MAC disponibles.`;
     } catch (e) {
-      document.getElementById("sub-bodega").innerText = "📦 Bodega lista en modo local.";
+      document.getElementById("sub-bodega").innerText = "📦 Bodega Digital activa.";
     }
   }
 
@@ -281,34 +301,126 @@
 
   function alCambiarMovimientoEquipo() {
     const t = document.getElementById("sel-tipo-equipo").value;
-    document.getElementById("bloque-mac-nuevo").classList.toggle("oculto", t === "SIN_EQUIPO");
     document.getElementById("bloque-mac-malo").classList.toggle("oculto", t !== "REEMPLAZO");
   }
 
   // =========================================================================
-  // JORNADA LABORAL Y PULSO GPS CADA 30 SEGUNDOS (CON WAKE LOCK)
+  // FUNCIONES DEL CARRITO DE EQUIPOS ÚNICOS Y CONSUMIBLES
+  // =========================================================================
+  function agregarEquipoAlCarrito() {
+    const tipoMov = document.getElementById("sel-tipo-equipo").value;
+    const macNuevo = document.getElementById("inp-mac-nuevo").value.trim().toUpperCase();
+    const macMalo = document.getElementById("inp-mac-malo").value.trim().toUpperCase();
+
+    if (!macNuevo) return alert("Selecciona de tu bodega o escanea la MAC del equipo único.");
+    if (tipoMov === "REEMPLAZO" && !macMalo) {
+      return alert("En un reemplazo debes escanear o escribir también la MAC del equipo dañado ('Malo').");
+    }
+
+    carritoEquipos.push({
+      movimiento: tipoMov,
+      macNuevo: macNuevo,
+      macDanado: tipoMov === "REEMPLAZO" ? macMalo : "N/A"
+    });
+
+    document.getElementById("inp-mac-nuevo").value = "";
+    document.getElementById("inp-mac-malo").value = "";
+    document.getElementById("sel-bodega-eq").value = "";
+    renderizarCarritoVisual();
+  }
+
+  function agregarConsumibleAlCarrito() {
+    const matRaw = document.getElementById("sel-bodega-mat").value;
+    const cant = Number(document.getElementById("inp-cant-mat").value) || 0;
+    if (!matRaw || cant <= 0) return alert("Selecciona un consumible e ingresa una cantidad válida.");
+
+    const limpio = matRaw.split(" (Mi Saldo:")[0].trim();
+    const existente = carritoConsumibles.find(x => x.material === limpio);
+    if (existente) {
+      existente.cantidad += cant;
+    } else {
+      carritoConsumibles.push({ material: limpio, cantidad: cant });
+    }
+    renderizarCarritoVisual();
+  }
+
+  function eliminarEquipoCarrito(idx) {
+    carritoEquipos.splice(idx, 1);
+    renderizarCarritoVisual();
+  }
+
+  function eliminarConsumibleCarrito(idx) {
+    carritoConsumibles.splice(idx, 1);
+    renderizarCarritoVisual();
+  }
+
+  function renderizarCarritoVisual() {
+    const cont = document.getElementById("lista-carrito-visual");
+    if (carritoEquipos.length === 0 && carritoConsumibles.length === 0) {
+      cont.innerHTML = `<div style="font-size:11.5px;color:#64748b;">Aún no has agregado equipos ni consumibles a esta orden.</div>`;
+      return;
+    }
+
+    let html = "";
+    carritoEquipos.forEach((eq, i) => {
+      const txtReemp = eq.movimiento === "REEMPLAZO" ? ` <span style="color:#fca5a5;">(Retira Malo: ${eq.macDanado})</span>` : "";
+      html += `
+        <div class="item-carrito">
+          <span>📡 <strong>[Equipo Único]</strong> ${eq.macNuevo}${txtReemp}</span>
+          <button type="button" class="btn-quitar" onclick="eliminarEquipoCarrito(${i})">✕</button>
+        </div>`;
+    });
+
+    carritoConsumibles.forEach(( c, i ) => {
+      html += `
+        <div class="item-carrito" style="border-left-color:#fde047;">
+          <span>🧰 <strong>[Consumible x${c.cantidad}]</strong> ${c.material}</span>
+          <button type="button" class="btn-quitar" onclick="eliminarConsumibleCarrito(${i})">✕</button>
+        </div>`;
+    });
+    cont.innerHTML = html;
+  }
+
+  // =========================================================================
+  // JORNADA LABORAL Y ESTADOS: "EN SITIO" VS "INACTIVO (SIN OT)"
   // =========================================================================
   async function iniciarJornadaLaboral() {
     jornadaActiva = true;
     document.getElementById("btn-iniciar-dia").classList.add("oculto");
     document.getElementById("btn-fin-dia").classList.remove("oculto");
-    document.getElementById("lbl-estado-jornada").innerText = "🟢 En Jornada Activa (GPS cada 30s)";
-    document.getElementById("lbl-estado-jornada").style.color = "#4ade80";
+    actualizarEtiquetaEstadoUI();
 
     if ("wakeLock" in navigator) {
       try { wakeLockObj = await navigator.wakeLock.request("screen"); } catch (e) {}
     }
 
-    enviarPulsoGpsAhora("EN_RUTA");
+    // Al iniciar jornada sin haber abierto OT aún, aparece como INACTIVO_SIN_OT (En espera de OT)
+    const estadoInicial = otInicioMs ? ("EN_SITIO_OT_" + document.getElementById("inp-ot").value.trim()) : "INACTIVO_SIN_OT";
+    enviarPulsoGpsAhora(estadoInicial);
+
     if (timerGps30s) clearInterval(timerGps30s);
     timerGps30s = setInterval(() => {
-      const estadoActual = otInicioMs ? ("EN_SITIO_OT_" + document.getElementById("inp-ot").value.trim()) : "EN_RUTA";
-      enviarPulsoGpsAhora(estadoActual);
+      const est = otInicioMs ? ("EN_SITIO_OT_" + document.getElementById("inp-ot").value.trim()) : "INACTIVO_SIN_OT";
+      enviarPulsoGpsAhora(est);
     }, 30000);
   }
 
+  function actualizarEtiquetaEstadoUI() {
+    const lbl = document.getElementById("lbl-estado-jornada");
+    if (!jornadaActiva) {
+      lbl.innerText = "⚪ Jornada Finalizada (GPS Apagado)";
+      lbl.style.color = "#94a3b8";
+    } else if (otInicioMs) {
+      lbl.innerText = "🟢 Activo en Sitio (OT en curso)";
+      lbl.style.color = "#4ade80";
+    } else {
+      lbl.innerText = "⚪ Inactivo (Sin OT activa · GPS encendido)";
+      lbl.style.color = "#fde047";
+    }
+  }
+
   async function finalizarJornadaLaboral() {
-    if (otInicioMs) return alert("Primero termina o cierra la OT que tienes activa en sitio.");
+    if (otInicioMs) return alert("Primero termina o cierra la OT que tienes en sitio.");
     if (!confirm("¿Confirmas que ya finalizaste tu día laboral? Se apagará el rastreo GPS.")) return;
 
     jornadaActiva = false;
@@ -318,8 +430,7 @@
     await enviarPulsoGpsAhora("FUERA_DE_TURNO");
     document.getElementById("btn-iniciar-dia").classList.remove("oculto");
     document.getElementById("btn-fin-dia").classList.add("oculto");
-    document.getElementById("lbl-estado-jornada").innerText = "⚪ Jornada Finalizada (GPS Apagado)";
-    document.getElementById("lbl-estado-jornada").style.color = "#94a3b8";
+    actualizarEtiquetaEstadoUI();
   }
 
   function enviarPulsoGpsAhora(estadoReporte) {
@@ -343,7 +454,6 @@
         hora: new Date().toISOString()
       };
 
-      // 1. Envía siempre en tiempo real a tu Firebase (aunque el teléfono ya estuviera vinculado antes)
       const urlFirebaseActiva = (cfg.fbUrl && cfg.fbUrl.startsWith("https://"))
         ? cfg.fbUrl.replace(/\/$/, "")
         : "https://cottech-52da5-default-rtdb.firebaseio.com";
@@ -354,8 +464,7 @@
         body: JSON.stringify(paqueteGps)
       }).catch(() => {});
 
-      // 2. En eventos importantes (Inicio/Fin de turno o Inicio de OT), respalda también en Apps Script
-      if (estadoReporte === "FUERA_DE_TURNO" || estadoReporte.startsWith("EN_SITIO")) {
+      if (estadoReporte === "FUERA_DE_TURNO" || estadoReporte === "INACTIVO_SIN_OT" || estadoReporte.startsWith("EN_SITIO")) {
         fetch(cfg.execUrl, {
           method: "POST",
           headers: { "Content-Type": "text/plain;charset=utf-8" },
@@ -366,35 +475,30 @@
   }
 
   // =========================================================================
-  // FLUJO DE LA OT: CRONÓMETRO CONTINUO HASTA "OT TERMINADA"
+  // FLUJO DE LA OT (SIN MOSTRAR EL RELOJ CORRIENDO EN PANTALLA)
   // =========================================================================
   function iniciarTrabajoEnSitio() {
     const ot = document.getElementById("inp-ot").value.trim();
     if (!ot) return alert("Ingresa el número de OT antes de iniciar en sitio.");
-    if (!jornadaActiva) iniciarJornadaLaboral();
 
     otInicioMs = Date.now();
+    carritoEquipos = [];
+    carritoConsumibles = [];
+    renderizarCarritoVisual();
+
+    if (!jornadaActiva) {
+      iniciarJornadaLaboral();
+    } else {
+      actualizarEtiquetaEstadoUI();
+      enviarPulsoGpsAhora("EN_SITIO_OT_" + ot);
+    }
+
     const tipo = document.getElementById("sel-tipo-servicio").value;
     document.getElementById("lbl-ot-activa").innerText = `🔧 Trabajando en Sitio: OT #${ot} (${tipo})`;
-
     document.getElementById("etapa-1-inicio").classList.add("oculto");
     document.getElementById("etapa-2-bitacora").classList.remove("oculto");
-
-    if (timerRelojOt) clearInterval(timerRelojOt);
-    timerRelojOt = setInterval(actualizarRelojesOt, 1000);
-    enviarPulsoGpsAhora("EN_SITIO_OT_" + ot);
   }
 
-  function actualizarRelojesOt() {
-    if (!otInicioMs) return;
-    const segTotales = Math.floor((Date.now() - otInicioMs) / 1000);
-    const min = String(Math.floor(segTotales / 60)).padStart(2, "0");
-    const seg = String(segTotales % 60).padStart(2, "0");
-    document.getElementById("reloj-transcurrido").innerText = `⏱️ ${min}:${seg} min en sitio`;
-    document.getElementById("reloj-transcurrido-qr").innerText = `⏱️ ${min}:${seg} min (Sigue contando hasta cerrar OT)`;
-  }
-
-  // Escáner de cámara para leer MAC o Serie
   function abrirEscanerCamara(inputIdDestino) {
     const divReader = document.getElementById("reader-mac");
     divReader.style.display = "block";
@@ -410,12 +514,11 @@
       },
       () => {}
     ).catch(() => {
-      alert("No se pudo acceder a la cámara. Verifica los permisos del navegador.");
+      alert("No se pudo acceder a la cámara.");
       divReader.style.display = "none";
     });
   }
 
-  // Compresión de fotografía a ~100KB para no llenar la nube
   function comprimirFotoSeleccionada(input) {
     if (!input.files || !input.files[0]) return;
     const reader = new FileReader();
@@ -437,19 +540,13 @@
   }
 
   async function pasarAPantallaQR() {
+    // Si el técnico escribió una MAC en la caja pero olvidó darle a "+ Agregar al Carrito", la agregamos automáticamente
+    const macEscrita = document.getElementById("inp-mac-nuevo").value.trim();
+    if (macEscrita) agregarEquipoAlCarrito();
+
     const cfg = JSON.parse(localStorage.getItem("cottech_movil_cfg"));
     const ot = document.getElementById("inp-ot").value.trim();
     const tipoServ = document.getElementById("sel-tipo-servicio").value;
-    const movEq = document.getElementById("sel-tipo-equipo").value;
-    const macNuevo = document.getElementById("inp-mac-nuevo").value.trim();
-    const macMalo = document.getElementById("inp-mac-malo").value.trim();
-
-    if (movEq !== "SIN_EQUIPO" && !macNuevo) {
-      return alert("Ingresa o escanea la MAC del equipo utilizado.");
-    }
-    if (movEq === "REEMPLAZO" && !macMalo) {
-      return alert("En un reemplazo es obligatorio escanear o escribir la MAC del equipo dañado ('Malo').");
-    }
 
     const ts = Date.now();
     const firma = await sha256(`${cfg.id}|${ot}|${ts}|${cfg.llave}`);
@@ -476,7 +573,6 @@
     document.getElementById("etapa-2-bitacora").classList.add("oculto");
     document.getElementById("etapa-3-qr").classList.remove("oculto");
 
-    // Acortar enlace automáticamente en segundo plano para WhatsApp
     fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(urlEncuestaActual)}`)
       .then(r => r.json())
       .then(d => { if (d && d.shorturl) urlCortaActual = d.shorturl; })
@@ -495,9 +591,14 @@
     const cfg = JSON.parse(localStorage.getItem("cottech_movil_cfg"));
     const ot = document.getElementById("inp-ot").value.trim();
     const minTranscurridos = Math.max(1, Math.round((Date.now() - otInicioMs) / 60000));
-
-    if (timerRelojOt) clearInterval(timerRelojOt);
     otInicioMs = null;
+
+    // Resumir el carrito para las columnas de la bitácora y enviar también el arreglo completo
+    const movResumen = carritoEquipos.length > 0 ? carritoEquipos.map(e => e.movimiento).join(" + ") : "SIN_EQUIPO";
+    const macNuevasStr = carritoEquipos.length > 0 ? carritoEquipos.map(e => e.macNuevo).join(" | ") : "N/A";
+    const macMalasStr = carritoEquipos.some(e => e.macDanado !== "N/A") ? carritoEquipos.map(e => e.macDanado).join(" | ") : "N/A";
+    const matStr = carritoConsumibles.length > 0 ? carritoConsumibles.map(c => `${c.material} (x${c.cantidad})`).join(" | ") : "Sin consumibles";
+    const cantTotalMat = carritoConsumibles.reduce((acc, c) => acc + c.cantidad, 0);
 
     const payloadCierre = {
       accion: "CERRAR_BITACORA_OT",
@@ -507,11 +608,13 @@
       tipoServicio: document.getElementById("sel-tipo-servicio").value,
       estadoOt: "TERMINADA",
       minutosEnSitio: minTranscurridos,
-      tipoMovimientoEquipo: document.getElementById("sel-tipo-equipo").value,
-      macEquipoNuevo: document.getElementById("inp-mac-nuevo").value.trim(),
-      macEquipoDañado: document.getElementById("inp-mac-malo").value.trim(),
-      materialUtilizado: document.getElementById("sel-bodega-mat").value,
-      cantidadMaterial: Number(document.getElementById("inp-cant-mat").value) || 0,
+      tipoMovimientoEquipo: movResumen,
+      macEquipoNuevo: macNuevasStr,
+      macEquipoDañado: macMalasStr,
+      materialUtilizado: matStr,
+      cantidadMaterial: cantTotalMat,
+      carritoEquipos: carritoEquipos,
+      carritoConsumibles: carritoConsumibles,
       observaciones: document.getElementById("inp-bitacora-obs").value.trim(),
       fotoBase64: fotoBase64Comprimida,
       lat: ultimaLat,
@@ -520,17 +623,24 @@
     };
 
     enviarConColaSegura(cfg.execUrl, payloadCierre);
-    enviarPulsoGpsAhora("EN_RUTA");
 
-    // Limpiar para la siguiente OT
+    // Al terminar la OT, el estado cambia inmediatamente a INACTIVO (Sin OT activa)
+    actualizarEtiquetaEstadoUI();
+    enviarPulsoGpsAhora("INACTIVO_SIN_OT");
+
     document.getElementById("inp-ot").value = "";
     document.getElementById("inp-mac-nuevo").value = "";
     document.getElementById("inp-mac-malo").value = "";
     document.getElementById("inp-bitacora-obs").value = "";
     fotoBase64Comprimida = "";
+    carritoEquipos = [];
+    carritoConsumibles = [];
+
     document.getElementById("etapa-3-qr").classList.add("oculto");
     document.getElementById("etapa-1-inicio").classList.remove("oculto");
-    alert(`✅ OT #${ot} finalizada en ${minTranscurridos} min. El sistema monitoreará la recepción de la encuesta del cliente.`);
+
+    // Solo al final se le informa el tiempo total que tardó la orden
+    alert(`✅ OT #${ot} finalizada con éxito.\n⏱️ Tiempo total empleado en la orden: ${minTranscurridos} min.\n⚪ Tu estado ahora es: Inactivo (En espera de nueva OT).`);
     sincronizarMiBodega();
   }
 
@@ -552,7 +662,6 @@
     if (!detalle) return alert("Explica brevemente la justificación por la que no se realizó.");
 
     const minTranscurridos = Math.max(1, Math.round((Date.now() - otInicioMs) / 60000));
-    if (timerRelojOt) clearInterval(timerRelojOt);
     otInicioMs = null;
 
     const payloadNo = {
@@ -576,15 +685,16 @@
     };
 
     enviarConColaSegura(cfg.execUrl, payloadNo);
-    enviarPulsoGpsAhora("EN_RUTA");
+    actualizarEtiquetaEstadoUI();
+    enviarPulsoGpsAhora("INACTIVO_SIN_OT");
+
     document.getElementById("inp-ot").value = "";
     document.getElementById("txt-justificacion-no").value = "";
     document.getElementById("etapa-no-realizada").classList.add("oculto");
     document.getElementById("etapa-1-inicio").classList.remove("oculto");
-    alert(`⚪ OT #${ot} cerrada como NO REALIZADA (Sin QR).`);
+    alert(`⚪ OT #${ot} cerrada como NO REALIZADA (${minTranscurridos} min).\nTu estado ahora es: Inactivo (En espera de nueva OT).`);
   }
 
-  // Cola anti-caídas si hay mala señal móvil
   async function enviarConColaSegura(url, payload) {
     try {
       await fetch(url, {
