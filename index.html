@@ -22,7 +22,7 @@
     .btn-star { flex: 1; padding: 9px 0; font-size: 16px; font-weight: bold; background: #1e293b; color: #64748b; border: 1px solid #334155; border-radius: 8px; cursor: pointer; }
     .btn-star.activo { background: #f59e0b; color: #0f172a; border-color: #fbbf24; }
     .fila-sino { display: flex; gap: 10px; }
-    .btn-sino { flex: 1; padding: 10px; font-size: 13.5px; font-weight: bold; background: #1e293b; color: #cbd5e1; border: 1px solid #334155; border-radius: 8px; cursor: pointer; }
+    .btn-sino { flex: 1; padding: 11px; font-size: 13.5px; font-weight: bold; background: #1e293b; color: #cbd5e1; border: 1px solid #475569; border-radius: 8px; cursor: pointer; transition: 0.15s; }
     .btn-sino.activo-si { background: #10b981; color: #0f172a; border-color: #34d399; }
     .btn-sino.activo-no { background: #ef4444; color: #ffffff; border-color: #f87171; }
     .grid-nps { display: grid; grid-template-columns: repeat(6, 1fr); gap: 6px; }
@@ -87,7 +87,6 @@
 
   <div class="seccion-titulo" id="subtitulo-seccion-2">II. Evaluación del Trabajo Técnico</div>
 
-  <!-- 1. Trato del Técnico -->
   <div class="bloque-pregunta">
     <p class="titulo-p" id="lbl-p1">1. ¿Qué tan satisfecho está con el trato brindado por el técnico?</p>
     <p class="explicacion-p" id="sub-p1">Evalúe la amabilidad, respeto y disposición del técnico durante la visita (1 = Muy bajo, 5 = Excelente).</p>
@@ -100,7 +99,6 @@
     </div>
   </div>
 
-  <!-- 2. Acabado Estético (Instalación) / Claridad de Diagnóstico y Solución (Reparación) -->
   <div class="bloque-pregunta">
     <p class="titulo-p" id="lbl-p2">2. ¿Cómo califica el acabado estético de la instalación realizada?</p>
     <p class="explicacion-p" id="sub-p2">Evalúe la presentación visual del cableado, fijación de equipos y orden dejado en el área.</p>
@@ -113,7 +111,6 @@
     </div>
   </div>
 
-  <!-- 3. Tiempo de Ejecución / Rapidez en Sitio (Sin puntualidad) -->
   <div class="bloque-pregunta">
     <p class="titulo-p" id="lbl-p3">3. ¿Cómo califica el tiempo que tomó el técnico desde que llegó hasta que finalizó el trabajo?</p>
     <p class="explicacion-p" id="sub-p3">Evalúe la agilidad y rapidez del técnico mientras realizaba el trabajo en su domicilio o negocio.</p>
@@ -126,7 +123,6 @@
     </div>
   </div>
 
-  <!-- CONDICIONAL: CAUSA RAÍZ (SI 1, 2 O 3 ES <= 3 ESTRELLAS) -->
   <div class="bloque-pregunta oculto" id="bloque-causa">
     <p class="titulo-p">↳ ¿Cuál fue el aspecto principal por mejorar?</p>
     <p class="explicacion-p">Seleccione el motivo principal de su calificación o elija "Otros" para detallarlo.</p>
@@ -142,17 +138,16 @@
     <input type="text" id="txt-causa-otro" class="input-otro oculto" maxlength="130" placeholder="Escriba aquí el aspecto por mejorar..." />
   </div>
 
-  <!-- 4. Confiabilidad: Funcionamiento desde la primera prueba -->
+  <!-- 4. Confiabilidad: AMBOS BOTONES INICIAN NEUTROS SIN COLOR PRE-SELECCIONADO -->
   <div class="bloque-pregunta">
     <p class="titulo-p" id="lbl-p4">4. ¿El servicio quedó funcionando correctamente desde la primera prueba?</p>
-    <p class="explicacion-p" id="sub-p4">Indique si el equipo y servicio quedaron operativos sin fallas al momento de la entrega.</p>
+    <p class="explicacion-p" id="sub-p4">Toque una de las dos opciones según cómo quedó funcionando su servicio al momento de la entrega.</p>
     <div class="fila-sino">
-      <button type="button" class="btn-sino activo-si" id="btn-si" onclick="setFuncionando('Sí')">Sí, funcionó al 100%</button>
+      <button type="button" class="btn-sino" id="btn-si" onclick="setFuncionando('Sí')">Sí, funcionó al 100%</button>
       <button type="button" class="btn-sino" id="btn-no" onclick="setFuncionando('No')">No, presentó fallas</button>
     </div>
   </div>
 
-  <!-- CONDICIONAL: CAUSA DE FALLA EN PRIMERA PRUEBA -->
   <div class="bloque-alerta oculto" id="bloque-falla">
     <p class="titulo-p" style="color:#fca5a5;">↳ ¿Cuál fue la causa de la falla presentada en la prueba?</p>
     <p class="explicacion-p">Seleccione la falla detectada o elija la opción para escribirla manualmente.</p>
@@ -168,14 +163,12 @@
     <input type="text" id="txt-falla-otro" class="input-otro oculto" maxlength="130" placeholder="Describa aquí la falla que presentó el servicio..." />
   </div>
 
-  <!-- 5. Recomendación Global (NPS) -->
   <div class="bloque-pregunta">
     <p class="titulo-p">5. ¿Qué tan probable es que recomiende nuestro servicio técnico a otra persona?</p>
     <p class="explicacion-p">Seleccione de 0 (Nada probable) a 10 (Totalmente probable).</p>
     <div class="grid-nps" id="grupo-nps"></div>
   </div>
 
-  <!-- 6. Observaciones opcionales -->
   <div class="bloque-pregunta">
     <p class="titulo-p">6. Observaciones adicionales (Opcional)</p>
     <p class="explicacion-p">Si desea agregar algún detalle adicional sobre la visita, escríbalo aquí.</p>
@@ -198,9 +191,8 @@
     ? apiKeyId
     : `https://script.google.com/macros/s/${apiKeyId}/exec`;
 
-  // Adaptar textos según si es INSTALACIÓN o REPARACIÓN
   const esReparacion = tipoServicio.includes("REPARA") || tipoServicio.includes("SOPORTE");
-  const etiquetaTipo = esReparacion ? "Reparación / Soporte" : "Instalación";
+  const etiquetaTipo = esReparacion ? "Reparación / Servicio" : "Instalación";
   document.getElementById("badge-info").innerText = `Técnico: ${tecnico || "N/A"} | OT #${ot || "N/A"} | ${etiquetaTipo}`;
   document.getElementById("titulo-principal").innerText = `Evaluación de ${etiquetaTipo}`;
 
@@ -212,7 +204,6 @@
     document.getElementById("lbl-p4").innerText = "4. ¿El problema reportado quedó solucionado correctamente desde la primera prueba?";
   }
 
-  // Avisar silenciosamente al servidor que el cliente SÍ escaneó/abrió el QR (Auditoría de ofrecimiento de QR)
   if (apiKeyId && tecnico && ot) {
     fetch(urlWebhook, {
       method: "POST",
@@ -222,7 +213,7 @@
   }
 
   let calificaciones = { tecnico: null, acabado: null, horario: null };
-  let funcionandoElegido = "Sí";
+  let funcionandoElegido = null; // Inicia sin seleccionar para no confundir al cliente
   let npsElegido = null;
 
   const contenedorNps = document.getElementById("grupo-nps");
@@ -297,7 +288,6 @@
   }
 
   async function enviarEvaluacion() {
-    // Candado local: Máximo 1 evaluación por dispositivo por día
     const hoyIso = new Date().toISOString().slice(0, 10);
     const ultimoDiaVoto = localStorage.getItem("calidad_ultimo_dia_voto");
     if (ultimoDiaVoto === hoyIso) {
@@ -327,6 +317,10 @@
       } else {
         causaFinal = selCausa;
       }
+    }
+
+    if (!funcionandoElegido) {
+      return alert("Por favor seleccione 'Sí' o 'No' en la pregunta 4 sobre el funcionamiento del servicio.");
     }
 
     let causaFallaFinal = "Sin fallas";
