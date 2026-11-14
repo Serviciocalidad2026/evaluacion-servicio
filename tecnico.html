@@ -343,15 +343,16 @@
         hora: new Date().toISOString()
       };
 
-      // 1. Si tiene Firebase configurado, sobrescribe en tiempo real (< 100ms)
-      if (cfg.fbUrl && cfg.fbUrl.startsWith("https://")) {
-        const baseFb = cfg.fbUrl.replace(/\/$/, "");
-        fetch(`${baseFb}/ubicaciones/${cfg.id}.json`, {
-          method: "PUT",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(paqueteGps)
-        }).catch(() => {});
-      }
+      // 1. Envía siempre en tiempo real a tu Firebase (aunque el teléfono ya estuviera vinculado antes)
+      const urlFirebaseActiva = (cfg.fbUrl && cfg.fbUrl.startsWith("https://"))
+        ? cfg.fbUrl.replace(/\/$/, "")
+        : "https://cottech-52da5-default-rtdb.firebaseio.com";
+
+      fetch(`${urlFirebaseActiva}/ubicaciones/${cfg.id}.json`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(paqueteGps)
+      }).catch(() => {});
 
       // 2. En eventos importantes (Inicio/Fin de turno o Inicio de OT), respalda también en Apps Script
       if (estadoReporte === "FUERA_DE_TURNO" || estadoReporte.startsWith("EN_SITIO")) {
