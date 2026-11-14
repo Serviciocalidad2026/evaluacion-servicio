@@ -61,6 +61,9 @@
     <h2 id="titulo-tec">Técnico Activo</h2>
     <p class="ayuda" id="sub-bodega">Sincronizando bodega virtual...</p>
 
+    <button id="btn-instalar-pwa" class="btn btn-azul oculto" style="margin-top:0; margin-bottom:12px; background:#0284c7;" onclick="instalarAppLimpia()">
+  📲 Instalar Aplicación Oficial en mi Celular
+    </button>
     <div class="panel-jornada">
       <div class="estado-gps">
         <span id="lbl-estado-jornada" style="color:#94a3b8;">⚪ Jornada No Iniciada (GPS Apagado)</span>
@@ -723,6 +726,40 @@
   }, 10000);
 
   cargarVista();
+  // 1. Registrar Service Worker para que Android confíe en la App sin mostrar alertas de peligro
+if ("serviceWorker" in navigator) {
+  navigator.serviceWorker.register("./sw.js").catch(() => {});
+}
+
+// 2. Capturar el instalador nativo de Google Chrome en Android
+let eventoInstalacionPwa = null;
+window.addEventListener("beforeinstallprompt", e => {
+  e.preventDefault();
+  eventoInstalacionPwa = e;
+  const btnInst = document.getElementById("btn-instalar-pwa");
+  if (btnInst) btnInst.classList.remove("oculto");
+});
+
+async function instalarAppLimpia() {
+  if (!eventoInstalacionPwa) return;
+  eventoInstalacionPwa.prompt();
+  const resultado = await eventoInstalacionPwa.userChoice;
+  if (resultado.outcome === "accepted") {
+    document.getElementById("btn-instalar-pwa").classList.add("oculto");
+  }
+  eventoInstalacionPwa = null;
+}
+
+// 3. Si el técnico bloqueó el celular o cambió de app, al volver a encenderlo envía GPS al instante y reactiva WakeLock
+document.addEventListener("visibilitychange", async () => {
+  if (document.visibilityState === "visible" && jornadaActiva) {
+    if ("wakeLock" in navigator) {
+      try { wakeLockObj = await navigator.wakeLock.request("screen"); } catch (e) {}
+    }
+    const est = otInicioMs ? ("EN_SITIO_OT_" + document.getElementById("inp-ot").value.trim()) : "INACTIVO_SIN_OT";
+    enviarPulsoGpsAhora(est);
+  }
+});
 </script>
 </body>
 </html>
