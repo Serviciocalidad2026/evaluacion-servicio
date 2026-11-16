@@ -33,6 +33,7 @@
     .carrito-box { background: #0f172a; border: 1px dashed #38bdf8; border-radius: 8px; padding: 10px; margin-top: 12px; }
     .item-carrito { display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 6px 10px; border-radius: 6px; margin-bottom: 5px; font-size: 12px; border-left: 3px solid #10b981; }
     .btn-quitar { background: #dc2626; color: white; border: none; border-radius: 4px; padding: 2px 7px; cursor: pointer; font-weight: bold; font-size: 11px; }
+    .aviso-guardado { font-size: 11px; color: #4ade80; text-align: right; margin-top: 4px; }
     #caja-qr { margin-top: 12px; background: white; padding: 16px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; }
     #reader-mac { width: 100%; margin-top: 8px; border-radius: 8px; overflow: hidden; display: none; }
     .oculto { display: none !important; }
@@ -62,8 +63,9 @@
     <p class="ayuda" id="sub-bodega">Sincronizando bodega virtual...</p>
 
     <button id="btn-instalar-pwa" class="btn btn-azul oculto" style="margin-top:0; margin-bottom:12px; background:#0284c7;" onclick="instalarAppLimpia()">
-  📲 Instalar Aplicación Oficial en mi Celular
+      📲 Instalar Aplicación Oficial en mi Celular
     </button>
+
     <div class="panel-jornada">
       <div class="estado-gps">
         <span id="lbl-estado-jornada" style="color:#94a3b8;">⚪ Jornada No Iniciada (GPS Apagado)</span>
@@ -78,10 +80,10 @@
     <!-- ETAPA A: INICIAR TRABAJO EN SITIO -->
     <div id="etapa-1-inicio" class="bloque">
       <label>Número de Orden de Trabajo (OT):</label>
-      <input type="text" id="inp-ot" placeholder="Ej. 15612" />
+      <input type="text" id="inp-ot" placeholder="Ej. 15612" oninput="guardarEstadoVivo()" />
 
       <label>Tipo de Servicio a Realizar:</label>
-      <select id="sel-tipo-servicio">
+      <select id="sel-tipo-servicio" onchange="guardarEstadoVivo()">
         <option value="INSTALACION">Instalación</option>
         <option value="REPARACION">Reparación / Servicio</option>
       </select>
@@ -89,9 +91,10 @@
       <button class="btn btn-azul" onclick="iniciarTrabajoEnSitio()">📍 Iniciar Trabajo en Sitio</button>
     </div>
 
-    <!-- ETAPA B: BITÁCORA CON CARRITO DE EQUIPOS ÚNICOS (MAC) Y CONSUMIBLES (CANTIDADES) -->
+    <!-- ETAPA B: BITÁCORA CON GUARDADO AUTOMÁTICO PERMANENTE -->
     <div id="etapa-2-bitacora" class="bloque oculto">
-      <div style="font-size:14px;font-weight:bold;color:#4ade80;margin-bottom:6px;" id="lbl-ot-activa">🔧 Trabajando en Sitio</div>
+      <div style="font-size:14px;font-weight:bold;color:#4ade80;margin-bottom:4px;" id="lbl-ot-activa">🔧 Trabajando en Sitio</div>
+      <div class="aviso-guardado">💾 Progreso guardado automáticamente en segundo plano</div>
 
       <div id="reader-mac"></div>
 
@@ -99,24 +102,24 @@
       <div class="sub-caja">
         <p class="titulo-sec">1. Equipos Únicos Serializados (Con MAC)</p>
         <label>Tipo de Movimiento del Equipo:</label>
-        <select id="sel-tipo-equipo" onchange="alCambiarMovimientoEquipo()">
+        <select id="sel-tipo-equipo" onchange="alCambiarMovimientoEquipo(); guardarEstadoVivo();">
           <option value="INSTALADO">Instalación de Equipo (De mi Bodega Virtual)</option>
           <option value="REEMPLAZO">Reemplazo de Equipo (Nuevo + Retiro de "Malo")</option>
         </select>
 
         <label>Buscar en mi Bodega Virtual o Escanear MAC:</label>
-        <select id="sel-bodega-eq" onchange="alElegirEquipoBodega()">
+        <select id="sel-bodega-eq" onchange="alElegirEquipoBodega(); guardarEstadoVivo();">
           <option value="">-- Seleccionar equipo de mi bodega --</option>
         </select>
         <div class="fila-input-cam" style="margin-top:6px;">
-          <input type="text" id="inp-mac-nuevo" placeholder="MAC / Serie Equipo Nuevo + Modelo" />
+          <input type="text" id="inp-mac-nuevo" placeholder="MAC / Serie Equipo Nuevo + Modelo" oninput="guardarEstadoVivo()" />
           <button type="button" class="btn-cam" onclick="abrirEscanerCamara('inp-mac-nuevo')">📷 MAC</button>
         </div>
 
         <div id="bloque-mac-malo" class="oculto">
           <label style="color:#fca5a5;">MAC / Serie del Equipo Dañado Retirado ("Malo"):</label>
           <div class="fila-input-cam">
-            <input type="text" id="inp-mac-malo" placeholder="MAC del equipo dañado retirado..." />
+            <input type="text" id="inp-mac-malo" placeholder="MAC del equipo dañado retirado..." oninput="guardarEstadoVivo()" />
             <button type="button" class="btn-cam" onclick="abrirEscanerCamara('inp-mac-malo')">📷 MAC</button>
           </div>
         </div>
@@ -154,7 +157,7 @@
       <input type="file" id="inp-foto" accept="image/*" capture="environment" onchange="comprimirFotoSeleccionada(this)" />
 
       <label>Observaciones de Bitácora Técnica:</label>
-      <textarea id="inp-bitacora-obs" rows="2" placeholder="Detalle del trabajo realizado..."></textarea>
+      <textarea id="inp-bitacora-obs" rows="2" placeholder="Detalle del trabajo realizado..." oninput="guardarEstadoVivo()"></textarea>
 
       <button class="btn btn-verde" onclick="pasarAPantallaQR()">Siguiente: Guardar Bitácora y Mostrar QR al Cliente →</button>
       <button class="btn btn-rojo" onclick="abrirModalNoRealizada()">⚠️ La OT NO se pudo realizar (Justificar y Cerrar)</button>
@@ -164,7 +167,7 @@
     <div id="etapa-no-realizada" class="bloque oculto" style="border-color:#ef4444;">
       <h2 style="color:#f87171;">⚠️ Justificación de OT No Realizada</h2>
       <label>Motivo por el cual no se realizó la OT:</label>
-      <select id="sel-motivo-no">
+      <select id="sel-motivo-no" onchange="guardarEstadoVivo()">
         <option value="Cliente ausente en el domicilio">Cliente ausente en el domicilio</option>
         <option value="Ductería interna obstruida">Ductería interna obstruida / Sin paso</option>
         <option value="Falta de postería o red externa">Falta de postería o disponibilidad técnica</option>
@@ -172,12 +175,12 @@
         <option value="Otro motivo">Otro motivo (Detallar abajo)</option>
       </select>
       <label>Explicación detallada:</label>
-      <textarea id="txt-justificacion-no" rows="2" placeholder="Explique por qué no se pudo ejecutar..."></textarea>
+      <textarea id="txt-justificacion-no" rows="2" placeholder="Explique por qué no se pudo ejecutar..." oninput="guardarEstadoVivo()"></textarea>
       <button class="btn btn-rojo" onclick="confirmarCierreNoRealizada()">Confirmar y Cerrar OT Sin QR ✔</button>
       <button class="btn btn-gris" onclick="cancelarNoRealizada()">← Volver a la Bitácora</button>
     </div>
 
-    <!-- ETAPA C: MOSTRAR QR O ENVIAR URL CORTA (SIN RELOJ EN PANTALLA) -->
+    <!-- ETAPA C: MOSTRAR QR O ENVIAR URL CORTA -->
     <div id="etapa-3-qr" class="bloque oculto">
       <p class="ayuda" style="text-align:center;color:#fde047;font-size:12.5px;">
         1. Pídale al cliente que escanee el código QR o envíele el enlace corto por WhatsApp.<br>
@@ -191,6 +194,7 @@
 
       <button class="btn btn-amarillo" id="btn-wa-corto" onclick="enviarUrlCortaWhatsApp()">📲 Copiar / Enviar Enlace Corto por WhatsApp</button>
       <button class="btn btn-verde" style="margin-top:14px;padding:14px;font-size:15px;" onclick="finalizarOrdenPorCompleto()">✅ Siguiente y OT Terminada</button>
+      <button class="btn btn-gris" onclick="volverABitacoraDesdeQR()">← Volver a editar Bitácora</button>
     </div>
 
     <button class="btn btn-gris" onclick="editarConfig()">⚙️ Configuración del Técnico</button>
@@ -199,7 +203,10 @@
 
 <script>
   let jornadaActiva = false;
+  let etapaActual = "1"; // "1" = Inicio, "2" = Bitacora, "3" = QR, "NO_REALIZADA" = Modal
   let timerGps30s = null;
+  let workerSegundoPlano = null;
+  let audioKeepAliveCtx = null;
   let wakeLockObj = null;
   let ultimaLat = 14.0818, ultimaLng = -87.2068;
 
@@ -210,7 +217,6 @@
   let html5QrScanner = null;
   let bodegaEquiposLocal = [];
 
-  // Carrito de la OT actual
   let carritoEquipos = [];
   let carritoConsumibles = [];
 
@@ -218,6 +224,166 @@
     const msgBuffer = new TextEncoder().encode(mensaje);
     const hashBuffer = await crypto.subtle.digest("SHA-256", msgBuffer);
     return Array.from(new Uint8Array(hashBuffer)).map(b => b.toString(16).padStart(2, "0")).join("");
+  }
+
+  // =========================================================================
+  // MOTOR DE PERSISTENCIA TOTAL: GUARDA Y RESTAURA EL ESTADO AUNQUE CAMBIE DE APP
+  // =========================================================================
+  function guardarEstadoVivo() {
+    const estado = {
+      jornadaActiva: jornadaActiva,
+      etapaActual: etapaActual,
+      otInicioMs: otInicioMs,
+      ot: document.getElementById("inp-ot").value,
+      tipoServicio: document.getElementById("sel-tipo-servicio").value,
+      tipoEquipo: document.getElementById("sel-tipo-equipo").value,
+      macNuevo: document.getElementById("inp-mac-nuevo").value,
+      macMalo: document.getElementById("inp-mac-malo").value,
+      obs: document.getElementById("inp-bitacora-obs").value,
+      motivoNo: document.getElementById("sel-motivo-no").value,
+      justificacionNo: document.getElementById("txt-justificacion-no").value,
+      carritoEquipos: carritoEquipos,
+      carritoConsumibles: carritoConsumibles,
+      urlEncuestaActual: urlEncuestaActual,
+      urlCortaActual: urlCortaActual,
+      fotoBase64Comprimida: fotoBase64Comprimida,
+      ultimaLat: ultimaLat,
+      ultimaLng: ultimaLng
+    };
+    localStorage.setItem("cottech_estado_vivo", JSON.stringify(estado));
+  }
+
+  function restaurarEstadoVivo() {
+    const raw = localStorage.getItem("cottech_estado_vivo");
+    if (!raw) return;
+    try {
+      const est = JSON.parse(raw);
+      jornadaActiva = Boolean(est.jornadaActiva);
+      etapaActual = est.etapaActual || "1";
+      otInicioMs = est.otInicioMs || null;
+      carritoEquipos = Array.isArray(est.carritoEquipos) ? est.carritoEquipos : [];
+      carritoConsumibles = Array.isArray(est.carritoConsumibles) ? est.carritoConsumibles : [];
+      urlEncuestaActual = est.urlEncuestaActual || "";
+      urlCortaActual = est.urlCortaActual || "";
+      fotoBase64Comprimida = est.fotoBase64Comprimida || "";
+      if (est.ultimaLat) ultimaLat = est.ultimaLat;
+      if (est.ultimaLng) ultimaLng = est.ultimaLng;
+
+      document.getElementById("inp-ot").value = est.ot || "";
+      if (est.tipoServicio) document.getElementById("sel-tipo-servicio").value = est.tipoServicio;
+      if (est.tipoEquipo) document.getElementById("sel-tipo-equipo").value = est.tipoEquipo;
+      document.getElementById("inp-mac-nuevo").value = est.macNuevo || "";
+      document.getElementById("inp-mac-malo").value = est.macMalo || "";
+      document.getElementById("inp-bitacora-obs").value = est.obs || "";
+      if (est.motivoNo) document.getElementById("sel-motivo-no").value = est.motivoNo;
+      document.getElementById("txt-justificacion-no").value = est.justificacionNo || "";
+
+      alCambiarMovimientoEquipo();
+      renderizarCarritoVisual();
+
+      // Si el técnico había dejado la jornada iniciada, reanudar automáticamente sin reiniciar
+      if (jornadaActiva) {
+        document.getElementById("btn-iniciar-dia").classList.add("oculto");
+        document.getElementById("btn-fin-dia").classList.remove("oculto");
+        iniciarMotorSegundoPlano();
+      } else {
+        document.getElementById("btn-iniciar-dia").classList.remove("oculto");
+        document.getElementById("btn-fin-dia").classList.add("oculto");
+      }
+
+      // Restaurar exactamente la pantalla en la que estaba trabajando (Inicio, Bitácora o QR)
+      mostrarEtapaPantalla(etapaActual);
+
+      if (etapaActual === "3" && urlEncuestaActual) {
+        const contenedorQR = document.getElementById("qrcode");
+        contenedorQR.innerHTML = "";
+        new QRCode(contenedorQR, { text: urlEncuestaActual, width: 215, height: 215, correctLevel: QRCode.CorrectLevel.L });
+        document.getElementById("lbl-pie-qr").innerText = `OT #${est.ot} (${est.tipoServicio}) · Escanee para evaluar`;
+      }
+
+      actualizarEtiquetaEstadoUI();
+    } catch (e) {}
+  }
+
+  function mostrarEtapaPantalla(numEtapa) {
+    etapaActual = numEtapa;
+    document.getElementById("etapa-1-inicio").classList.toggle("oculto", numEtapa !== "1");
+    document.getElementById("etapa-2-bitacora").classList.toggle("oculto", numEtapa !== "2");
+    document.getElementById("etapa-no-realizada").classList.toggle("oculto", numEtapa !== "NO_REALIZADA");
+    document.getElementById("etapa-3-qr").classList.toggle("oculto", numEtapa !== "3");
+
+    if (numEtapa === "2") {
+      const ot = document.getElementById("inp-ot").value.trim();
+      const tipo = document.getElementById("sel-tipo-servicio").value;
+      document.getElementById("lbl-ot-activa").innerText = `🔧 Trabajando en Sitio: OT #${ot} (${tipo})`;
+    }
+    guardarEstadoVivo();
+  }
+
+  // =========================================================================
+  // MOTOR DE SEGUNDO PLANO (WEB WORKER + CANAL DE AUDIO SILENCIOSO PARA ANDROID)
+  // =========================================================================
+  function iniciarMotorSegundoPlano() {
+    // 1. Solicitar almacenamiento persistente al navegador Android
+    if (navigator.storage && navigator.storage.persist) {
+      navigator.storage.persist().catch(() => {});
+    }
+
+    // 2. WakeLock para pantalla activa
+    if ("wakeLock" in navigator) {
+      navigator.wakeLock.request("screen").then(w => { wakeLockObj = w; }).catch(() => {});
+    }
+
+    // 3. Web Worker dedicado en hilo separado (No se congela al cambiar de pestaña o abrir WhatsApp)
+    if (!workerSegundoPlano) {
+      const codigoWorker = `
+        setInterval(() => {
+          postMessage("PULSO_GPS_30S");
+        }, 25000);
+      `;
+      const blob = new Blob([codigoWorker], { type: "application/javascript" });
+      workerSegundoPlano = new Worker(URL.createObjectURL(blob));
+      workerSegundoPlano.onmessage = () => {
+        if (jornadaActiva) {
+          const est = otInicioMs ? ("EN_SITIO_OT_" + document.getElementById("inp-ot").value.trim()) : "INACTIVO_SIN_OT";
+          enviarPulsoGpsAhora(est);
+        }
+      };
+    }
+
+    // 4. Canal de audio silencioso de ganancia 0.0001 para que Android no cierre la App en segundo plano
+    try {
+      const AudioCtx = window.AudioContext || window.webkitAudioContext;
+      if (AudioCtx && !audioKeepAliveCtx) {
+        audioKeepAliveCtx = new AudioCtx();
+        const osc = audioKeepAliveCtx.createOscillator();
+        const gain = audioKeepAliveCtx.createGain();
+        gain.gain.value = 0.0001; // Totalmente inaudible
+        osc.connect(gain);
+        gain.connect(audioKeepAliveCtx.destination);
+        osc.start();
+      } else if (audioKeepAliveCtx && audioKeepAliveCtx.state === "suspended") {
+        audioKeepAliveCtx.resume();
+      }
+    } catch (e) {}
+
+    // 5. Respaldo con intervalo estándar y envío inmediato
+    const estAhora = otInicioMs ? ("EN_SITIO_OT_" + document.getElementById("inp-ot").value.trim()) : "INACTIVO_SIN_OT";
+    enviarPulsoGpsAhora(estAhora);
+
+    if (timerGps30s) clearInterval(timerGps30s);
+    timerGps30s = setInterval(() => {
+      if (!jornadaActiva) return;
+      const est = otInicioMs ? ("EN_SITIO_OT_" + document.getElementById("inp-ot").value.trim()) : "INACTIVO_SIN_OT";
+      enviarPulsoGpsAhora(est);
+    }, 30000);
+  }
+
+  function detenerMotorSegundoPlano() {
+    if (timerGps30s) { clearInterval(timerGps30s); timerGps30s = null; }
+    if (workerSegundoPlano) { workerSegundoPlano.terminate(); workerSegundoPlano = null; }
+    if (wakeLockObj) { try { wakeLockObj.release(); } catch (e) {} wakeLockObj = null; }
+    if (audioKeepAliveCtx) { try { audioKeepAliveCtx.close(); } catch (e) {} audioKeepAliveCtx = null; }
   }
 
   function verificarAutoConfigURL() {
@@ -245,6 +411,7 @@
       document.getElementById("vista-config").classList.add("oculto");
       document.getElementById("vista-operacion").classList.remove("oculto");
       document.getElementById("titulo-tec").innerText = `👷 ${cfg.id} - ${cfg.nombre || "Técnico"}`;
+      restaurarEstadoVivo();
       sincronizarMiBodega();
     }
   }
@@ -309,9 +476,6 @@
     document.getElementById("bloque-mac-malo").classList.toggle("oculto", t !== "REEMPLAZO");
   }
 
-  // =========================================================================
-  // FUNCIONES DEL CARRITO DE EQUIPOS ÚNICOS Y CONSUMIBLES
-  // =========================================================================
   function agregarEquipoAlCarrito() {
     const tipoMov = document.getElementById("sel-tipo-equipo").value;
     const macNuevo = document.getElementById("inp-mac-nuevo").value.trim().toUpperCase();
@@ -332,6 +496,7 @@
     document.getElementById("inp-mac-malo").value = "";
     document.getElementById("sel-bodega-eq").value = "";
     renderizarCarritoVisual();
+    guardarEstadoVivo();
   }
 
   function agregarConsumibleAlCarrito() {
@@ -347,16 +512,19 @@
       carritoConsumibles.push({ material: limpio, cantidad: cant });
     }
     renderizarCarritoVisual();
+    guardarEstadoVivo();
   }
 
   function eliminarEquipoCarrito(idx) {
     carritoEquipos.splice(idx, 1);
     renderizarCarritoVisual();
+    guardarEstadoVivo();
   }
 
   function eliminarConsumibleCarrito(idx) {
     carritoConsumibles.splice(idx, 1);
     renderizarCarritoVisual();
+    guardarEstadoVivo();
   }
 
   function renderizarCarritoVisual() {
@@ -376,7 +544,7 @@
         </div>`;
     });
 
-    carritoConsumibles.forEach(( c, i ) => {
+    carritoConsumibles.forEach((c, i) => {
       html += `
         <div class="item-carrito" style="border-left-color:#fde047;">
           <span>🧰 <strong>[Consumible x${c.cantidad}]</strong> ${c.material}</span>
@@ -387,27 +555,15 @@
   }
 
   // =========================================================================
-  // JORNADA LABORAL Y ESTADOS: "EN SITIO" VS "INACTIVO (SIN OT)"
+  // JORNADA LABORAL PERSISTENTE
   // =========================================================================
   async function iniciarJornadaLaboral() {
     jornadaActiva = true;
     document.getElementById("btn-iniciar-dia").classList.add("oculto");
     document.getElementById("btn-fin-dia").classList.remove("oculto");
     actualizarEtiquetaEstadoUI();
-
-    if ("wakeLock" in navigator) {
-      try { wakeLockObj = await navigator.wakeLock.request("screen"); } catch (e) {}
-    }
-
-    // Al iniciar jornada sin haber abierto OT aún, aparece como INACTIVO_SIN_OT (En espera de OT)
-    const estadoInicial = otInicioMs ? ("EN_SITIO_OT_" + document.getElementById("inp-ot").value.trim()) : "INACTIVO_SIN_OT";
-    enviarPulsoGpsAhora(estadoInicial);
-
-    if (timerGps30s) clearInterval(timerGps30s);
-    timerGps30s = setInterval(() => {
-      const est = otInicioMs ? ("EN_SITIO_OT_" + document.getElementById("inp-ot").value.trim()) : "INACTIVO_SIN_OT";
-      enviarPulsoGpsAhora(est);
-    }, 30000);
+    guardarEstadoVivo();
+    iniciarMotorSegundoPlano();
   }
 
   function actualizarEtiquetaEstadoUI() {
@@ -419,7 +575,7 @@
       lbl.innerText = "🟢 Activo en Sitio (OT en curso)";
       lbl.style.color = "#4ade80";
     } else {
-      lbl.innerText = "⚪ Inactivo (Sin OT activa · GPS encendido)";
+      lbl.innerText = "⚪ Inactivo (Sin OT activa · GPS en 2° plano)";
       lbl.style.color = "#fde047";
     }
   }
@@ -429,13 +585,13 @@
     if (!confirm("¿Confirmas que ya finalizaste tu día laboral? Se apagará el rastreo GPS.")) return;
 
     jornadaActiva = false;
-    if (timerGps30s) clearInterval(timerGps30s);
-    if (wakeLockObj) { try { await wakeLockObj.release(); } catch (e) {} }
-
+    detenerMotorSegundoPlano();
     await enviarPulsoGpsAhora("FUERA_DE_TURNO");
+
     document.getElementById("btn-iniciar-dia").classList.remove("oculto");
     document.getElementById("btn-fin-dia").classList.add("oculto");
     actualizarEtiquetaEstadoUI();
+    guardarEstadoVivo();
   }
 
   function enviarPulsoGpsAhora(estadoReporte) {
@@ -480,31 +636,26 @@
   }
 
   // =========================================================================
-  // FLUJO DE LA OT (SIN MOSTRAR EL RELOJ CORRIENDO EN PANTALLA)
+  // FLUJO DE LA OT CON PROTECCIÓN ANTE CAMBIO DE APLICACIÓN
   // =========================================================================
   function iniciarTrabajoEnSitio() {
     const ot = document.getElementById("inp-ot").value.trim();
     if (!ot) return alert("Ingresa el número de OT antes de iniciar en sitio.");
 
-    otInicioMs = Date.now();
-    carritoEquipos = [];
-    carritoConsumibles = [];
-    renderizarCarritoVisual();
-
+    if (!otInicioMs) otInicioMs = Date.now();
     if (!jornadaActiva) {
       iniciarJornadaLaboral();
     } else {
-      actualizarEtiquetaEstadoUI();
-      enviarPulsoGpsAhora("EN_SITIO_OT_" + ot);
+      iniciarMotorSegundoPlano();
     }
 
-    const tipo = document.getElementById("sel-tipo-servicio").value;
-    document.getElementById("lbl-ot-activa").innerText = `🔧 Trabajando en Sitio: OT #${ot} (${tipo})`;
-    document.getElementById("etapa-1-inicio").classList.add("oculto");
-    document.getElementById("etapa-2-bitacora").classList.remove("oculto");
+    mostrarEtapaPantalla("2");
+    actualizarEtiquetaEstadoUI();
+    enviarPulsoGpsAhora("EN_SITIO_OT_" + ot);
   }
 
   function abrirEscanerCamara(inputIdDestino) {
+    guardarEstadoVivo();
     const divReader = document.getElementById("reader-mac");
     divReader.style.display = "block";
     if (html5QrScanner) { try { html5QrScanner.clear(); } catch (e) {} }
@@ -515,6 +666,7 @@
       { fps: 10, qrbox: { width: 250, height: 110 } },
       decodedText => {
         document.getElementById(inputIdDestino).value = decodedText.trim().toUpperCase();
+        guardarEstadoVivo();
         html5QrScanner.stop().then(() => { divReader.style.display = "none"; });
       },
       () => {}
@@ -531,13 +683,14 @@
       const img = new Image();
       img.onload = function() {
         const canvas = document.createElement("canvas");
-        const maxW = 900;
+        const maxW = 800;
         const scale = Math.min(1, maxW / img.width);
         canvas.width = Math.round(img.width * scale);
         canvas.height = Math.round(img.height * scale);
         const ctx = canvas.getContext("2d");
         ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-        fotoBase64Comprimida = canvas.toDataURL("image/jpeg", 0.65);
+        fotoBase64Comprimida = canvas.toDataURL("image/jpeg", 0.60);
+        guardarEstadoVivo();
       };
       img.src = e.target.result;
     };
@@ -545,7 +698,6 @@
   }
 
   async function pasarAPantallaQR() {
-    // Si el técnico escribió una MAC en la caja pero olvidó darle a "+ Agregar al Carrito", la agregamos automáticamente
     const macEscrita = document.getElementById("inp-mac-nuevo").value.trim();
     if (macEscrita) agregarEquipoAlCarrito();
 
@@ -575,16 +727,25 @@
     new QRCode(contenedorQR, { text: urlEncuestaActual, width: 215, height: 215, correctLevel: QRCode.CorrectLevel.L });
     document.getElementById("lbl-pie-qr").innerText = `OT #${ot} (${tipoServ}) · Escanee para evaluar`;
 
-    document.getElementById("etapa-2-bitacora").classList.add("oculto");
-    document.getElementById("etapa-3-qr").classList.remove("oculto");
+    mostrarEtapaPantalla("3");
 
     fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(urlEncuestaActual)}`)
       .then(r => r.json())
-      .then(d => { if (d && d.shorturl) urlCortaActual = d.shorturl; })
+      .then(d => {
+        if (d && d.shorturl) {
+          urlCortaActual = d.shorturl;
+          guardarEstadoVivo();
+        }
+      })
       .catch(() => {});
   }
 
+  function volverABitacoraDesdeQR() {
+    mostrarEtapaPantalla("2");
+  }
+
   function enviarUrlCortaWhatsApp() {
+    guardarEstadoVivo();
     const ot = document.getElementById("inp-ot").value.trim();
     const link = urlCortaActual || urlEncuestaActual;
     const msg = `Hola, gracias por permitirnos atender su solicitud técnica (Orden #${ot}). Por favor ayúdenos evaluando el servicio recibido en este enlace corto y confidencial: ${link}`;
@@ -595,10 +756,9 @@
   async function finalizarOrdenPorCompleto() {
     const cfg = JSON.parse(localStorage.getItem("cottech_movil_cfg"));
     const ot = document.getElementById("inp-ot").value.trim();
-    const minTranscurridos = Math.max(1, Math.round((Date.now() - otInicioMs) / 60000));
+    const minTranscurridos = Math.max(1, Math.round((Date.now() - (otInicioMs || Date.now())) / 60000));
     otInicioMs = null;
 
-    // Resumir el carrito para las columnas de la bitácora y enviar también el arreglo completo
     const movResumen = carritoEquipos.length > 0 ? carritoEquipos.map(e => e.movimiento).join(" + ") : "SIN_EQUIPO";
     const macNuevasStr = carritoEquipos.length > 0 ? carritoEquipos.map(e => e.macNuevo).join(" | ") : "N/A";
     const macMalasStr = carritoEquipos.some(e => e.macDanado !== "N/A") ? carritoEquipos.map(e => e.macDanado).join(" | ") : "N/A";
@@ -629,34 +789,31 @@
 
     enviarConColaSegura(cfg.execUrl, payloadCierre);
 
-    // Al terminar la OT, el estado cambia inmediatamente a INACTIVO (Sin OT activa)
-    actualizarEtiquetaEstadoUI();
-    enviarPulsoGpsAhora("INACTIVO_SIN_OT");
-
     document.getElementById("inp-ot").value = "";
     document.getElementById("inp-mac-nuevo").value = "";
     document.getElementById("inp-mac-malo").value = "";
     document.getElementById("inp-bitacora-obs").value = "";
     fotoBase64Comprimida = "";
+    urlEncuestaActual = "";
+    urlCortaActual = "";
     carritoEquipos = [];
     carritoConsumibles = [];
+    renderizarCarritoVisual();
 
-    document.getElementById("etapa-3-qr").classList.add("oculto");
-    document.getElementById("etapa-1-inicio").classList.remove("oculto");
+    mostrarEtapaPantalla("1");
+    actualizarEtiquetaEstadoUI();
+    enviarPulsoGpsAhora("INACTIVO_SIN_OT");
 
-    // Solo al final se le informa el tiempo total que tardó la orden
-    alert(`✅ OT #${ot} finalizada con éxito.\n⏱️ Tiempo total empleado en la orden: ${minTranscurridos} min.\n⚪ Tu estado ahora es: Inactivo (En espera de nueva OT).`);
+    alert(`✅ OT #${ot} finalizada con éxito.\n⏱️ Tiempo total empleado: ${minTranscurridos} min.\n⚪ Estado actual: Inactivo (En espera de nueva OT).`);
     sincronizarMiBodega();
   }
 
   function abrirModalNoRealizada() {
-    document.getElementById("etapa-2-bitacora").classList.add("oculto");
-    document.getElementById("etapa-no-realizada").classList.remove("oculto");
+    mostrarEtapaPantalla("NO_REALIZADA");
   }
 
   function cancelarNoRealizada() {
-    document.getElementById("etapa-no-realizada").classList.add("oculto");
-    document.getElementById("etapa-2-bitacora").classList.remove("oculto");
+    mostrarEtapaPantalla("2");
   }
 
   function confirmarCierreNoRealizada() {
@@ -666,7 +823,7 @@
     const detalle = document.getElementById("txt-justificacion-no").value.trim();
     if (!detalle) return alert("Explica brevemente la justificación por la que no se realizó.");
 
-    const minTranscurridos = Math.max(1, Math.round((Date.now() - otInicioMs) / 60000));
+    const minTranscurridos = Math.max(1, Math.round((Date.now() - (otInicioMs || Date.now())) / 60000));
     otInicioMs = null;
 
     const payloadNo = {
@@ -690,14 +847,17 @@
     };
 
     enviarConColaSegura(cfg.execUrl, payloadNo);
-    actualizarEtiquetaEstadoUI();
-    enviarPulsoGpsAhora("INACTIVO_SIN_OT");
 
     document.getElementById("inp-ot").value = "";
     document.getElementById("txt-justificacion-no").value = "";
-    document.getElementById("etapa-no-realizada").classList.add("oculto");
-    document.getElementById("etapa-1-inicio").classList.remove("oculto");
-    alert(`⚪ OT #${ot} cerrada como NO REALIZADA (${minTranscurridos} min).\nTu estado ahora es: Inactivo (En espera de nueva OT).`);
+    carritoEquipos = [];
+    carritoConsumibles = [];
+    renderizarCarritoVisual();
+
+    mostrarEtapaPantalla("1");
+    actualizarEtiquetaEstadoUI();
+    enviarPulsoGpsAhora("INACTIVO_SIN_OT");
+    alert(`⚪ OT #${ot} cerrada como NO REALIZADA (${minTranscurridos} min).`);
   }
 
   async function enviarConColaSegura(url, payload) {
@@ -725,41 +885,44 @@
     } catch (e) {}
   }, 10000);
 
-  cargarVista();
-  // 1. Registrar Service Worker para que Android confíe en la App sin mostrar alertas de peligro
-if ("serviceWorker" in navigator) {
-  navigator.serviceWorker.register("./sw.js").catch(() => {});
-}
-
-// 2. Capturar el instalador nativo de Google Chrome en Android
-let eventoInstalacionPwa = null;
-window.addEventListener("beforeinstallprompt", e => {
-  e.preventDefault();
-  eventoInstalacionPwa = e;
-  const btnInst = document.getElementById("btn-instalar-pwa");
-  if (btnInst) btnInst.classList.remove("oculto");
-});
-
-async function instalarAppLimpia() {
-  if (!eventoInstalacionPwa) return;
-  eventoInstalacionPwa.prompt();
-  const resultado = await eventoInstalacionPwa.userChoice;
-  if (resultado.outcome === "accepted") {
-    document.getElementById("btn-instalar-pwa").classList.add("oculto");
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("./sw.js").catch(() => {});
   }
-  eventoInstalacionPwa = null;
-}
 
-// 3. Si el técnico bloqueó el celular o cambió de app, al volver a encenderlo envía GPS al instante y reactiva WakeLock
-document.addEventListener("visibilitychange", async () => {
-  if (document.visibilityState === "visible" && jornadaActiva) {
-    if ("wakeLock" in navigator) {
-      try { wakeLockObj = await navigator.wakeLock.request("screen"); } catch (e) {}
+  let eventoInstalacionPwa = null;
+  window.addEventListener("beforeinstallprompt", e => {
+    e.preventDefault();
+    eventoInstalacionPwa = e;
+    const btnInst = document.getElementById("btn-instalar-pwa");
+    if (btnInst) btnInst.classList.remove("oculto");
+  });
+
+  async function instalarAppLimpia() {
+    if (!eventoInstalacionPwa) return;
+    eventoInstalacionPwa.prompt();
+    const resultado = await eventoInstalacionPwa.userChoice;
+    if (resultado.outcome === "accepted") {
+      document.getElementById("btn-instalar-pwa").classList.add("oculto");
     }
-    const est = otInicioMs ? ("EN_SITIO_OT_" + document.getElementById("inp-ot").value.trim()) : "INACTIVO_SIN_OT";
-    enviarPulsoGpsAhora(est);
+    eventoInstalacionPwa = null;
   }
-});
+
+  // Al volver a la aplicación desde otra ventana, reafirma el estado sin perder nada y envía pulso GPS inmediato
+  window.addEventListener("pageshow", () => {
+    if (jornadaActiva) {
+      const est = otInicioMs ? ("EN_SITIO_OT_" + document.getElementById("inp-ot").value.trim()) : "INACTIVO_SIN_OT";
+      enviarPulsoGpsAhora(est);
+    }
+  });
+
+  document.addEventListener("visibilitychange", async () => {
+    guardarEstadoVivo();
+    if (document.visibilityState === "visible" && jornadaActiva) {
+      iniciarMotorSegundoPlano();
+    }
+  });
+
+  cargarVista();
 </script>
 </body>
 </html>
