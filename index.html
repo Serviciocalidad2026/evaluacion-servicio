@@ -204,12 +204,36 @@
     document.getElementById("lbl-p4").innerText = "4. ¿El problema reportado quedó solucionado correctamente desde la primera prueba?";
   }
 
-  if (apiKeyId && tecnico && ot) {
+  function bloquearEncuesta(mensaje) {
+    const cont = document.getElementById("contenedor-encuesta");
+    cont.innerHTML = "";
+    const div = document.createElement("div");
+    div.className = "mensaje-final";
+    const h = document.createElement("h1");
+    h.style.color = "#fca5a5";
+    h.style.fontSize = "20px";
+    h.textContent = "Enlace no disponible";
+    const p = document.createElement("p");
+    p.style.color = "#cbd5e1";
+    p.style.fontSize = "14px";
+    p.textContent = mensaje;
+    div.appendChild(h);
+    div.appendChild(p);
+    cont.appendChild(div);
+  }
+
+  if (!apiKeyId || !tecnico || !ot || !ts || !sig) {
+    bloquearEncuesta("El enlace de evaluación está incompleto. Solicite al técnico que le muestre nuevamente el código QR.");
+  } else {
+    // La apertura también se valida con la firma: si el enlace expiró se avisa de inmediato.
     fetch(urlWebhook, {
       method: "POST",
       headers: { "Content-Type": "text/plain;charset=utf-8" },
-      body: JSON.stringify({ accion: "REGISTRAR_APERTURA_QR", tecnico: tecnico, ot: ot })
-    }).catch(() => {});
+      body: JSON.stringify({ accion: "REGISTRAR_APERTURA_QR", tecnico: tecnico, ot: ot, tipo: tipoServicio, ts: Number(ts), sig: sig })
+    })
+      .then(r => r.json())
+      .then(j => { if (j && j.code === "AUTH") bloquearEncuesta(j.message); })
+      .catch(() => {});
   }
 
   let calificaciones = { tecnico: null, acabado: null, horario: null };
@@ -361,6 +385,7 @@
       tecnico: tecnico,
       ot: ot,
       tipoServicio: etiquetaTipo,
+      tipo: tipoServicio,
       ts: Number(ts),
       sig: sig,
       csat: csatPromedio,
@@ -391,8 +416,11 @@
         document.getElementById("contenedor-encuesta").innerHTML = `
           <div class="mensaje-final">
             <h1 style="color:#4ade80;font-size:22px;">¡Muchas gracias por su tiempo!</h1>
-            <p style="color:#cbd5e1;font-size:14px;">${resJson.message}</p>
+            <p style="color:#cbd5e1;font-size:14px;" id="txt-msg-final"></p>
           </div>`;
+        document.getElementById("txt-msg-final").textContent = resJson.message || "";
+      } else if (resJson.code === "AUTH") {
+        bloquearEncuesta(resJson.message);
       } else {
         alert("Aviso: " + resJson.message);
         btn.disabled = false;
