@@ -88,8 +88,8 @@
     <div class="panel-jornada">
       <div class="estado-gps">
         <span id="lbl-estado-jornada" style="color:#94a3b8;">Día no iniciado</span>
-        <span id="lbl-ultimo-gps" style="font-size:12px;color:#38bdf8;"></span>
       </div>
+      <div id="lbl-ultimo-gps" style="font-size:13px;font-weight:bold;margin:-2px 0 8px 0;"></div>
       <div style="display:flex; gap:8px;">
         <button id="btn-iniciar-dia" class="btn btn-verde btn-grande" style="margin-top:0;" onclick="iniciarJornadaLaboral()">EMPEZAR MI DÍA</button>
         <button id="btn-fin-dia" class="btn btn-rojo btn-grande oculto" style="margin-top:0;" onclick="finalizarJornadaLaboral()">TERMINAR MI DÍA</button>
@@ -580,13 +580,13 @@
     if (gpsNativoActivo) return;
     gpsNativoActivo = true;
     window.CottechNativo.iniciarGps({
-      titulo: "Jornada laboral activa",
-      mensaje: "Cottech registra tu ubicación para el supervisor mientras dure la jornada."
+      titulo: "Cottech Técnico",
+      mensaje: "Jornada laboral activa"
     }, (ubicacion, error) => {
       if (error) {
         if (error.code === "NOT_AUTHORIZED") {
-          mostrarAvisoGps("No hay permiso de ubicación", "#f87171");
-          if (confirm("La app necesita permiso para usar tu ubicación. ¿Quieres abrir los ajustes para darlo?")) {
+          mostrarAvisoGps("Falta activar un permiso del celular. Pide ayuda a tu supervisor.", "#f87171");
+          if (confirm("A la app le falta un permiso para funcionar. ¿Quieres abrir los ajustes para activarlo?")) {
             window.CottechNativo.abrirAjustes();
           }
         }
@@ -1106,7 +1106,7 @@
 
   async function finalizarJornadaLaboral() {
     if (otInicioMs) return alert("Primero termina la orden en la que estás trabajando.");
-    if (!confirm("¿Ya terminaste tu día de trabajo? Se apagará la ubicación.")) return;
+    if (!confirm("¿Ya terminaste tu día de trabajo?")) return;
 
     jornadaActiva = false;
     inicioJornadaMs = 0;
@@ -1137,11 +1137,11 @@
         ultimoPulsoNativoMs = Date.now();
         publicarPulso(cfg, estadoReporte, ultimaPrecision);
       } else {
-        mostrarAvisoGps("Buscando señal de GPS...", "#f59e0b");
+        mostrarAvisoGps("");
       }
       return;
     }
-    if (!navigator.geolocation) return mostrarAvisoGps("Este celular no tiene GPS", "#f87171");
+    if (!navigator.geolocation) return mostrarAvisoGps("Este celular no es compatible con la app. Pide ayuda a tu supervisor.", "#f87171");
 
     navigator.geolocation.getCurrentPosition(async pos => {
       ultimaLat = Number(pos.coords.latitude.toFixed(6));
@@ -1149,9 +1149,9 @@
       await publicarPulso(cfg, estadoReporte, Math.round(pos.coords.accuracy || 0));
     }, err => {
       if (err && err.code === 1) {
-        mostrarAvisoGps("Falta el permiso de ubicación", "#f87171");
+        mostrarAvisoGps("Falta activar un permiso del celular. Pide ayuda a tu supervisor.", "#f87171");
       } else {
-        mostrarAvisoGps("Sin señal de GPS, intentando...", "#f59e0b");
+        mostrarAvisoGps("");
       }
       // Un cambio de estado (fin de jornada, inicio/cierre de OT) se publica igual con la última posición conocida
       if (estadoReporte !== ultimoEstadoEnviadoHoja) publicarPulso(cfg, estadoReporte, -1);
@@ -1181,14 +1181,14 @@
           body: JSON.stringify(paqueteGps)
         });
         if (r.ok) {
-          mostrarAvisoGps(`Ubicación enviada ${new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`, "#4ade80");
+          mostrarAvisoGps("");
         } else if (r.status === 401 || r.status === 403) {
-          mostrarAvisoGps("Ubicación no aceptada: pide un enlace nuevo a tu supervisor", "#f87171");
+          mostrarAvisoGps("Hay un problema con tu acceso. Pide a tu supervisor un enlace nuevo.", "#f87171");
         } else {
-          mostrarAvisoGps("No se pudo enviar la ubicación, intentando...", "#f59e0b");
+          mostrarAvisoGps("");
         }
       } catch (e) {
-        mostrarAvisoGps("Sin internet, intentando...", "#f59e0b");
+        mostrarAvisoGps("");
       }
 
       // La hoja de cálculo solo se actualiza cuando CAMBIA el estado (no cada 30 s)
