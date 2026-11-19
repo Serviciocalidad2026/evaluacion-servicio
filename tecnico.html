@@ -12,18 +12,19 @@
     * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
     body { margin: 0; padding: 14px; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; }
     .card { width: 100%; max-width: 480px; background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 18px; box-shadow: 0 10px 25px rgba(0,0,0,0.45); }
-    h2 { margin: 0 0 4px 0; color: #38bdf8; font-size: 17px; }
-    p.ayuda { margin: 0 0 12px 0; font-size: 12px; color: #94a3b8; }
+    h2 { margin: 0 0 4px 0; color: #38bdf8; font-size: 19px; }
+    p.ayuda { margin: 0 0 12px 0; font-size: 13.5px; color: #cbd5e1; }
     .panel-jornada { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 12px; margin-bottom: 14px; }
-    .estado-gps { font-size: 12px; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
+    .estado-gps { font-size: 14px; font-weight: bold; margin-bottom: 8px; display: flex; justify-content: space-between; align-items: center; }
     .bloque { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 13px; margin-bottom: 12px; }
     .sub-caja { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-top: 10px; }
-    .titulo-sec { font-size: 12px; font-weight: 800; color: #38bdf8; text-transform: uppercase; margin: 0 0 6px 0; }
-    label { display: block; font-size: 12px; font-weight: bold; margin: 7px 0 4px 0; color: #cbd5e1; }
-    input, select, textarea { width: 100%; padding: 9px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: white; font-size: 13px; }
+    .titulo-sec { font-size: 14px; font-weight: 800; color: #38bdf8; margin: 0 0 6px 0; }
+    label { display: block; font-size: 14px; font-weight: bold; margin: 9px 0 5px 0; color: #e2e8f0; }
+    input, select, textarea { width: 100%; padding: 11px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: white; font-size: 15px; }
     .fila-input-cam { display: flex; gap: 6px; align-items: center; }
-    .btn { width: 100%; padding: 11px; border: none; border-radius: 8px; font-weight: bold; font-size: 13.5px; cursor: pointer; margin-top: 10px; }
-    .btn-sm { padding: 8px 12px; font-size: 12.5px; margin-top: 8px; }
+    .btn { width: 100%; padding: 13px; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 10px; }
+    .btn-grande { padding: 16px; font-size: 17px; letter-spacing: 0.3px; }
+    .btn-sm { padding: 11px 12px; font-size: 14px; margin-top: 8px; }
     .btn-cam { width: auto; padding: 9px 12px; margin-top: 0; background: #0284c7; color: white; border-radius: 8px; border: none; font-weight: bold; cursor: pointer; }
     .btn-verde { background: #10b981; color: #0f172a; }
     .btn-azul { background: #2563eb; color: white; }
@@ -31,17 +32,17 @@
     .btn-amarillo { background: #f59e0b; color: #0f172a; }
     .btn-gris { background: #334155; color: #cbd5e1; font-size: 12px; padding: 8px; }
     .carrito-box { background: #0f172a; border: 1px dashed #38bdf8; border-radius: 8px; padding: 10px; margin-top: 12px; }
-    .item-carrito { display: flex; justify-content: space-between; align-items: center; background: #1e293b; padding: 6px 10px; border-radius: 6px; margin-bottom: 5px; font-size: 12px; border-left: 3px solid #10b981; }
-    .btn-quitar { background: #dc2626; color: white; border: none; border-radius: 4px; padding: 2px 7px; cursor: pointer; font-weight: bold; font-size: 11px; }
-    .aviso-guardado { font-size: 11px; color: #4ade80; text-align: right; margin-top: 4px; }
+    .item-carrito { display: flex; justify-content: space-between; align-items: center; gap: 8px; background: #1e293b; padding: 8px 10px; border-radius: 6px; margin-bottom: 6px; font-size: 14px; border-left: 3px solid #10b981; }
+    .btn-quitar { background: #dc2626; color: white; border: none; border-radius: 6px; padding: 6px 10px; cursor: pointer; font-weight: bold; font-size: 13px; }
+    .aviso-guardado { font-size: 13px; color: #4ade80; margin-top: 4px; }
     .galeria-previews { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
     .thumb-box { position: relative; width: 64px; height: 64px; border-radius: 8px; overflow: hidden; border: 1px solid #38bdf8; }
     .thumb-box img { width: 100%; height: 100%; object-fit: cover; }
-    .thumb-del { position: absolute; top: 2px; right: 2px; background: rgba(220,38,38,0.9); color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 11px; font-weight: bold; cursor: pointer; }
+    .thumb-del { position: absolute; top: 2px; right: 2px; background: rgba(220,38,38,0.95); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 13px; font-weight: bold; cursor: pointer; }
     .modal-historial { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.96); z-index: 999; padding: 16px; overflow-y: auto; display: none; }
     .ot-card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.15s; }
     .ot-card:hover { border-color: #38bdf8; }
-    .ot-detalle { background: #0f172a; border-top: 1px solid #334155; margin-top: 8px; padding-top: 8px; font-size: 12px; color: #cbd5e1; line-height: 1.5; }
+    .ot-detalle { background: #0f172a; border-top: 1px solid #334155; margin-top: 8px; padding-top: 8px; font-size: 14px; color: #e2e8f0; line-height: 1.6; }
     #caja-qr { margin-top: 12px; background: white; padding: 16px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; }
     #reader-mac { width: 100%; margin-top: 8px; border-radius: 8px; overflow: hidden; display: none; }
     .oculto { display: none !important; }
@@ -52,198 +53,198 @@
 <div class="card">
   <!-- 1. CONFIGURACIÓN INICIAL -->
   <div id="vista-config" class="oculto">
-    <h2>⚙️ Vinculación de App del Técnico</h2>
-    <p class="ayuda">Pega el enlace que te envió tu supervisor por WhatsApp (o ábrelo directamente).</p>
-    <label>Enlace de acceso enviado por tu supervisor:</label>
+    <h2>Configurar mi app</h2>
+    <p class="ayuda">Pega aquí el enlace que te mandó tu supervisor por WhatsApp.</p>
+    <label>Enlace de tu supervisor:</label>
     <div class="fila-input-cam">
-      <input type="text" id="cfg-enlace" placeholder="https://…/tecnico.html#id=…" />
-      <button type="button" class="btn-cam" onclick="usarEnlacePegado()">Usar ✔</button>
+      <input type="text" id="cfg-enlace" placeholder="Pega aquí el enlace" />
+      <button type="button" class="btn-cam" onclick="usarEnlacePegado()">Usar</button>
     </div>
-    <p class="ayuda" style="margin-top:10px;">O escribe los datos manualmente:</p>
-    <label>Código del Técnico (Ej. TEC-01):</label>
+    <p class="ayuda" style="margin-top:12px;">Si no tienes el enlace, llena estos datos:</p>
+    <label>Tu código (ejemplo: TEC-01):</label>
     <input type="text" id="cfg-id" placeholder="TEC-01" />
-    <label>Nombre del Técnico:</label>
-    <input type="text" id="cfg-nombre" placeholder="Fernando Ortez" />
-    <label>Credencial Secreta:</label>
+    <label>Tu nombre:</label>
+    <input type="text" id="cfg-nombre" placeholder="Tu nombre completo" />
+    <label>Tu clave (empieza con CTK-):</label>
     <input type="text" id="cfg-llave" placeholder="CTK-..." />
-    <label>Enlace del Servidor:</label>
-    <input type="text" id="cfg-exec" placeholder="https://script.google.com/macros/s/.../exec" />
-    <button class="btn btn-azul" onclick="guardarConfigCelular()">Guardar Configuración ✔</button>
+    <label>Dirección del sistema (te la da tu supervisor):</label>
+    <input type="text" id="cfg-exec" placeholder="https://script.google.com/..." />
+    <button class="btn btn-azul" onclick="guardarConfigCelular()">Guardar</button>
   </div>
 
   <!-- 2. PANEL OPERATIVO PRINCIPAL -->
   <div id="vista-operacion" class="oculto">
-    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:4px;">
-      <h2 id="titulo-tec" style="margin:0;">Técnico Activo</h2>
-      <button type="button" class="btn btn-amarillo btn-sm" style="margin-top:0; width:auto;" onclick="abrirHistorialTecnico()">📂 Historial de Mis OTs</button>
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px;">
+      <h2 id="titulo-tec" style="margin:0;">Técnico</h2>
+      <button type="button" class="btn btn-amarillo btn-sm" style="margin-top:0; width:auto; white-space:nowrap;" onclick="abrirHistorialTecnico()">Mis órdenes</button>
     </div>
-    <p class="ayuda" id="sub-bodega">Sincronizando bodega virtual...</p>
+    <p class="ayuda" id="sub-bodega">Cargando tus equipos...</p>
 
     <button id="btn-instalar-pwa" class="btn btn-azul oculto" style="margin-top:0; margin-bottom:12px; background:#0284c7;" onclick="instalarAppLimpia()">
-      📲 Instalar Aplicación Oficial en mi Celular
+      Instalar la app en mi celular
     </button>
 
-    <!-- PANEL DE JORNADA LABORAL Y SEGUNDO PLANO ESTRICTO -->
+    <!-- PANEL DE JORNADA LABORAL -->
     <div class="panel-jornada">
       <div class="estado-gps">
-        <span id="lbl-estado-jornada" style="color:#94a3b8;">⚪ Jornada No Iniciada (GPS Apagado)</span>
-        <span id="lbl-ultimo-gps" style="font-size:11px;color:#38bdf8;"></span>
+        <span id="lbl-estado-jornada" style="color:#94a3b8;">Día no iniciado</span>
+        <span id="lbl-ultimo-gps" style="font-size:12px;color:#38bdf8;"></span>
       </div>
       <div style="display:flex; gap:8px;">
-        <button id="btn-iniciar-dia" class="btn btn-verde" style="margin-top:0;" onclick="iniciarJornadaLaboral()">🟢 Iniciar Jornada Laboral</button>
-        <button id="btn-fin-dia" class="btn btn-rojo oculto" style="margin-top:0;" onclick="finalizarJornadaLaboral()">🔴 Finalizar Día Laboral</button>
+        <button id="btn-iniciar-dia" class="btn btn-verde btn-grande" style="margin-top:0;" onclick="iniciarJornadaLaboral()">EMPEZAR MI DÍA</button>
+        <button id="btn-fin-dia" class="btn btn-rojo btn-grande oculto" style="margin-top:0;" onclick="finalizarJornadaLaboral()">TERMINAR MI DÍA</button>
       </div>
-      <div id="lbl-cola-ot" class="oculto" style="font-size:11.5px;color:#fde047;margin-top:8px;font-weight:bold;"></div>
+      <div id="lbl-cola-ot" class="oculto" style="font-size:13px;color:#fde047;margin-top:8px;font-weight:bold;"></div>
     </div>
 
-    <!-- ETAPA A: INICIAR TRABAJO EN SITIO -->
+    <!-- PASO A: EMPEZAR UNA ORDEN -->
     <div id="etapa-1-inicio" class="bloque">
-      <label>Número de Orden de Trabajo (OT):</label>
-      <input type="text" id="inp-ot" placeholder="Ej. 15612" oninput="guardarEstadoVivo()" />
+      <label>Número de orden (OT):</label>
+      <input type="text" id="inp-ot" inputmode="numeric" placeholder="Ejemplo: 15612" oninput="guardarEstadoVivo()" />
 
-      <label>Tipo de Servicio a Realizar:</label>
+      <label>¿Qué vas a hacer?</label>
       <select id="sel-tipo-servicio" onchange="guardarEstadoVivo()">
         <option value="INSTALACION">Instalación</option>
-        <option value="REPARACION">Reparación / Servicio</option>
+        <option value="REPARACION">Reparación</option>
       </select>
 
-      <button class="btn btn-azul" onclick="iniciarTrabajoEnSitio()">📍 Iniciar Trabajo en Sitio</button>
+      <button class="btn btn-azul btn-grande" onclick="iniciarTrabajoEnSitio()">EMPEZAR TRABAJO</button>
     </div>
 
-    <!-- ETAPA B: BITÁCORA CON CARRITO, 5 FOTOS Y CLASIFICACIÓN DE CLIENTE -->
+    <!-- PASO B: LO QUE SE HIZO EN LA ORDEN -->
     <div id="etapa-2-bitacora" class="bloque oculto">
-      <div style="font-size:14px;font-weight:bold;color:#4ade80;margin-bottom:4px;" id="lbl-ot-activa">🔧 Trabajando en Sitio</div>
-      <div class="aviso-guardado">💾 Guardado automático activo en 2° plano</div>
+      <div style="font-size:16px;font-weight:bold;color:#4ade80;margin-bottom:4px;" id="lbl-ot-activa">Trabajando en la orden</div>
+      <div class="aviso-guardado">Todo se guarda solo, aunque salgas de la app.</div>
 
       <div id="reader-mac"></div>
 
-      <!-- 1. EQUIPOS ÚNICOS CON MAC -->
+      <!-- 1. EQUIPO CON MAC -->
       <div class="sub-caja">
-        <p class="titulo-sec">1. Equipos Únicos Serializados (Con MAC)</p>
-        <label>Tipo de Movimiento del Equipo:</label>
+        <p class="titulo-sec">1. Equipo con MAC</p>
+        <label>¿Qué hiciste con el equipo?</label>
         <select id="sel-tipo-equipo" onchange="alCambiarMovimientoEquipo(); guardarEstadoVivo();">
-          <option value="INSTALADO">Instalación de Equipo (De mi Bodega Virtual)</option>
-          <option value="REEMPLAZO">Reemplazo de Equipo (Nuevo + Retiro de "Malo")</option>
+          <option value="INSTALADO">Instalé un equipo nuevo</option>
+          <option value="REEMPLAZO">Cambié un equipo dañado por uno nuevo</option>
         </select>
 
-        <label>Buscar en mi Bodega Virtual o Escanear MAC:</label>
+        <label>Elige el equipo de tu lista o escanea la MAC:</label>
         <select id="sel-bodega-eq" onchange="alElegirEquipoBodega(); guardarEstadoVivo();">
-          <option value="">-- Sin equipos asignados en tu bodega --</option>
+          <option value="">-- No tienes equipos asignados --</option>
         </select>
         <div class="fila-input-cam" style="margin-top:6px;">
-          <input type="text" id="inp-mac-nuevo" placeholder="MAC / Serie Equipo Nuevo + Modelo" oninput="guardarEstadoVivo()" />
-          <button type="button" class="btn-cam" onclick="abrirEscanerCamara('inp-mac-nuevo')">📷 MAC</button>
+          <input type="text" id="inp-mac-nuevo" placeholder="MAC del equipo nuevo" oninput="guardarEstadoVivo()" />
+          <button type="button" class="btn-cam" onclick="abrirEscanerCamara('inp-mac-nuevo')">Escanear</button>
         </div>
 
         <div id="bloque-mac-malo" class="oculto">
-          <label style="color:#fca5a5;">MAC / Serie del Equipo Dañado Retirado ("Malo"):</label>
+          <label style="color:#fca5a5;">MAC del equipo dañado que quitaste:</label>
           <div class="fila-input-cam">
-            <input type="text" id="inp-mac-malo" placeholder="MAC del equipo dañado retirado..." oninput="guardarEstadoVivo()" />
-            <button type="button" class="btn-cam" onclick="abrirEscanerCamara('inp-mac-malo')">📷 MAC</button>
+            <input type="text" id="inp-mac-malo" placeholder="MAC del equipo dañado" oninput="guardarEstadoVivo()" />
+            <button type="button" class="btn-cam" onclick="abrirEscanerCamara('inp-mac-malo')">Escanear</button>
           </div>
         </div>
 
-        <button type="button" class="btn btn-azul btn-sm" onclick="agregarEquipoAlCarrito()">➕ Agregar Equipo Único al Carrito</button>
+        <button type="button" class="btn btn-azul btn-sm" onclick="agregarEquipoAlCarrito()">Agregar equipo</button>
       </div>
 
-      <!-- 2. CONSUMIBLES EXCLUSIVOS ASIGNADOS AL TÉCNICO -->
+      <!-- 2. MATERIALES -->
       <div class="sub-caja">
-        <p class="titulo-sec" style="color:#fde047;">2. Consumibles Asignados a mi Bodega</p>
-        <label>Seleccionar Consumible (Solo aparecen los asignados a ti):</label>
+        <p class="titulo-sec" style="color:#fde047;">2. Materiales que usaste</p>
+        <label>Elige el material y escribe cuántos usaste:</label>
         <div class="fila-input-cam">
           <select id="sel-bodega-mat" style="flex:2.2;">
-            <option value="">-- Sin consumibles asignados en tu bodega --</option>
+            <option value="">-- No tienes materiales asignados --</option>
           </select>
-          <input type="number" id="inp-cant-mat" placeholder="Cant." value="1" min="1" style="flex:0.8;" />
+          <input type="number" id="inp-cant-mat" inputmode="numeric" placeholder="Cant." value="1" min="1" style="flex:0.8;" />
         </div>
-        <button type="button" class="btn btn-amarillo btn-sm" onclick="agregarConsumibleAlCarrito()">➕ Agregar Consumible al Carrito</button>
+        <button type="button" class="btn btn-amarillo btn-sm" onclick="agregarConsumibleAlCarrito()">Agregar material</button>
       </div>
 
-      <!-- CARRITO DE LA OT -->
+      <!-- LISTA DE LA ORDEN -->
       <div class="carrito-box">
-        <div style="font-size:12px;font-weight:bold;color:#38bdf8;margin-bottom:6px;">🛒 Carrito de Equipos y Consumibles de esta OT:</div>
+        <div style="font-size:14px;font-weight:bold;color:#38bdf8;margin-bottom:6px;">Lo que usaste en esta orden:</div>
         <div id="lista-carrito-visual">
-          <div style="font-size:11.5px;color:#64748b;">Aún no has agregado equipos ni consumibles a esta orden.</div>
+          <div style="font-size:13px;color:#94a3b8;">Todavía no has agregado nada.</div>
         </div>
       </div>
 
-      <!-- 3. EVIDENCIA FOTOGRÁFICA: CÁMARA + GALERÍA (MÁXIMO 5 FOTOS) -->
+      <!-- 3. FOTOS -->
       <div class="sub-caja">
-        <p class="titulo-sec" style="color:#4ade80;">3. Evidencia Fotográfica (Máximo 5 Fotos)</p>
+        <p class="titulo-sec" style="color:#4ade80;">3. Fotos del trabajo (máximo 5)</p>
         <input type="file" id="inp-foto-camara" accept="image/*" capture="environment" class="oculto" onchange="procesarFotosSeleccionadas(this)" />
         <input type="file" id="inp-foto-galeria" accept="image/*" multiple class="oculto" onchange="procesarFotosSeleccionadas(this)" />
 
         <div style="display:flex; gap:8px;">
-          <button type="button" class="btn btn-azul btn-sm" style="margin-top:2px;" onclick="document.getElementById('inp-foto-camara').click()">📷 Tomar Foto</button>
-          <button type="button" class="btn btn-amarillo btn-sm" style="margin-top:2px;" onclick="document.getElementById('inp-foto-galeria').click()">🖼️ Subir de Galería</button>
+          <button type="button" class="btn btn-azul btn-sm" style="margin-top:2px;" onclick="document.getElementById('inp-foto-camara').click()">Tomar foto</button>
+          <button type="button" class="btn btn-amarillo btn-sm" style="margin-top:2px;" onclick="document.getElementById('inp-foto-galeria').click()">Elegir de la galería</button>
         </div>
-        <div id="lbl-conteo-fotos" style="font-size:11.5px;color:#38bdf8;margin-top:6px;font-weight:bold;">📸 0 de 5 fotos cargadas</div>
+        <div id="lbl-conteo-fotos" style="font-size:13px;color:#38bdf8;margin-top:6px;font-weight:bold;">0 de 5 fotos</div>
         <div id="contenedor-miniaturas" class="galeria-previews"></div>
       </div>
 
-      <!-- 4. CLASIFICACIÓN DEL CLIENTE Y BITÁCORA DESCRIPTIVA -->
-      <label>4. Percepción / Actitud del Cliente durante la Visita:</label>
+      <!-- 4. CLIENTE Y DESCRIPCIÓN -->
+      <label>4. ¿Cómo fue el cliente?</label>
       <select id="sel-comportamiento-cliente" onchange="guardarEstadoVivo()">
-        <option value="🤝 Colaborador / Accesible">🤝 Colaborador / Accesible (Facilitó el trabajo)</option>
-        <option value="😐 Neutral / Estándar">😐 Neutral / Estándar (Trato normal sin contratiempos)</option>
-        <option value="⚠️ Exigente / Inconforme">⚠️ Exigente / Inconforme (Con reclamos u observaciones)</option>
-        <option value="❌ Conflictivo / Difícil Trato">❌ Conflictivo / Difícil Trato (Hostil o puso obstáculos)</option>
+        <option value="Colaborador">Colaborador: me ayudó</option>
+        <option value="Normal">Normal: sin problemas</option>
+        <option value="Exigente / Con quejas">Exigente: tuvo quejas</option>
+        <option value="Difícil / Conflictivo">Difícil: no dejaba trabajar</option>
       </select>
 
-      <label>5. Bitácora Descriptiva del Trabajo Realizado:</label>
-      <textarea id="inp-bitacora-obs" rows="3" placeholder="Describe qué trabajo se realizó, pruebas efectuadas y detalles relevantes..." oninput="guardarEstadoVivo()"></textarea>
+      <label>5. ¿Qué trabajo hiciste?</label>
+      <textarea id="inp-bitacora-obs" rows="3" placeholder="Escribe qué hiciste y qué pruebas hiciste..." oninput="guardarEstadoVivo()"></textarea>
 
-      <button class="btn btn-verde" onclick="pasarAPantallaQR()">Siguiente: Guardar Bitácora y Mostrar QR al Cliente →</button>
-      <button class="btn btn-rojo" onclick="abrirModalNoRealizada()">⚠️ La OT NO se pudo realizar (Justificar y Cerrar)</button>
+      <button class="btn btn-verde btn-grande" onclick="pasarAPantallaQR()">SIGUIENTE: ENCUESTA DEL CLIENTE</button>
+      <button class="btn btn-rojo" onclick="abrirModalNoRealizada()">No se pudo hacer esta orden</button>
     </div>
 
-    <!-- MODAL SI LA OT NO SE PUDO REALIZAR -->
+    <!-- SI LA ORDEN NO SE PUDO HACER -->
     <div id="etapa-no-realizada" class="bloque oculto" style="border-color:#ef4444;">
-      <h2 style="color:#f87171;">⚠️ Justificación de OT No Realizada</h2>
-      <label>Motivo por el cual no se realizó la OT:</label>
+      <h2 style="color:#f87171;">No se pudo hacer la orden</h2>
+      <label>¿Por qué no se pudo?</label>
       <select id="sel-motivo-no" onchange="guardarEstadoVivo()">
-        <option value="Cliente ausente en el domicilio">Cliente ausente en el domicilio</option>
-        <option value="Ductería interna obstruida">Ductería interna obstruida / Sin paso</option>
-        <option value="Falta de postería o red externa">Falta de postería o disponibilidad técnica</option>
-        <option value="Cliente solicitó reprogramar o cancelar">Cliente solicitó reprogramar o cancelar</option>
-        <option value="Otro motivo">Otro motivo (Detallar abajo)</option>
+        <option value="Cliente ausente en el domicilio">El cliente no estaba</option>
+        <option value="Ductería interna obstruida">El tubo de adentro está tapado</option>
+        <option value="Falta de postería o red externa">Falta poste o red afuera</option>
+        <option value="Cliente solicitó reprogramar o cancelar">El cliente pidió otro día o canceló</option>
+        <option value="Otro motivo">Otro motivo (escríbelo abajo)</option>
       </select>
-      <label>Explicación detallada:</label>
-      <textarea id="txt-justificacion-no" rows="2" placeholder="Explique por qué no se pudo ejecutar..." oninput="guardarEstadoVivo()"></textarea>
-      <button class="btn btn-rojo" onclick="confirmarCierreNoRealizada()">Confirmar y Cerrar OT Sin QR ✔</button>
-      <button class="btn btn-gris" onclick="cancelarNoRealizada()">← Volver a la Bitácora</button>
+      <label>Explica en pocas palabras:</label>
+      <textarea id="txt-justificacion-no" rows="2" placeholder="Escribe por qué no se pudo..." oninput="guardarEstadoVivo()"></textarea>
+      <button class="btn btn-rojo btn-grande" onclick="confirmarCierreNoRealizada()">CERRAR ORDEN SIN ENCUESTA</button>
+      <button class="btn btn-gris" onclick="cancelarNoRealizada()">Regresar</button>
     </div>
 
-    <!-- ETAPA C: MOSTRAR QR O ENVIAR URL CORTA -->
+    <!-- PASO C: ENCUESTA DEL CLIENTE -->
     <div id="etapa-3-qr" class="bloque oculto">
-      <p class="ayuda" style="text-align:center;color:#fde047;font-size:12.5px;">
-        1. Pídale al cliente que escanee el código QR o envíele el enlace corto por WhatsApp.<br>
-        2. Una vez entregada la encuesta, presione <strong>"Siguiente y OT Terminada"</strong>.
+      <p class="ayuda" style="text-align:center;color:#fde047;font-size:14px;line-height:1.5;">
+        1. Pídele al cliente que escanee este código con su celular, o mándale el enlace por WhatsApp.<br>
+        2. Cuando el cliente termine, toca <strong>TERMINAR ORDEN</strong>.
       </p>
 
       <div id="caja-qr">
         <div id="qrcode"></div>
-        <div style="color:#0f172a;font-weight:bold;font-size:12px;margin-top:8px;" id="lbl-pie-qr"></div>
+        <div style="color:#0f172a;font-weight:bold;font-size:13px;margin-top:8px;" id="lbl-pie-qr"></div>
       </div>
 
-      <button class="btn btn-amarillo" id="btn-wa-corto" onclick="enviarUrlCortaWhatsApp()">📲 Copiar / Enviar Enlace Corto por WhatsApp</button>
-      <button class="btn btn-verde" style="margin-top:14px;padding:14px;font-size:15px;" onclick="finalizarOrdenPorCompleto()">✅ Siguiente y OT Terminada</button>
-      <button class="btn btn-gris" onclick="volverABitacoraDesdeQR()">← Volver a editar Bitácora</button>
+      <button class="btn btn-amarillo" id="btn-wa-corto" onclick="enviarUrlCortaWhatsApp()">Mandar enlace por WhatsApp</button>
+      <button class="btn btn-verde btn-grande" style="margin-top:14px;" onclick="finalizarOrdenPorCompleto()">TERMINAR ORDEN</button>
+      <button class="btn btn-gris" onclick="volverABitacoraDesdeQR()">Regresar a corregir</button>
     </div>
 
-    <button class="btn btn-gris" onclick="editarConfig()">⚙️ Configuración del Técnico</button>
+    <button class="btn btn-gris" onclick="editarConfig()">Configurar mi app</button>
   </div>
 </div>
 
-<!-- MODAL: HISTORIAL DE OTS REALIZADAS POR EL TÉCNICO (CON BUSCADOR Y CLIC PARA VER DETALLE) -->
+<!-- HISTORIAL: MIS ÓRDENES -->
 <div id="modal-historial-tec" class="modal-historial">
   <div style="max-width:480px; margin:0 auto;">
     <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:10px;">
-      <h2 style="color:#38bdf8; margin:0;">📂 Historial de Mis OTs</h2>
-      <button type="button" class="btn btn-rojo" style="width:auto; margin:0; padding:6px 14px;" onclick="cerrarHistorialTecnico()">✕ Cerrar</button>
+      <h2 style="color:#38bdf8; margin:0;">Mis órdenes</h2>
+      <button type="button" class="btn btn-rojo" style="width:auto; margin:0; padding:8px 16px;" onclick="cerrarHistorialTecnico()">Cerrar</button>
     </div>
-    <p class="ayuda">Busca por número de OT o toca cualquier orden para ver los equipos instalados, materiales y tu bitácora descriptiva.</p>
-    <input type="text" id="inp-buscar-mi-ot" placeholder="🔍 Buscar N° de OT, MAC o material..." oninput="filtrarHistorialTecnicoUI()" style="margin-bottom:12px; border-color:#38bdf8;" />
+    <p class="ayuda">Busca por número de orden, o toca una orden para ver lo que usaste.</p>
+    <input type="text" id="inp-buscar-mi-ot" placeholder="Buscar número de orden, MAC o material..." oninput="filtrarHistorialTecnicoUI()" style="margin-bottom:12px; border-color:#38bdf8;" />
     <div id="lista-historial-tec-container"></div>
   </div>
 </div>
@@ -283,6 +284,13 @@
 
   function leerCfg() {
     try { return JSON.parse(localStorage.getItem("cottech_movil_cfg") || "{}") || {}; } catch (e) { return {}; }
+  }
+
+  // Quita emojis de textos guardados por versiones anteriores (por ejemplo, en el historial)
+  function sinEmojis(texto) {
+    return String(texto === undefined || texto === null ? "" : texto)
+      .replace(/[\u{1F000}-\u{1FAFF}\u{2600}-\u{27BF}\u{2B00}-\u{2BFF}\u{FE0F}]/gu, "")
+      .replace(/\s{2,}/g, " ").trim();
   }
 
   function esc(valor) {
@@ -471,7 +479,11 @@
       document.getElementById("inp-bitacora-obs").value = est.obs || "";
       if (est.motivoNo) document.getElementById("sel-motivo-no").value = est.motivoNo;
       document.getElementById("txt-justificacion-no").value = est.justificacionNo || "";
-      if (est.comportamientoCliente) document.getElementById("sel-comportamiento-cliente").value = est.comportamientoCliente;
+      if (est.comportamientoCliente) {
+        const selCli = document.getElementById("sel-comportamiento-cliente");
+        selCli.value = est.comportamientoCliente;
+        if (selCli.selectedIndex < 0) selCli.selectedIndex = 0;   // Valor de la versión anterior (con emojis)
+      }
 
       alCambiarMovimientoEquipo();
       renderizarCarritoVisual();
@@ -495,7 +507,7 @@
         const contenedorQR = document.getElementById("qrcode");
         contenedorQR.innerHTML = "";
         new QRCode(contenedorQR, { text: urlEncuestaActual, width: 215, height: 215, correctLevel: QRCode.CorrectLevel.L });
-        document.getElementById("lbl-pie-qr").innerText = `OT #${est.ot} (${est.tipoServicio}) · Escanee para evaluar`;
+        document.getElementById("lbl-pie-qr").innerText = `Orden ${est.ot} · Escanee para evaluar`;
       }
 
       actualizarEtiquetaEstadoUI();
@@ -512,7 +524,7 @@
     if (numEtapa === "2") {
       const ot = document.getElementById("inp-ot").value.trim();
       const tipo = document.getElementById("sel-tipo-servicio").value;
-      document.getElementById("lbl-ot-activa").innerText = `🔧 Trabajando en Sitio: OT #${ot} (${tipo})`;
+      document.getElementById("lbl-ot-activa").innerText = `Trabajando en la orden ${ot} (${tipo === "REPARACION" ? "Reparación" : "Instalación"})`;
     }
     guardarEstadoVivo();
   }
@@ -573,8 +585,8 @@
     }, (ubicacion, error) => {
       if (error) {
         if (error.code === "NOT_AUTHORIZED") {
-          mostrarAvisoGps("⚠️ Sin permiso de ubicación: actívalo en Ajustes del teléfono", "#f87171");
-          if (confirm("La app necesita el permiso de ubicación 'Permitir todo el tiempo'. ¿Abrir los ajustes?")) {
+          mostrarAvisoGps("No hay permiso de ubicación", "#f87171");
+          if (confirm("La app necesita permiso para usar tu ubicación. ¿Quieres abrir los ajustes para darlo?")) {
             window.CottechNativo.abrirAjustes();
           }
         }
@@ -713,7 +725,7 @@
       document.getElementById("cfg-enlace").value = "";
       cargarVista();
     } catch (e) {
-      alert("Ese enlace no es válido. Copia completo el enlace que te envió tu supervisor.");
+      alert("Ese enlace no sirve. Copia el enlace completo que te mandó tu supervisor.");
     }
   }
 
@@ -727,7 +739,8 @@
       cfg = await asegurarLlaveGps(cfg);
       document.getElementById("vista-config").classList.add("oculto");
       document.getElementById("vista-operacion").classList.remove("oculto");
-      document.getElementById("titulo-tec").innerText = `👷 ${cfg.id} - ${cfg.nombre || "Técnico"}`;
+      document.getElementById("titulo-tec").innerHTML =
+        `${esc(cfg.nombre || "Técnico")}<br><span style="font-size:13px;color:#94a3b8;font-weight:normal;">Código: ${esc(cfg.id)}</span>`;
       restaurarEstadoVivo();
       sincronizarMiBodega();
       migrarColaLegada().then(() => procesarCola());
@@ -739,7 +752,7 @@
     const nombre = document.getElementById("cfg-nombre").value.trim() || id;
     const llave = document.getElementById("cfg-llave").value.trim();
     const execUrl = document.getElementById("cfg-exec").value.trim();
-    if (!id || !llave || !execUrl.startsWith("https://")) return alert("Completa Código, Llave y Enlace del Servidor.");
+    if (!id || !llave || !execUrl.startsWith("https://")) return alert("Falta llenar tu código, tu clave o la dirección del sistema.");
     const anterior = leerCfg();
     localStorage.setItem("cottech_movil_cfg", JSON.stringify({
       id, nombre, llave, execUrl,
@@ -777,7 +790,9 @@
     try {
       const data = await pedirBodegaFirmada();
       if (!data || data.status !== "success") {
-        document.getElementById("sub-bodega").innerText = "⚠️ " + ((data && data.message) || "No se pudo sincronizar la bodega.");
+        document.getElementById("sub-bodega").innerText = (data && data.code === "AUTH")
+          ? "Tu acceso no es válido. Pide a tu supervisor un enlace nuevo."
+          : "No se pudieron cargar tus equipos. Revisa tu internet.";
         return;
       }
 
@@ -785,12 +800,12 @@
       const selEq = document.getElementById("sel-bodega-eq");
       bodegaEquiposLocal = (data && Array.isArray(data.equipos)) ? data.equipos : [];
       if (bodegaEquiposLocal.length > 0) {
-        selEq.innerHTML = `<option value="">-- Seleccionar equipo de mi bodega (${bodegaEquiposLocal.length} disp.) --</option>`;
+        selEq.innerHTML = `<option value="">-- Elige un equipo (tienes ${bodegaEquiposLocal.length}) --</option>`;
         bodegaEquiposLocal.forEach(eq => {
           selEq.innerHTML += `<option value="${esc(eq.mac)} (${esc(eq.modelo)})">${esc(eq.modelo)} | MAC: ${esc(eq.mac)}</option>`;
         });
       } else {
-        selEq.innerHTML = `<option value="">-- Sin equipos asignados en tu bodega --</option>`;
+        selEq.innerHTML = `<option value="">-- No tienes equipos asignados --</option>`;
       }
 
       // 2. Consumibles estrictamente asignados al técnico con saldo > 0
@@ -802,10 +817,10 @@
       if (bodegaMaterialesLocal.length > 0) {
         selMat.innerHTML = "";
         bodegaMaterialesLocal.forEach(m => {
-          selMat.innerHTML += `<option value="${esc(m.codigo)} - ${esc(m.nombre)}">${esc(m.codigo)} - ${esc(m.nombre)} (Disponible: ${esc(m.saldo)})</option>`;
+          selMat.innerHTML += `<option value="${esc(m.codigo)} - ${esc(m.nombre)}">${esc(m.codigo)} - ${esc(m.nombre)} (tienes ${esc(m.saldo)})</option>`;
         });
       } else {
-        selMat.innerHTML = `<option value="">-- Sin consumibles asignados en tu bodega --</option>`;
+        selMat.innerHTML = `<option value="">-- No tienes materiales asignados --</option>`;
       }
 
       // 3. Historial de OTs del técnico desde el servidor
@@ -814,9 +829,9 @@
         localStorage.setItem("cottech_mis_ots_servidor", JSON.stringify(historialCompletoTecnico));
       }
 
-      document.getElementById("sub-bodega").innerText = `📦 Mi Bodega: ${bodegaEquiposLocal.length} equipo(s) y ${bodegaMaterialesLocal.length} consumible(s) asignados.`;
+      document.getElementById("sub-bodega").innerText = `Tienes ${bodegaEquiposLocal.length} equipo(s) y ${bodegaMaterialesLocal.length} material(es) asignados.`;
     } catch (e) {
-      document.getElementById("sub-bodega").innerText = "📦 Bodega Digital activa.";
+      document.getElementById("sub-bodega").innerText = "Sin internet: se muestran tus equipos guardados.";
     }
   }
 
@@ -835,9 +850,9 @@
     const macNuevo = document.getElementById("inp-mac-nuevo").value.trim().toUpperCase();
     const macMalo = document.getElementById("inp-mac-malo").value.trim().toUpperCase();
 
-    if (!macNuevo) return alert("Selecciona de tu bodega o escanea la MAC del equipo único.");
+    if (!macNuevo) return alert("Elige el equipo de tu lista o escanea su MAC.");
     if (tipoMov === "REEMPLAZO" && !macMalo) {
-      return alert("En un reemplazo debes escanear o escribir también la MAC del equipo dañado ('Malo').");
+      return alert("Como cambiaste un equipo, escanea o escribe también la MAC del equipo dañado.");
     }
 
     carritoEquipos.push({
@@ -856,8 +871,8 @@
   function agregarConsumibleAlCarrito() {
     const matRaw = document.getElementById("sel-bodega-mat").value;
     const cant = Number(document.getElementById("inp-cant-mat").value) || 0;
-    if (!matRaw) return alert("No tienes este consumible asignado en tu bodega virtual.");
-    if (cant <= 0) return alert("Ingresa una cantidad válida.");
+    if (!matRaw) return alert("Elige un material de la lista.");
+    if (cant <= 0) return alert("Escribe cuántos usaste (1 o más).");
 
     const limpio = matRaw.split(" (Disponible:")[0].trim();
     const existente = carritoConsumibles.find(x => x.material === limpio);
@@ -885,25 +900,25 @@
   function renderizarCarritoVisual() {
     const cont = document.getElementById("lista-carrito-visual");
     if (carritoEquipos.length === 0 && carritoConsumibles.length === 0) {
-      cont.innerHTML = `<div style="font-size:11.5px;color:#64748b;">Aún no has agregado equipos ni consumibles a esta orden.</div>`;
+      cont.innerHTML = `<div style="font-size:13px;color:#94a3b8;">Todavía no has agregado nada.</div>`;
       return;
     }
 
     let html = "";
     carritoEquipos.forEach((eq, i) => {
-      const txtReemp = eq.movimiento === "REEMPLAZO" ? ` <span style="color:#fca5a5;">(Retira Malo: ${esc(eq.macDanado)})</span>` : "";
+      const txtReemp = eq.movimiento === "REEMPLAZO" ? `<br><span style="color:#fca5a5;">Quitaste el dañado: ${esc(eq.macDanado)}</span>` : "";
       html += `
         <div class="item-carrito">
-          <span>📡 <strong>[Equipo]</strong> ${esc(eq.macNuevo)}${txtReemp}</span>
-          <button type="button" class="btn-quitar" onclick="eliminarEquipoCarrito(${i})">✕</button>
+          <span><strong>Equipo:</strong> ${esc(eq.macNuevo)}${txtReemp}</span>
+          <button type="button" class="btn-quitar" onclick="eliminarEquipoCarrito(${i})">Quitar</button>
         </div>`;
     });
 
     carritoConsumibles.forEach((c, i) => {
       html += `
         <div class="item-carrito" style="border-left-color:#fde047;">
-          <span>🧰 <strong>[Consumible x${esc(c.cantidad)}]</strong> ${esc(c.material)}</span>
-          <button type="button" class="btn-quitar" onclick="eliminarConsumibleCarrito(${i})">✕</button>
+          <span><strong>Material (${esc(c.cantidad)}):</strong> ${esc(c.material)}</span>
+          <button type="button" class="btn-quitar" onclick="eliminarConsumibleCarrito(${i})">Quitar</button>
         </div>`;
     });
     cont.innerHTML = html;
@@ -918,7 +933,7 @@
 
     archivos.forEach(file => {
       if (fotosComprimidasArray.length >= 5) {
-        alert("Ya alcanzaste el límite máximo de 5 fotografías para esta OT.");
+        alert("Ya tienes 5 fotos. No se pueden agregar más.");
         return;
       }
       const reader = new FileReader();
@@ -955,14 +970,14 @@
   function renderizarMiniaturasFotos() {
     const lbl = document.getElementById("lbl-conteo-fotos");
     const cont = document.getElementById("contenedor-miniaturas");
-    if (lbl) lbl.innerText = `📸 ${fotosComprimidasArray.length} de 5 fotos cargadas`;
+    if (lbl) lbl.innerText = `${fotosComprimidasArray.length} de 5 fotos`;
     if (!cont) return;
     cont.innerHTML = "";
     fotosComprimidasArray.forEach((b64, idx) => {
       cont.innerHTML += `
         <div class="thumb-box">
           <img src="${b64}" alt="Evidencia ${idx + 1}" />
-          <button type="button" class="thumb-del" onclick="eliminarFotoMiniatura(${idx})">✕</button>
+          <button type="button" class="thumb-del" onclick="eliminarFotoMiniatura(${idx})">X</button>
         </div>`;
     });
   }
@@ -1004,7 +1019,7 @@
     });
 
     if (lista.length === 0) {
-      container.innerHTML = `<div style="color:#94a3b8; font-size:13px; text-align:center; padding:30px;">No se encontraron órdenes registradas con ese criterio.</div>`;
+      container.innerHTML = `<div style="color:#94a3b8; font-size:14px; text-align:center; padding:30px;">No hay órdenes con esa búsqueda.</div>`;
       return;
     }
 
@@ -1012,27 +1027,27 @@
     lista.forEach((b, idx) => {
       const macN = b.macNuevo || b.macEquipoNuevo || "N/A";
       const macM = b.macDanado || b.macEquipoDañado || "N/A";
-      const matU = b.material || b.materialUtilizado || "Sin consumibles";
-      const cli = b.compCliente || b.comportamientoCliente || "N/A";
+      const matU = b.material || b.materialUtilizado || "Ninguno";
+      const cli = sinEmojis(b.compCliente || b.comportamientoCliente || "") || "No indicado";
       const min = b.minutos || b.minutosEnSitio || 1;
-      const obs = b.observaciones || "Sin observaciones adicionales";
+      const obs = b.observaciones || "Sin descripción";
 
       html += `
         <div class="ot-card" onclick="alternarDetalleOtCard(${idx})">
           <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:14px; font-weight:bold; color:#38bdf8;">📌 OT #${esc(b.ot)} · ${esc(b.tipoServicio || 'SERVICIO')}</span>
-            <span style="font-size:11.5px; color:#4ade80;">${esc(String(b.fecha || '').substring(0, 16))} ▾</span>
+            <span style="font-size:16px; font-weight:bold; color:#38bdf8;">Orden ${esc(b.ot)} · ${String(b.tipoServicio || '').toUpperCase().indexOf('REPARA') !== -1 ? 'Reparación' : 'Instalación'}</span>
+            <span style="font-size:13px; color:#4ade80;">${esc(String(b.fecha || '').substring(0, 16))}</span>
           </div>
-          <div style="font-size:11.5px; color:#94a3b8; margin-top:3px;">Toca aquí para ver equipos, materiales y bitácora completa</div>
+          <div style="font-size:13px; color:#94a3b8; margin-top:3px;">Toca para ver el detalle</div>
           <div id="det-ot-card-${idx}" class="ot-detalle oculto">
-            <div>⏱️ <strong>Tiempo en sitio:</strong> ${esc(min)} min</div>
-            <div>📡 <strong>Equipo Instalado (MAC):</strong> ${esc(macN)}</div>
-            <div>🔄 <strong>Equipo Dañado Retirado:</strong> ${esc(macM)}</div>
-            <div>🧰 <strong>Materiales Implementados:</strong> ${esc(matU)}</div>
-            <div>🤝 <strong>Actitud del Cliente:</strong> ${esc(cli)}</div>
-            ${b.alertas ? `<div style="color:#fca5a5;">⚠️ <strong>Alertas de inventario:</strong> ${esc(b.alertas)}</div>` : ''}
+            <div><strong>Tiempo en el lugar:</strong> ${esc(min)} minutos</div>
+            <div><strong>Equipo instalado (MAC):</strong> ${esc(macN)}</div>
+            <div><strong>Equipo dañado que quitaste:</strong> ${esc(macM)}</div>
+            <div><strong>Materiales usados:</strong> ${esc(matU)}</div>
+            <div><strong>Cómo fue el cliente:</strong> ${esc(cli)}</div>
+            ${b.alertas ? `<div style="color:#fca5a5;"><strong>Aviso de inventario:</strong> ${esc(b.alertas)}</div>` : ''}
             <div style="margin-top:6px; padding:8px; background:#1e293b; border-radius:6px; color:#f8fafc;">
-              📝 <strong>Bitácora Descriptiva:</strong><br>${esc(obs)}
+              <strong>Lo que hiciste:</strong><br>${esc(obs)}
             </div>
           </div>
         </div>`;
@@ -1078,20 +1093,20 @@
   function actualizarEtiquetaEstadoUI() {
     const lbl = document.getElementById("lbl-estado-jornada");
     if (!jornadaActiva) {
-      lbl.innerText = "⚪ Jornada Finalizada (GPS Apagado)";
+      lbl.innerText = "Día no iniciado";
       lbl.style.color = "#94a3b8";
     } else if (otInicioMs) {
-      lbl.innerText = "🟢 Activo en Sitio (OT en curso · 2° Plano Fijo)";
+      lbl.innerText = "Trabajando en una orden";
       lbl.style.color = "#4ade80";
     } else {
-      lbl.innerText = "⚪ Inactivo (Sin OT activa · 2° Plano Fijo)";
+      lbl.innerText = "Día iniciado · Sin orden ahora";
       lbl.style.color = "#fde047";
     }
   }
 
   async function finalizarJornadaLaboral() {
-    if (otInicioMs) return alert("Primero termina o cierra la OT que tienes en sitio.");
-    if (!confirm("¿Confirmas que ya finalizaste tu día laboral? Se apagará el segundo plano y el GPS.")) return;
+    if (otInicioMs) return alert("Primero termina la orden en la que estás trabajando.");
+    if (!confirm("¿Ya terminaste tu día de trabajo? Se apagará la ubicación.")) return;
 
     jornadaActiva = false;
     inicioJornadaMs = 0;
@@ -1122,11 +1137,11 @@
         ultimoPulsoNativoMs = Date.now();
         publicarPulso(cfg, estadoReporte, ultimaPrecision);
       } else {
-        mostrarAvisoGps("⏳ Buscando señal GPS…", "#f59e0b");
+        mostrarAvisoGps("Buscando señal de GPS...", "#f59e0b");
       }
       return;
     }
-    if (!navigator.geolocation) return mostrarAvisoGps("⚠️ Este celular no tiene GPS disponible", "#f87171");
+    if (!navigator.geolocation) return mostrarAvisoGps("Este celular no tiene GPS", "#f87171");
 
     navigator.geolocation.getCurrentPosition(async pos => {
       ultimaLat = Number(pos.coords.latitude.toFixed(6));
@@ -1134,9 +1149,9 @@
       await publicarPulso(cfg, estadoReporte, Math.round(pos.coords.accuracy || 0));
     }, err => {
       if (err && err.code === 1) {
-        mostrarAvisoGps("⚠️ Permiso de ubicación denegado: actívalo en el navegador", "#f87171");
+        mostrarAvisoGps("Falta el permiso de ubicación", "#f87171");
       } else {
-        mostrarAvisoGps("⚠️ Sin señal GPS: reintentando…", "#f59e0b");
+        mostrarAvisoGps("Sin señal de GPS, intentando...", "#f59e0b");
       }
       // Un cambio de estado (fin de jornada, inicio/cierre de OT) se publica igual con la última posición conocida
       if (estadoReporte !== ultimoEstadoEnviadoHoja) publicarPulso(cfg, estadoReporte, -1);
@@ -1166,14 +1181,14 @@
           body: JSON.stringify(paqueteGps)
         });
         if (r.ok) {
-          mostrarAvisoGps(`📡 ${new Date().toLocaleTimeString()}`, "#38bdf8");
+          mostrarAvisoGps(`Ubicación enviada ${new Date().toLocaleTimeString([], { hour: "numeric", minute: "2-digit" })}`, "#4ade80");
         } else if (r.status === 401 || r.status === 403) {
-          mostrarAvisoGps("⚠️ GPS rechazado: pide a tu supervisor un enlace nuevo", "#f87171");
+          mostrarAvisoGps("Ubicación no aceptada: pide un enlace nuevo a tu supervisor", "#f87171");
         } else {
-          mostrarAvisoGps(`⚠️ Error GPS (${r.status})`, "#f59e0b");
+          mostrarAvisoGps("No se pudo enviar la ubicación, intentando...", "#f59e0b");
         }
       } catch (e) {
-        mostrarAvisoGps("⚠️ Sin internet: reintentando…", "#f59e0b");
+        mostrarAvisoGps("Sin internet, intentando...", "#f59e0b");
       }
 
       // La hoja de cálculo solo se actualiza cuando CAMBIA el estado (no cada 30 s)
@@ -1187,7 +1202,7 @@
 
   function iniciarTrabajoEnSitio() {
     const ot = document.getElementById("inp-ot").value.trim();
-    if (!ot) return alert("Ingresa el número de OT antes de iniciar en sitio.");
+    if (!ot) return alert("Escribe el número de orden primero.");
 
     if (!otInicioMs) otInicioMs = Date.now();
     if (!jornadaActiva) {
@@ -1218,7 +1233,7 @@
       },
       () => {}
     ).catch(() => {
-      alert("No se pudo acceder a la cámara.");
+      alert("No se pudo abrir la cámara. Revisa que la app tenga permiso de cámara.");
       divReader.style.display = "none";
     });
   }
@@ -1255,7 +1270,7 @@
     const contenedorQR = document.getElementById("qrcode");
     contenedorQR.innerHTML = "";
     new QRCode(contenedorQR, { text: urlEncuestaActual, width: 215, height: 215, correctLevel: QRCode.CorrectLevel.L });
-    document.getElementById("lbl-pie-qr").innerText = `OT #${ot} (${tipoServ}) · Escanee para evaluar`;
+    document.getElementById("lbl-pie-qr").innerText = `Orden ${ot} · Escanee para evaluar`;
 
     mostrarEtapaPantalla("3");
 
@@ -1340,7 +1355,7 @@
     encolarYEnviarOT(payloadCierre);
     enviarPulsoGpsAhora("INACTIVO_SIN_OT");
 
-    alert(`✅ OT #${ot} registrada.\n⏱️ Tiempo total: ${minTranscurridos} min.\n📤 Se está enviando al servidor (si no hay señal, se enviará sola al recuperarla).\n⚪ Estado: Inactivo (En espera de nueva OT).`);
+    alert(`La orden ${ot} se terminó.\nTiempo: ${minTranscurridos} minutos.\nSe está enviando. Si no hay internet, se enviará sola cuando vuelva la señal.`);
   }
 
   function abrirModalNoRealizada() {
@@ -1356,7 +1371,7 @@
     const ot = document.getElementById("inp-ot").value.trim();
     const motivo = document.getElementById("sel-motivo-no").value;
     const detalle = document.getElementById("txt-justificacion-no").value.trim();
-    if (!detalle) return alert("Explica brevemente la justificación por la que no se realizó.");
+    if (!detalle) return alert("Escribe en pocas palabras por qué no se pudo.");
 
     const minTranscurridos = Math.max(1, Math.round((Date.now() - (otInicioMs || Date.now())) / 60000));
     otInicioMs = null;
@@ -1397,7 +1412,7 @@
     actualizarEtiquetaEstadoUI();
     encolarYEnviarOT(payloadNo);
     enviarPulsoGpsAhora("INACTIVO_SIN_OT");
-    alert(`⚪ OT #${ot} cerrada como NO REALIZADA (${minTranscurridos} min).`);
+    alert(`La orden ${ot} se cerró como NO REALIZADA.`);
   }
 
   // =========================================================================
@@ -1481,15 +1496,15 @@
       return;
     }
     lbl.classList.remove("oculto");
-    lbl.innerText = mensajeExtra || `📤 ${n} OT(s) pendientes de envío · se reintentan solas`;
+    lbl.innerText = mensajeExtra || `${n} orden(es) esperando internet. Se enviarán solas.`;
   }
 
   async function encolarYEnviarOT(payload) {
     const guardada = await colaAgregar({ opId: payload.opId, payload: payload, creado: Date.now() });
     if (!guardada) {
-      alert("⚠️ El celular no tiene espacio para guardar la OT. No cierre la aplicación hasta ver la confirmación.");
+      alert("El celular no tiene espacio. No cierres la app hasta que veas que la orden se envió.");
       postFirmado("CERRAR_BITACORA_OT", payload).then(res => {
-        if (res && res.status === "success") alert(`✅ OT #${payload.ot} recibida por el servidor.`);
+        if (res && res.status === "success") alert(`La orden ${payload.ot} ya llegó al sistema.`);
       }).catch(() => {});
     }
     await actualizarIndicadorCola();
@@ -1520,12 +1535,12 @@
           await colaQuitar(item.opId);
           enviadas++;
           if (res.alertas && res.alertas.length > 0) {
-            aviso = `⚠️ OT #${payload.ot} registrada con alertas de inventario: ${res.alertas.join("; ")}`;
+            aviso = `La orden ${payload.ot} se guardó, pero hay un aviso de equipos o materiales. Tu supervisor lo revisará.`;
           }
           continue;
         }
         if (res && res.code === "AUTH") {
-          aviso = "⚠️ " + res.message;      // Credencial inválida o técnico desactivado
+          aviso = "Tu acceso no es válido. Pide a tu supervisor un enlace nuevo.";   // Credencial inválida o técnico desactivado
         }
         break;                               // BUSY u otro error: reintentar más tarde
       }
