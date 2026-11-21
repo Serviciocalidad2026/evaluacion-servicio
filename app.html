@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Instalar la app · Cottech Técnico</title>
+  <meta name="theme-color" content="#0f172a" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { margin: 0; padding: 14px; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; }
+    .card { width: 100%; max-width: 520px; background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 20px; box-shadow: 0 10px 25px rgba(0,0,0,0.45); }
+    .ancho { max-width: 900px; }
+    h1 { margin: 0 0 6px 0; color: #38bdf8; font-size: 22px; }
+    p { font-size: 15px; color: #cbd5e1; margin: 0 0 12px 0; }
+    .btn { display: block; width: 100%; padding: 18px; border: none; border-radius: 10px; font-weight: bold; font-size: 19px; cursor: pointer; text-align: center; text-decoration: none; background: #10b981; color: #0f172a; margin: 14px 0 18px 0; }
+    ol { padding-left: 22px; margin: 0; }
+    li { font-size: 16px; margin-bottom: 12px; line-height: 1.4; }
+    b { color: #fde047; }
+    .nota { background: #0f172a; border: 1px solid #334155; border-radius: 10px; padding: 12px; font-size: 14px; color: #cbd5e1; margin-top: 14px; }
+    .nota h3 { margin: 0 0 6px 0; font-size: 15px; color: #38bdf8; }
+    .oculto { display: none !important; }
+    .fila-qr { display: flex; gap: 18px; flex-wrap: wrap; justify-content: center; margin-top: 10px; }
+    .caja-qr { flex: 1 1 300px; background: #0f172a; border: 1px solid #334155; border-radius: 12px; padding: 16px; text-align: center; }
+    .caja-qr h2 { margin: 0 0 6px 0; font-size: 19px; color: #4ade80; }
+    .caja-qr p { font-size: 14.5px; margin-bottom: 12px; }
+    .qr { background: white; padding: 12px; border-radius: 10px; display: inline-block; }
+    .aviso-personal { color: #fca5a5; font-weight: bold; font-size: 13.5px; margin-top: 10px; }
+  </style>
+</head>
+<body>
+
+<!-- VISTA DEL TÉCNICO (en su celular) -->
+<div id="vista-tecnico" class="card">
+  <h1>App Cottech Técnico</h1>
+  <p>Para celulares Android.</p>
+  <a id="btn-descargar" class="btn" href="#">DESCARGAR LA APP</a>
+
+  <ol>
+    <li>Toca <b>DESCARGAR LA APP</b> y espera a que termine.</li>
+    <li>Toca el archivo descargado (o <b>Abrir</b>).</li>
+    <li>Si el celular dice que no deja instalar, toca <b>Ajustes</b>, activa <b>Permitir de esta fuente</b> y regresa.</li>
+    <li>Toca <b>Instalar</b>. Si sale un aviso de seguridad, toca la opción para <b>instalar de todas formas</b>.</li>
+    <li>Abre <b>Cottech Técnico</b> y toca <b>ESCANEAR CÓDIGO DEL SUPERVISOR</b>.</li>
+    <li>Cuando la app pida permisos, toca <b>Permitir</b>.</li>
+  </ol>
+
+  <div class="nota">
+    <h3>Si ya tienes la app</h3>
+    No necesitas hacer nada. Cuando haya una versión nueva, la app te muestra el botón <b>ACTUALIZAR AHORA</b>.
+  </div>
+  <div class="nota">
+    <h3>Si tienes dudas</h3>
+    Pide ayuda a tu supervisor.
+  </div>
+</div>
+
+<!-- VISTA DEL SUPERVISOR (en la PC, abierta desde el programa) -->
+<div id="vista-supervisor" class="card ancho oculto">
+  <h1>Instalar la app a <span id="nombre-tecnico"></span></h1>
+  <p>Pide al técnico que siga estos 2 pasos con su celular.</p>
+  <div class="fila-qr">
+    <div class="caja-qr">
+      <h2>1. Descargar la app</h2>
+      <p>Abre la <b>cámara</b> del celular, apunta a este código y toca el enlace que aparece. Sigue los pasos de la página.</p>
+      <div class="qr"><div id="qr-descarga"></div></div>
+    </div>
+    <div class="caja-qr">
+      <h2>2. Configurar la app</h2>
+      <p>Abre la app <b>Cottech Técnico</b>, toca <b>ESCANEAR CÓDIGO DEL SUPERVISOR</b> y apunta a este código.</p>
+      <div class="qr"><div id="qr-config"></div></div>
+      <div class="aviso-personal">Código personal de <span id="nombre-tecnico-2"></span>. No lo compartas.</div>
+    </div>
+  </div>
+  <div class="nota">
+    Al terminar, cierra esta página. Si el técnico ya tenía la app, solo necesita el paso 2.
+  </div>
+</div>
+
+<script>
+  // Repositorio de GitHub donde se publica la app (se deduce de la dirección de esta página).
+  const REPO_POR_DEFECTO = "serviciocalidad2026/evaluacion-servicio";
+
+  function repoDeEstaPagina() {
+    const host = window.location.hostname;
+    const carpeta = window.location.pathname.split("/").filter(Boolean)[0];
+    if (host.endsWith(".github.io") && carpeta && carpeta !== "app.html") {
+      return host.replace(".github.io", "") + "/" + carpeta;
+    }
+    return REPO_POR_DEFECTO;
+  }
+
+  function enlaceDescarga() {
+    return `https://github.com/${repoDeEstaPagina()}/releases/latest/download/CottechTecnico.apk`;
+  }
+
+  function leerPaqueteSupervisor() {
+    const m = window.location.hash.match(/^#tec=([A-Za-z0-9_-]+)$/);
+    if (!m) return null;
+    try {
+      let b64 = m[1].replace(/-/g, "+").replace(/_/g, "/");
+      while (b64.length % 4) b64 += "=";
+      const bytes = Uint8Array.from(atob(b64), c => c.charCodeAt(0));
+      const datos = JSON.parse(new TextDecoder().decode(bytes));
+      if (!datos || typeof datos.l !== "string" || !datos.l.startsWith("https://")) return null;
+      return datos;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  function dibujarQr(idDiv, texto) {
+    const div = document.getElementById(idDiv);
+    div.innerHTML = "";
+    try {
+      new QRCode(div, { text: texto, width: 280, height: 280, correctLevel: QRCode.CorrectLevel.L });
+    } catch (e) {
+      div.textContent = "No se pudo dibujar este código. En el programa de la PC usa 'Copiar Enlace de Acceso'.";
+      div.style.color = "#0f172a";
+    }
+  }
+
+  function iniciar() {
+    document.getElementById("btn-descargar").href = enlaceDescarga();
+    const paquete = leerPaqueteSupervisor();
+    if (!paquete) return;
+
+    // Se quita el código personal de la barra de direcciones apenas se lee.
+    history.replaceState(null, document.title, window.location.pathname);
+
+    const nombre = `${paquete.n || "Técnico"} (${paquete.id || ""})`;
+    document.getElementById("nombre-tecnico").textContent = nombre;
+    document.getElementById("nombre-tecnico-2").textContent = paquete.n || "este técnico";
+    document.getElementById("vista-tecnico").classList.add("oculto");
+    document.getElementById("vista-supervisor").classList.remove("oculto");
+    dibujarQr("qr-descarga", window.location.origin + window.location.pathname);
+    dibujarQr("qr-config", paquete.l);
+  }
+
+  iniciar();
+</script>
+</body>
+</html>
