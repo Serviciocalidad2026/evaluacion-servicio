@@ -2,6 +2,8 @@
 // Lo compila esbuild (npm run preparar) y queda como www/nativo.js.
 import { registerPlugin } from "@capacitor/core";
 import { BackgroundGeolocation } from "@capgo/background-geolocation";
+import { Filesystem, Directory } from "@capacitor/filesystem";
+import { Share } from "@capacitor/share";
 
 // Complemento propio de la app (android_extra/AjustesCelularPlugin.java)
 const AjustesCelular = registerPlugin("AjustesCelular");
@@ -33,5 +35,12 @@ window.CottechNativo = {
   },
   abrirInicioAutomatico() {
     return AjustesCelular.abrirInicioAutomatico();
+  },
+  // Guarda el PDF en la memoria temporal de la app y abre "Compartir"
+  // (el técnico elige: guardarlo, mandarlo por WhatsApp, Drive, etc.).
+  async compartirPdf(nombre, base64) {
+    const limpio = String(nombre || "orden.pdf").replace(/[^A-Za-z0-9_.-]/g, "_");
+    const archivo = await Filesystem.writeFile({ path: limpio, data: base64, directory: Directory.Cache });
+    await Share.share({ title: limpio, dialogTitle: "Guardar o enviar el PDF", files: [archivo.uri] });
   }
 };

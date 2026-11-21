@@ -23,7 +23,7 @@ import { execSync } from "node:child_process";
 const RAIZ = path.dirname(fileURLToPath(import.meta.url));
 const WWW = path.join(RAIZ, "www");
 const PAQUETE = "com.cottech.tecnico";
-export const VERSION_BASE = "2.5";
+export const VERSION_BASE = "2.6";
 export const REPO_POR_DEFECTO = "serviciocalidad2026/evaluacion-servicio";
 
 export const LIBRERIAS = [

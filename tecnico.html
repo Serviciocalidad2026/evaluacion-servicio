@@ -39,15 +39,32 @@
     .thumb-box { position: relative; width: 64px; height: 64px; border-radius: 8px; overflow: hidden; border: 1px solid #38bdf8; }
     .thumb-box img { width: 100%; height: 100%; object-fit: cover; }
     .thumb-del { position: absolute; top: 2px; right: 2px; background: rgba(220,38,38,0.95); color: white; border: none; border-radius: 50%; width: 24px; height: 24px; font-size: 13px; font-weight: bold; cursor: pointer; }
-    .modal-historial { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(15,23,42,0.96); z-index: 999; padding: 16px; overflow-y: auto; display: none; }
+    .modal-historial { position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: #0f172a; z-index: 999; padding: 16px; overflow-y: auto; display: none; }
     .ot-card { background: #1e293b; border: 1px solid #334155; border-radius: 10px; padding: 12px; margin-bottom: 10px; cursor: pointer; transition: 0.15s; }
     .ot-card:hover { border-color: #38bdf8; }
     .ot-detalle { background: #0f172a; border-top: 1px solid #334155; margin-top: 8px; padding-top: 8px; font-size: 14px; color: #e2e8f0; line-height: 1.6; }
-    #caja-qr { margin-top: 12px; background: white; padding: 16px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; }
     #reader-config { width: 100%; margin: 8px 0; border-radius: 8px; overflow: hidden; display: none; }
     .aviso-actualizacion { background: #1d4ed8; color: white; border-radius: 10px; padding: 12px; margin-bottom: 12px; font-weight: bold; font-size: 15px; text-align: center; }
     .aviso-actualizacion button { margin-top: 8px; background: white; color: #1d4ed8; }
-    #reader-mac { width: 100%; margin-top: 8px; border-radius: 8px; overflow: hidden; display: none; }
+    .titulo-orden { font-size: 19px; font-weight: bold; color: #f8fafc; }
+    .estado-orden { font-size: 15px; font-weight: bold; margin: 2px 0 6px 0; }
+    .pestanas { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; margin: 12px 0; }
+    .pestanas button { padding: 11px 4px; border-radius: 8px; border: 1px solid #475569; background: #1e293b; color: #cbd5e1; font-weight: bold; font-size: 14px; cursor: pointer; }
+    .pestanas button.activa { background: #2563eb; border-color: #60a5fa; color: white; }
+    .pestanas button.lista { border-color: #22c55e; color: #4ade80; }
+    .pestanas button.lista.activa { color: white; }
+    .pestanas button.tab-encuesta { border-color: #f59e0b; color: #fde047; }
+    .pestanas button.tab-encuesta.activa { background: #f59e0b; color: #0f172a; }
+    .lista-items { margin-top: 8px; }
+    .lista-vacia { font-size: 13px; color: #94a3b8; }
+    .conteo-fotos { font-size: 13px; color: #38bdf8; margin-top: 6px; font-weight: bold; }
+    .galeria-previews .thumb-box { width: 30%; height: auto; aspect-ratio: 1; }
+    .caja-qr { margin-top: 12px; background: white; padding: 16px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; }
+    .pie-qr { color: #0f172a; font-weight: bold; font-size: 13px; margin-top: 8px; }
+    #caja-escaner { margin-bottom: 10px; }
+    .ayuda-escaner { color: #4ade80; font-weight: bold; font-size: 15px; text-align: center; margin-bottom: 6px; }
+    .lector { position: relative; width: 100%; border-radius: 8px; overflow: hidden; background: #000; }
+    .linea-verde { position: absolute; left: 6%; right: 6%; top: 50%; height: 3px; margin-top: -1px; background: #22c55e; box-shadow: 0 0 10px #22c55e; z-index: 10; pointer-events: none; }
     .oculto { display: none !important; }
   </style>
 </head>
@@ -110,104 +127,175 @@
       <div id="lbl-cola-ot" class="oculto" style="font-size:13px;color:#fde047;margin-top:8px;font-weight:bold;"></div>
     </div>
 
-    <!-- PASO A: EMPEZAR UNA ORDEN -->
+    <!-- ORDEN · PASO 1: NÚMERO DE ORDEN -->
     <div id="etapa-1-inicio" class="bloque">
       <label>Número de orden (OT):</label>
       <input type="text" id="inp-ot" inputmode="numeric" placeholder="Ejemplo: 15612" oninput="guardarEstadoVivo()" />
-
-      <label>¿Qué vas a hacer?</label>
-      <select id="sel-tipo-servicio" onchange="guardarEstadoVivo()">
-        <option value="INSTALACION">Instalación</option>
-        <option value="REPARACION">Reparación</option>
-      </select>
-
-      <button class="btn btn-azul btn-grande" onclick="iniciarTrabajoEnSitio()">EMPEZAR TRABAJO</button>
+      <button class="btn btn-azul btn-grande" onclick="salirEnCamino()">VOY EN CAMINO</button>
     </div>
 
-    <!-- PASO B: LO QUE SE HIZO EN LA ORDEN -->
+    <!-- ORDEN · PASO 2: EN CAMINO -->
+    <div id="etapa-camino" class="bloque oculto">
+      <div class="titulo-orden" id="lbl-ot-camino">Orden</div>
+      <div class="estado-orden" style="color:#60a5fa;">Vas en camino</div>
+      <button class="btn btn-verde btn-grande" onclick="irAElegirTipo()">LLEGUÉ AL SITIO</button>
+      <button class="btn btn-rojo" onclick="abrirModalNoRealizada()">No se pudo hacer esta orden</button>
+      <button class="btn btn-gris" onclick="corregirNumeroOrden()">Corregir el número de orden</button>
+    </div>
+
+    <!-- ORDEN · PASO 3: ¿QUÉ TRABAJO ES? -->
+    <div id="etapa-tipo" class="bloque oculto">
+      <div class="titulo-orden" id="lbl-ot-tipo">Orden</div>
+      <p class="ayuda" style="font-size:16px;color:#f8fafc;">¿Qué trabajo vas a hacer?</p>
+      <button class="btn btn-azul btn-grande" onclick="elegirTipoTrabajo('INSTALACION')">INSTALACIÓN</button>
+      <button class="btn btn-azul btn-grande" onclick="elegirTipoTrabajo('REINSTALACION')">REINSTALACIÓN</button>
+      <button class="btn btn-amarillo btn-grande" onclick="elegirTipoTrabajo('REPARACION')">REPARACIÓN</button>
+      <button class="btn btn-gris" onclick="volverDeTipo()">Regresar</button>
+    </div>
+    <select id="sel-tipo-servicio" class="oculto">
+      <option value="INSTALACION">Instalación</option>
+      <option value="REINSTALACION">Reinstalación</option>
+      <option value="REPARACION">Reparación</option>
+    </select>
+
+    <!-- ORDEN · PASO 4: EN EL SITIO (PESTAÑAS) -->
     <div id="etapa-2-bitacora" class="bloque oculto">
-      <div style="font-size:16px;font-weight:bold;color:#4ade80;margin-bottom:4px;" id="lbl-ot-activa">Trabajando en la orden</div>
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:8px;">
+        <div>
+          <div class="titulo-orden" id="lbl-ot-activa">Orden</div>
+          <div class="estado-orden" id="lbl-tipo-activo" style="color:#4ade80;">En el sitio</div>
+        </div>
+        <button type="button" class="btn btn-gris" style="width:auto; margin:0;" onclick="irAElegirTipo()">Cambiar trabajo</button>
+      </div>
       <div class="aviso-guardado">Todo se guarda solo, aunque salgas de la app.</div>
 
-      <div id="reader-mac"></div>
+      <div class="pestanas">
+        <button type="button" id="tab-btn-productos" onclick="mostrarPestana('productos')">Productos</button>
+        <button type="button" id="tab-btn-retirado" onclick="mostrarPestana('retirado')">Retirado</button>
+        <button type="button" id="tab-btn-fotos" onclick="mostrarPestana('fotos')">Fotos</button>
+        <button type="button" id="tab-btn-bitacora" onclick="mostrarPestana('bitacora')">Bitácora</button>
+        <button type="button" id="tab-btn-problema" onclick="mostrarPestana('problema')">Problema</button>
+        <button type="button" id="tab-btn-encuesta" class="tab-encuesta" onclick="mostrarPestana('encuesta')">Encuesta</button>
+      </div>
 
-      <!-- 1. EQUIPO CON MAC -->
-      <div class="sub-caja">
-        <p class="titulo-sec">1. Equipo con MAC</p>
-        <label>¿Qué hiciste con el equipo?</label>
-        <select id="sel-tipo-equipo" onchange="alCambiarMovimientoEquipo(); guardarEstadoVivo();">
-          <option value="INSTALADO">Instalé un equipo nuevo</option>
-          <option value="REEMPLAZO">Cambié un equipo dañado por uno nuevo</option>
-        </select>
+      <!-- Cámara para escanear MAC (se usa en Productos y Retirado) -->
+      <div id="caja-escaner" class="oculto">
+        <div class="ayuda-escaner">Pon el código de barras sobre la línea verde</div>
+        <div id="reader-mac" class="lector"></div>
+        <button type="button" class="btn btn-gris" onclick="cerrarEscanerCamara()">Cerrar cámara</button>
+      </div>
 
-        <label>Elige el equipo de tu lista o escanea la MAC:</label>
-        <select id="sel-bodega-eq" onchange="alElegirEquipoBodega(); guardarEstadoVivo();">
-          <option value="">-- No tienes equipos asignados --</option>
-        </select>
-        <div class="fila-input-cam" style="margin-top:6px;">
-          <input type="text" id="inp-mac-nuevo" placeholder="MAC del equipo nuevo" oninput="guardarEstadoVivo()" />
-          <button type="button" class="btn-cam" onclick="abrirEscanerCamara('inp-mac-nuevo')">Escanear</button>
+      <!-- PESTAÑA: PRODUCTOS -->
+      <div id="tab-productos" class="pestana">
+        <div class="sub-caja" style="margin-top:0;">
+          <p class="titulo-sec">Equipo que instalaste</p>
+          <label>Elige el equipo de tu lista o escanea la MAC:</label>
+          <select id="sel-bodega-eq" onchange="alElegirEquipoBodega(); guardarEstadoVivo();">
+            <option value="">-- No tienes equipos asignados --</option>
+          </select>
+          <div class="fila-input-cam" style="margin-top:6px;">
+            <input type="text" id="inp-mac-nuevo" placeholder="MAC del equipo" oninput="guardarEstadoVivo()" />
+            <button type="button" class="btn-cam" onclick="abrirEscanerCamara('inp-mac-nuevo')">Escanear</button>
+          </div>
+          <button type="button" class="btn btn-azul btn-sm" onclick="agregarEquipoAlCarrito()">Agregar equipo</button>
+          <div id="lista-equipos" class="lista-items"></div>
         </div>
 
-        <div id="bloque-mac-malo" class="oculto">
-          <label style="color:#fca5a5;">MAC del equipo dañado que quitaste:</label>
+        <div class="sub-caja">
+          <p class="titulo-sec" style="color:#fde047;">Material que usaste</p>
+          <label>Elige el material y escribe cuántos usaste:</label>
           <div class="fila-input-cam">
-            <input type="text" id="inp-mac-malo" placeholder="MAC del equipo dañado" oninput="guardarEstadoVivo()" />
+            <select id="sel-bodega-mat" style="flex:2.2;">
+              <option value="">-- No tienes materiales asignados --</option>
+            </select>
+            <input type="number" id="inp-cant-mat" inputmode="numeric" placeholder="Cant." value="1" min="1" style="flex:0.8;" />
+          </div>
+          <button type="button" class="btn btn-amarillo btn-sm" onclick="agregarConsumibleAlCarrito()">Agregar material</button>
+          <div id="lista-materiales" class="lista-items"></div>
+        </div>
+      </div>
+
+      <!-- PESTAÑA: EQUIPO RETIRADO / DAÑADO -->
+      <div id="tab-retirado" class="pestana oculto">
+        <div class="sub-caja" style="margin-top:0;">
+          <p class="titulo-sec" style="color:#fca5a5;">Equipo que le quitaste al cliente</p>
+          <label>MAC o serie del equipo que quitaste:</label>
+          <div class="fila-input-cam">
+            <input type="text" id="inp-mac-malo" placeholder="MAC del equipo que quitaste" oninput="guardarEstadoVivo()" />
             <button type="button" class="btn-cam" onclick="abrirEscanerCamara('inp-mac-malo')">Escanear</button>
           </div>
-        </div>
-
-        <button type="button" class="btn btn-azul btn-sm" onclick="agregarEquipoAlCarrito()">Agregar equipo</button>
-      </div>
-
-      <!-- 2. MATERIALES -->
-      <div class="sub-caja">
-        <p class="titulo-sec" style="color:#fde047;">2. Materiales que usaste</p>
-        <label>Elige el material y escribe cuántos usaste:</label>
-        <div class="fila-input-cam">
-          <select id="sel-bodega-mat" style="flex:2.2;">
-            <option value="">-- No tienes materiales asignados --</option>
+          <label>Modelo (si lo sabes):</label>
+          <input type="text" id="inp-modelo-malo" placeholder="Ejemplo: Router ZTE" oninput="guardarEstadoVivo()" />
+          <label>¿Cómo estaba el equipo?</label>
+          <select id="sel-estado-malo">
+            <option value="Dañado">Dañado</option>
+            <option value="Funcionando">Funcionaba (solo se cambió)</option>
           </select>
-          <input type="number" id="inp-cant-mat" inputmode="numeric" placeholder="Cant." value="1" min="1" style="flex:0.8;" />
-        </div>
-        <button type="button" class="btn btn-amarillo btn-sm" onclick="agregarConsumibleAlCarrito()">Agregar material</button>
-      </div>
-
-      <!-- LISTA DE LA ORDEN -->
-      <div class="carrito-box">
-        <div style="font-size:14px;font-weight:bold;color:#38bdf8;margin-bottom:6px;">Lo que usaste en esta orden:</div>
-        <div id="lista-carrito-visual">
-          <div style="font-size:13px;color:#94a3b8;">Todavía no has agregado nada.</div>
+          <button type="button" class="btn btn-rojo btn-sm" onclick="agregarRetirado()">Agregar equipo quitado</button>
+          <div id="lista-retirados" class="lista-items"></div>
         </div>
       </div>
 
-      <!-- 3. FOTOS -->
-      <div class="sub-caja">
-        <p class="titulo-sec" style="color:#4ade80;">3. Fotos del trabajo (máximo 5)</p>
-        <input type="file" id="inp-foto-camara" accept="image/*" capture="environment" class="oculto" onchange="procesarFotosSeleccionadas(this)" />
-        <input type="file" id="inp-foto-galeria" accept="image/*" multiple class="oculto" onchange="procesarFotosSeleccionadas(this)" />
+      <!-- PESTAÑA: FOTOS -->
+      <div id="tab-fotos" class="pestana oculto">
+        <div class="sub-caja" style="margin-top:0;">
+          <p class="titulo-sec" style="color:#4ade80;">Fotos del trabajo (máximo 15)</p>
+          <input type="file" id="inp-foto-camara" accept="image/*" capture="environment" class="oculto" onchange="procesarFotosSeleccionadas(this, 'trabajo')" />
+          <input type="file" id="inp-foto-galeria" accept="image/*" multiple class="oculto" onchange="procesarFotosSeleccionadas(this, 'trabajo')" />
+          <div style="display:flex; gap:8px;">
+            <button type="button" class="btn btn-azul btn-sm" style="margin-top:2px;" onclick="document.getElementById('inp-foto-camara').click()">Tomar foto</button>
+            <button type="button" class="btn btn-amarillo btn-sm" style="margin-top:2px;" onclick="document.getElementById('inp-foto-galeria').click()">Elegir de la galería</button>
+          </div>
+          <div id="lbl-conteo-fotos" class="conteo-fotos">0 de 15 fotos</div>
+          <div id="contenedor-miniaturas" class="galeria-previews"></div>
+        </div>
+      </div>
 
+      <!-- PESTAÑA: BITÁCORA -->
+      <div id="tab-bitacora" class="pestana oculto">
+        <label style="margin-top:0;">Teléfono del cliente:</label>
+        <input type="tel" id="inp-tel-cliente" inputmode="tel" placeholder="Ejemplo: 9988-7766" oninput="guardarEstadoVivo()" />
+        <label>Nombre del cliente:</label>
+        <input type="text" id="inp-nombre-cliente" placeholder="Nombre y apellido" oninput="guardarEstadoVivo()" />
+        <label>¿Cómo fue el cliente?</label>
+        <select id="sel-comportamiento-cliente" onchange="guardarEstadoVivo()">
+          <option value="Colaborador">Colaborador: me ayudó</option>
+          <option value="Normal">Normal: sin problemas</option>
+          <option value="Exigente / Con quejas">Exigente: tuvo quejas</option>
+          <option value="Difícil / Conflictivo">Difícil: no dejaba trabajar</option>
+        </select>
+        <label>¿Qué trabajo hiciste?</label>
+        <textarea id="inp-bitacora-obs" rows="4" placeholder="Escribe qué hiciste y qué pruebas hiciste..." oninput="guardarEstadoVivo()"></textarea>
+      </div>
+
+      <!-- PESTAÑA: PROBLEMA / INCONVENIENTE -->
+      <div id="tab-problema" class="pestana oculto">
+        <p class="ayuda">Llena esto solo si hubo algún problema en el servicio.</p>
+        <label style="margin-top:0;">¿Qué pasó?</label>
+        <textarea id="inp-inconveniente" rows="3" placeholder="Escribe qué pasó..." oninput="guardarEstadoVivo()"></textarea>
+        <input type="file" id="inp-foto-camara-inc" accept="image/*" capture="environment" class="oculto" onchange="procesarFotosSeleccionadas(this, 'problema')" />
+        <input type="file" id="inp-foto-galeria-inc" accept="image/*" multiple class="oculto" onchange="procesarFotosSeleccionadas(this, 'problema')" />
         <div style="display:flex; gap:8px;">
-          <button type="button" class="btn btn-azul btn-sm" style="margin-top:2px;" onclick="document.getElementById('inp-foto-camara').click()">Tomar foto</button>
-          <button type="button" class="btn btn-amarillo btn-sm" style="margin-top:2px;" onclick="document.getElementById('inp-foto-galeria').click()">Elegir de la galería</button>
+          <button type="button" class="btn btn-azul btn-sm" onclick="document.getElementById('inp-foto-camara-inc').click()">Tomar foto</button>
+          <button type="button" class="btn btn-amarillo btn-sm" onclick="document.getElementById('inp-foto-galeria-inc').click()">Elegir de la galería</button>
         </div>
-        <div id="lbl-conteo-fotos" style="font-size:13px;color:#38bdf8;margin-top:6px;font-weight:bold;">0 de 5 fotos</div>
-        <div id="contenedor-miniaturas" class="galeria-previews"></div>
+        <div id="lbl-conteo-fotos-inc" class="conteo-fotos">0 de 3 fotos</div>
+        <div id="contenedor-miniaturas-inc" class="galeria-previews"></div>
       </div>
 
-      <!-- 4. CLIENTE Y DESCRIPCIÓN -->
-      <label>4. ¿Cómo fue el cliente?</label>
-      <select id="sel-comportamiento-cliente" onchange="guardarEstadoVivo()">
-        <option value="Colaborador">Colaborador: me ayudó</option>
-        <option value="Normal">Normal: sin problemas</option>
-        <option value="Exigente / Con quejas">Exigente: tuvo quejas</option>
-        <option value="Difícil / Conflictivo">Difícil: no dejaba trabajar</option>
-      </select>
+      <!-- PESTAÑA: ENCUESTA DEL CLIENTE -->
+      <div id="tab-encuesta" class="pestana oculto">
+        <p class="ayuda" style="text-align:center; color:#fde047; font-size:14.5px;">
+          Pídele al cliente que escanee este código con su celular.<br>Puede hacerlo ahora o cuando termines.
+        </p>
+        <div id="caja-qr" class="caja-qr">
+          <div id="qrcode"></div>
+          <div class="pie-qr" id="lbl-pie-qr"></div>
+        </div>
+        <button type="button" class="btn btn-amarillo" onclick="enviarUrlCortaWhatsApp()">Mandar enlace por WhatsApp</button>
+      </div>
 
-      <label>5. Bitácora</label>
-      <textarea id="inp-bitacora-obs" rows="3" placeholder="Escribe qué hiciste y qué pruebas hiciste..." oninput="guardarEstadoVivo()"></textarea>
-
-      <button class="btn btn-verde btn-grande" onclick="pasarAPantallaQR()">SIGUIENTE: ENCUESTA DEL CLIENTE</button>
+      <button class="btn btn-verde btn-grande" style="margin-top:18px;" onclick="terminarOrden()">TERMINAR ORDEN</button>
       <button class="btn btn-rojo" onclick="abrirModalNoRealizada()">No se pudo hacer esta orden</button>
     </div>
 
@@ -228,21 +316,14 @@
       <button class="btn btn-gris" onclick="cancelarNoRealizada()">Regresar</button>
     </div>
 
-    <!-- PASO C: ENCUESTA DEL CLIENTE -->
-    <div id="etapa-3-qr" class="bloque oculto">
-      <p class="ayuda" style="text-align:center;color:#fde047;font-size:14px;line-height:1.5;">
-        1. Pídele al cliente que escanee este código con su celular, o mándale el enlace por WhatsApp.<br>
-        2. Cuando el cliente termine, toca <strong>TERMINAR ORDEN</strong>.
-      </p>
-
-      <div id="caja-qr">
-        <div id="qrcode"></div>
-        <div style="color:#0f172a;font-weight:bold;font-size:13px;margin-top:8px;" id="lbl-pie-qr"></div>
-      </div>
-
-      <button class="btn btn-amarillo" id="btn-wa-corto" onclick="enviarUrlCortaWhatsApp()">Mandar enlace por WhatsApp</button>
-      <button class="btn btn-verde btn-grande" style="margin-top:14px;" onclick="finalizarOrdenPorCompleto()">TERMINAR ORDEN</button>
-      <button class="btn btn-gris" onclick="volverABitacoraDesdeQR()">Regresar a corregir</button>
+    <!-- ORDEN TERMINADA -->
+    <div id="etapa-fin" class="bloque oculto">
+      <h2 style="color:#4ade80;">Orden <span id="lbl-ot-fin"></span> terminada</h2>
+      <p class="ayuda">Se está enviando. Si no hay internet, se envía sola cuando vuelva la señal.</p>
+      <p class="ayuda" id="lbl-aviso-fin" style="color:#fde047; font-size:15px;"></p>
+      <div id="caja-qr-fin" class="caja-qr"><div id="qrcode-fin"></div></div>
+      <button type="button" class="btn btn-amarillo" onclick="enviarUrlCortaWhatsApp()">Mandar enlace por WhatsApp</button>
+      <button class="btn btn-verde btn-grande" onclick="cerrarPantallaFin()">LISTO</button>
     </div>
 
     <button class="btn btn-gris" onclick="editarConfig()">Configurar mi app</button>
@@ -256,8 +337,14 @@
       <h2 style="color:#38bdf8; margin:0;">Mis órdenes</h2>
       <button type="button" class="btn btn-rojo" style="width:auto; margin:0; padding:8px 16px;" onclick="cerrarHistorialTecnico()">Cerrar</button>
     </div>
-    <p class="ayuda">Busca por número de orden, o toca una orden para ver lo que usaste.</p>
-    <input type="text" id="inp-buscar-mi-ot" placeholder="Buscar número de orden, MAC o material..." oninput="filtrarHistorialTecnicoUI()" style="margin-bottom:12px; border-color:#38bdf8;" />
+    <label style="margin-top:0;">Buscar:</label>
+    <input type="text" id="inp-buscar-mi-ot" placeholder="Orden, teléfono, nombre, MAC..." oninput="filtrarHistorialTecnicoUI()" style="border-color:#38bdf8;" />
+    <label>Fecha:</label>
+    <div class="fila-input-cam">
+      <input type="date" id="inp-fecha-mi-ot" onchange="filtrarHistorialTecnicoUI()" />
+      <button type="button" class="btn-cam" style="background:#334155;" onclick="document.getElementById('inp-fecha-mi-ot').value=''; filtrarHistorialTecnicoUI();">Todas</button>
+    </div>
+    <div id="lbl-total-mis-ot" class="ayuda" style="margin-top:10px;"></div>
     <div id="lista-historial-tec-container"></div>
   </div>
 </div>
@@ -272,7 +359,15 @@
   let wakeLockObj = null;
   let ultimaLat = 14.0818, ultimaLng = -87.2068;
 
-  let otInicioMs = null;
+  let estadoOt = "";              // "" | "CAMINO" | "SITIO"
+  let caminoMs = 0;               // Hora en que salió hacia el cliente
+  let sitioMs = 0;                // Hora en que llegó al sitio
+  let pestanaActual = "productos";
+  let otTerminada = "";           // Orden recién terminada (pantalla final con el QR)
+  let etapaAntesNoRealizada = "";
+  let retirados = [];
+  let fotosProblemaArray = [];
+  let historialVisible = [];
   let urlEncuestaActual = "";
   let urlCortaActual = "";
   let fotosComprimidasArray = [];
@@ -435,23 +530,35 @@
   // =========================================================================
   // PERSISTENCIA AUTOMÁTICA: GUARDA Y RECUPERA EL PROCESO AUNQUE SALGA DE LA APP
   // =========================================================================
+  const valorDe = id => document.getElementById(id).value;
+
   function guardarEstadoVivo() {
     const estado = {
+      version: 26,
       jornadaActiva: jornadaActiva,
       inicioJornadaMs: inicioJornadaMs,
       etapaActual: etapaActual,
-      otInicioMs: otInicioMs,
-      ot: document.getElementById("inp-ot").value,
-      tipoServicio: document.getElementById("sel-tipo-servicio").value,
-      tipoEquipo: document.getElementById("sel-tipo-equipo").value,
-      macNuevo: document.getElementById("inp-mac-nuevo").value,
-      macMalo: document.getElementById("inp-mac-malo").value,
-      obs: document.getElementById("inp-bitacora-obs").value,
-      motivoNo: document.getElementById("sel-motivo-no").value,
-      justificacionNo: document.getElementById("txt-justificacion-no").value,
-      comportamientoCliente: document.getElementById("sel-comportamiento-cliente").value,
+      etapaAntesNoRealizada: etapaAntesNoRealizada,
+      estadoOt: estadoOt,
+      caminoMs: caminoMs,
+      sitioMs: sitioMs,
+      pestanaActual: pestanaActual,
+      otTerminada: otTerminada,
+      ot: valorDe("inp-ot"),
+      tipoServicio: valorDe("sel-tipo-servicio"),
+      macNuevo: valorDe("inp-mac-nuevo"),
+      macMalo: valorDe("inp-mac-malo"),
+      modeloMalo: valorDe("inp-modelo-malo"),
+      telCliente: valorDe("inp-tel-cliente"),
+      nombreCliente: valorDe("inp-nombre-cliente"),
+      obs: valorDe("inp-bitacora-obs"),
+      inconveniente: valorDe("inp-inconveniente"),
+      motivoNo: valorDe("sel-motivo-no"),
+      justificacionNo: valorDe("txt-justificacion-no"),
+      comportamientoCliente: valorDe("sel-comportamiento-cliente"),
       carritoEquipos: carritoEquipos,
       carritoConsumibles: carritoConsumibles,
+      retirados: retirados,
       urlEncuestaActual: urlEncuestaActual,
       urlCortaActual: urlCortaActual,
       ultimaLat: ultimaLat,
@@ -470,35 +577,62 @@
       jornadaActiva = Boolean(est.jornadaActiva);
       inicioJornadaMs = Number(est.inicioJornadaMs) || 0;
       etapaActual = est.etapaActual || "1";
-      otInicioMs = est.otInicioMs || null;
+      etapaAntesNoRealizada = est.etapaAntesNoRealizada || "";
       carritoEquipos = Array.isArray(est.carritoEquipos) ? est.carritoEquipos : [];
       carritoConsumibles = Array.isArray(est.carritoConsumibles) ? est.carritoConsumibles : [];
+      retirados = Array.isArray(est.retirados) ? est.retirados : [];
       urlEncuestaActual = est.urlEncuestaActual || "";
       urlCortaActual = est.urlCortaActual || "";
+      estadoOt = est.estadoOt || "";
+      caminoMs = Number(est.caminoMs) || 0;
+      sitioMs = Number(est.sitioMs) || 0;
+      pestanaActual = est.pestanaActual || "productos";
+      otTerminada = est.otTerminada || "";
+
+      // Orden a medias guardada por la versión anterior de la app (v2.5)
+      if (!est.version && est.otInicioMs) {
+        estadoOt = "SITIO";
+        sitioMs = Number(est.otInicioMs) || Date.now();
+        if (etapaActual === "3") { etapaActual = "2"; pestanaActual = "encuesta"; }
+        carritoEquipos.forEach(e => {
+          if (e.movimiento === "REEMPLAZO" && e.macDanado && e.macDanado !== "N/A") {
+            retirados.push({ mac: e.macDanado, modelo: "", estado: "Dañado" });
+          }
+        });
+      }
+
       if (Array.isArray(est.fotosComprimidasArray) && est.fotosComprimidasArray.length > 0) {
-        fotosComprimidasArray = est.fotosComprimidasArray;      // Estado guardado por la versión anterior
+        fotosComprimidasArray = est.fotosComprimidasArray;      // Estado guardado por versiones viejas
         await guardarFotosActuales();
       } else {
         fotosComprimidasArray = await cargarFotosActuales();
       }
+      fotosProblemaArray = await cargarFotosProblema();
       if (est.ultimaLat) ultimaLat = est.ultimaLat;
       if (est.ultimaLng) ultimaLng = est.ultimaLng;
 
-      document.getElementById("inp-ot").value = est.ot || "";
-      if (est.tipoServicio) document.getElementById("sel-tipo-servicio").value = est.tipoServicio;
-      if (est.tipoEquipo) document.getElementById("sel-tipo-equipo").value = est.tipoEquipo;
-      document.getElementById("inp-mac-nuevo").value = est.macNuevo || "";
-      document.getElementById("inp-mac-malo").value = est.macMalo || "";
-      document.getElementById("inp-bitacora-obs").value = est.obs || "";
+      const poner = (id, v) => { document.getElementById(id).value = v || ""; };
+      poner("inp-ot", est.ot);
+      if (est.tipoServicio) {
+        const sel = document.getElementById("sel-tipo-servicio");
+        sel.value = est.tipoServicio;
+        if (sel.selectedIndex < 0) sel.selectedIndex = 0;
+      }
+      poner("inp-mac-nuevo", est.macNuevo);
+      poner("inp-mac-malo", est.macMalo);
+      poner("inp-modelo-malo", est.modeloMalo);
+      poner("inp-tel-cliente", est.telCliente);
+      poner("inp-nombre-cliente", est.nombreCliente);
+      poner("inp-bitacora-obs", est.obs);
+      poner("inp-inconveniente", est.inconveniente);
       if (est.motivoNo) document.getElementById("sel-motivo-no").value = est.motivoNo;
-      document.getElementById("txt-justificacion-no").value = est.justificacionNo || "";
+      poner("txt-justificacion-no", est.justificacionNo);
       if (est.comportamientoCliente) {
         const selCli = document.getElementById("sel-comportamiento-cliente");
         selCli.value = est.comportamientoCliente;
-        if (selCli.selectedIndex < 0) selCli.selectedIndex = 0;   // Valor de la versión anterior (con emojis)
+        if (selCli.selectedIndex < 0) selCli.selectedIndex = 0;   // Valor de una versión anterior (con emojis)
       }
 
-      alCambiarMovimientoEquipo();
       renderizarCarritoVisual();
       renderizarMiniaturasFotos();
 
@@ -515,31 +649,73 @@
       }
 
       mostrarEtapaPantalla(etapaActual);
-
-      if (etapaActual === "3" && urlEncuestaActual) {
-        const contenedorQR = document.getElementById("qrcode");
-        contenedorQR.innerHTML = "";
-        new QRCode(contenedorQR, { text: urlEncuestaActual, width: 215, height: 215, correctLevel: QRCode.CorrectLevel.L });
-        document.getElementById("lbl-pie-qr").innerText = `Orden ${est.ot} · Escanee para evaluar`;
-      }
-
       actualizarEtiquetaEstadoUI();
     } catch (e) {}
   }
 
+  const ETAPAS = {
+    "1": "etapa-1-inicio", "CAMINO": "etapa-camino", "TIPO": "etapa-tipo",
+    "2": "etapa-2-bitacora", "NO_REALIZADA": "etapa-no-realizada", "FIN": "etapa-fin"
+  };
+
+  function nombreTipo(tipo) {
+    const t = String(tipo || "").toUpperCase();
+    if (t.indexOf("REPARA") !== -1) return "Reparación";
+    if (t.indexOf("REINST") !== -1) return "Reinstalación";
+    return "Instalación";
+  }
+
   function mostrarEtapaPantalla(numEtapa) {
+    if (!ETAPAS[numEtapa]) numEtapa = "1";
     etapaActual = numEtapa;
-    document.getElementById("etapa-1-inicio").classList.toggle("oculto", numEtapa !== "1");
-    document.getElementById("etapa-2-bitacora").classList.toggle("oculto", numEtapa !== "2");
-    document.getElementById("etapa-no-realizada").classList.toggle("oculto", numEtapa !== "NO_REALIZADA");
-    document.getElementById("etapa-3-qr").classList.toggle("oculto", numEtapa !== "3");
+    Object.keys(ETAPAS).forEach(k => {
+      document.getElementById(ETAPAS[k]).classList.toggle("oculto", k !== numEtapa);
+    });
+    if (numEtapa !== "2") cerrarEscanerCamara();
+
+    const ot = valorDe("inp-ot").trim();
+    document.getElementById("lbl-ot-camino").innerText = `Orden ${ot}`;
+    document.getElementById("lbl-ot-tipo").innerText = `Orden ${ot}`;
+    document.getElementById("lbl-ot-activa").innerText = `Orden ${ot}`;
+    document.getElementById("lbl-tipo-activo").innerText = `${nombreTipo(valorDe("sel-tipo-servicio"))} · En el sitio`;
 
     if (numEtapa === "2") {
-      const ot = document.getElementById("inp-ot").value.trim();
-      const tipo = document.getElementById("sel-tipo-servicio").value;
-      document.getElementById("lbl-ot-activa").innerText = `Trabajando en la orden ${ot} (${tipo === "REPARACION" ? "Reparación" : "Instalación"})`;
+      mostrarPestana(pestanaActual || "productos");
+    }
+    if (numEtapa === "FIN") {
+      document.getElementById("lbl-ot-fin").innerText = otTerminada;
+      document.getElementById("lbl-aviso-fin").innerText =
+        `Si el cliente todavía no llenó la encuesta, puede hacerlo durante ${minutosEncuesta()} minutos más con este código.`;
+      dibujarQr("qrcode-fin", urlEncuestaActual);
     }
     guardarEstadoVivo();
+  }
+
+  function mostrarPestana(nombre) {
+    pestanaActual = nombre;
+    ["productos", "retirado", "fotos", "bitacora", "problema", "encuesta"].forEach(p => {
+      document.getElementById("tab-" + p).classList.toggle("oculto", p !== nombre);
+      document.getElementById("tab-btn-" + p).classList.toggle("activa", p === nombre);
+    });
+    if (nombre === "encuesta") dibujarQr("qrcode", urlEncuestaActual);
+    actualizarPestanas();
+    guardarEstadoVivo();
+  }
+
+  function actualizarPestanas() {
+    const conNumero = (id, texto, n) => {
+      document.getElementById(id).innerText = n > 0 ? `${texto} (${n})` : texto;
+    };
+    conNumero("tab-btn-productos", "Productos", carritoEquipos.length + carritoConsumibles.length);
+    conNumero("tab-btn-retirado", "Retirado", retirados.length);
+    conNumero("tab-btn-fotos", "Fotos", fotosComprimidasArray.length);
+    const bitacoraLista = Boolean(valorDe("inp-tel-cliente").trim() && valorDe("inp-nombre-cliente").trim() && valorDe("inp-bitacora-obs").trim());
+    document.getElementById("tab-btn-bitacora").classList.toggle("lista", bitacoraLista);
+    conNumero("tab-btn-problema", "Problema", valorDe("inp-inconveniente").trim() ? Math.max(1, fotosProblemaArray.length) : fotosProblemaArray.length);
+  }
+
+  function minutosEncuesta() {
+    return Number(localStorage.getItem("cottech_minutos_encuesta")) || 10;
   }
 
   // =========================================================================
@@ -586,7 +762,10 @@
   let ultimoPulsoNativoMs = 0;
 
   function estadoReporteActual() {
-    return otInicioMs ? ("EN_SITIO_OT_" + document.getElementById("inp-ot").value.trim()) : "INACTIVO_SIN_OT";
+    const ot = document.getElementById("inp-ot").value.trim();
+    if (estadoOt === "SITIO") return "EN_SITIO_OT_" + ot;
+    if (estadoOt === "CAMINO") return "EN_CAMINO_OT_" + ot;
+    return "INACTIVO_SIN_OT";
   }
 
   function iniciarGpsNativo() {
@@ -653,8 +832,7 @@
         if (!jornadaActiva) return;
         const cerradoPorPc = await verificarSiSupervisorCerroTurno();
         if (!cerradoPorPc && jornadaActiva) {
-          const est = otInicioMs ? ("EN_SITIO_OT_" + document.getElementById("inp-ot").value.trim()) : "INACTIVO_SIN_OT";
-          enviarPulsoGpsAhora(est);
+          enviarPulsoGpsAhora(estadoReporteActual());
         }
       };
     }
@@ -675,16 +853,14 @@
       }
     } catch (e) {}
 
-    const estAhora = otInicioMs ? ("EN_SITIO_OT_" + document.getElementById("inp-ot").value.trim()) : "INACTIVO_SIN_OT";
-    enviarPulsoGpsAhora(estAhora);
+    enviarPulsoGpsAhora(estadoReporteActual());
 
     if (timerGps30s) clearInterval(timerGps30s);
     timerGps30s = setInterval(async () => {
       if (!jornadaActiva) return;
       const cerradoPorPc = await verificarSiSupervisorCerroTurno();
       if (!cerradoPorPc && jornadaActiva) {
-        const est = otInicioMs ? ("EN_SITIO_OT_" + document.getElementById("inp-ot").value.trim()) : "INACTIVO_SIN_OT";
-        enviarPulsoGpsAhora(est);
+        enviarPulsoGpsAhora(estadoReporteActual());
       }
     }, 30000);
   }
@@ -920,7 +1096,7 @@
       if (bodegaEquiposLocal.length > 0) {
         selEq.innerHTML = `<option value="">-- Elige un equipo (tienes ${bodegaEquiposLocal.length}) --</option>`;
         bodegaEquiposLocal.forEach(eq => {
-          selEq.innerHTML += `<option value="${esc(eq.mac)} (${esc(eq.modelo)})">${esc(eq.modelo)} | MAC: ${esc(eq.mac)}</option>`;
+          selEq.innerHTML += `<option value="${esc(eq.mac)}">${esc(eq.modelo)} | MAC: ${esc(eq.mac)}</option>`;
         });
       } else {
         selEq.innerHTML = `<option value="">-- No tienes equipos asignados --</option>`;
@@ -941,6 +1117,8 @@
         selMat.innerHTML = `<option value="">-- No tienes materiales asignados --</option>`;
       }
 
+      if (data.minutosEncuesta) localStorage.setItem("cottech_minutos_encuesta", String(data.minutosEncuesta));
+
       // 3. Historial de OTs del técnico desde el servidor
       if (data && Array.isArray(data.bitacoras)) {
         historialCompletoTecnico = data.bitacoras;
@@ -958,29 +1136,21 @@
     if (v) document.getElementById("inp-mac-nuevo").value = v;
   }
 
-  function alCambiarMovimientoEquipo() {
-    const t = document.getElementById("sel-tipo-equipo").value;
-    document.getElementById("bloque-mac-malo").classList.toggle("oculto", t !== "REEMPLAZO");
+  function equipoDeMiBodega(mac) {
+    const m = String(mac || "").trim().toUpperCase();
+    return bodegaEquiposLocal.find(e => String(e.mac || "").trim().toUpperCase() === m) || null;
   }
 
   function agregarEquipoAlCarrito() {
-    const tipoMov = document.getElementById("sel-tipo-equipo").value;
     const macNuevo = document.getElementById("inp-mac-nuevo").value.trim().toUpperCase();
-    const macMalo = document.getElementById("inp-mac-malo").value.trim().toUpperCase();
-
     if (!macNuevo) return alert("Elige el equipo de tu lista o escanea su MAC.");
-    if (tipoMov === "REEMPLAZO" && !macMalo) {
-      return alert("Como cambiaste un equipo, escanea o escribe también la MAC del equipo dañado.");
-    }
+    if (carritoEquipos.some(e => e.macNuevo === macNuevo)) return alert("Ese equipo ya está en la lista.");
+    const deBodega = equipoDeMiBodega(macNuevo);
+    if (bodegaEquiposLocal.length > 0 && !deBodega &&
+        !confirm("Ese equipo no aparece en tu lista de equipos. ¿Agregarlo de todas formas?")) return;
 
-    carritoEquipos.push({
-      movimiento: tipoMov,
-      macNuevo: macNuevo,
-      macDanado: tipoMov === "REEMPLAZO" ? macMalo : "N/A"
-    });
-
+    carritoEquipos.push({ movimiento: "INSTALADO", macNuevo: macNuevo, modelo: deBodega ? deBodega.modelo : "" });
     document.getElementById("inp-mac-nuevo").value = "";
-    document.getElementById("inp-mac-malo").value = "";
     document.getElementById("sel-bodega-eq").value = "";
     renderizarCarritoVisual();
     guardarEstadoVivo();
@@ -992,119 +1162,148 @@
     if (!matRaw) return alert("Elige un material de la lista.");
     if (cant <= 0) return alert("Escribe cuántos usaste (1 o más).");
 
-    const limpio = matRaw.split(" (Disponible:")[0].trim();
-    const existente = carritoConsumibles.find(x => x.material === limpio);
+    const partes = matRaw.split(" - ");
+    const codigo = partes[0].trim();
+    const nombre = partes.slice(1).join(" - ").trim();
+    const existente = carritoConsumibles.find(x => (x.codigo || String(x.material).split(" - ")[0]) === codigo);
     if (existente) {
       existente.cantidad += cant;
     } else {
-      carritoConsumibles.push({ material: limpio, cantidad: cant });
+      carritoConsumibles.push({ codigo: codigo, nombre: nombre, material: `${codigo} - ${nombre}`, cantidad: cant });
     }
+    document.getElementById("inp-cant-mat").value = "1";
     renderizarCarritoVisual();
     guardarEstadoVivo();
   }
 
-  function eliminarEquipoCarrito(idx) {
-    carritoEquipos.splice(idx, 1);
+  function agregarRetirado() {
+    const mac = document.getElementById("inp-mac-malo").value.trim().toUpperCase();
+    if (!mac) return alert("Escanea o escribe la MAC del equipo que quitaste.");
+    if (retirados.some(r => r.mac === mac)) return alert("Ese equipo ya está en la lista.");
+    retirados.push({
+      mac: mac,
+      modelo: document.getElementById("inp-modelo-malo").value.trim(),
+      estado: document.getElementById("sel-estado-malo").value
+    });
+    document.getElementById("inp-mac-malo").value = "";
+    document.getElementById("inp-modelo-malo").value = "";
     renderizarCarritoVisual();
     guardarEstadoVivo();
   }
 
-  function eliminarConsumibleCarrito(idx) {
-    carritoConsumibles.splice(idx, 1);
+  function quitarDeLista(lista, idx) {
+    if (lista === "equipo") carritoEquipos.splice(idx, 1);
+    if (lista === "material") carritoConsumibles.splice(idx, 1);
+    if (lista === "retirado") retirados.splice(idx, 1);
     renderizarCarritoVisual();
     guardarEstadoVivo();
   }
 
   function renderizarCarritoVisual() {
-    const cont = document.getElementById("lista-carrito-visual");
-    if (carritoEquipos.length === 0 && carritoConsumibles.length === 0) {
-      cont.innerHTML = `<div style="font-size:13px;color:#94a3b8;">Todavía no has agregado nada.</div>`;
-      return;
-    }
+    const fila = (texto, lista, i, color) => `
+      <div class="item-carrito" style="border-left-color:${color};">
+        <span>${texto}</span>
+        <button type="button" class="btn-quitar" onclick="quitarDeLista('${lista}', ${i})">Quitar</button>
+      </div>`;
+    const vacio = `<div class="lista-vacia">Todavía no has agregado nada.</div>`;
 
-    let html = "";
-    carritoEquipos.forEach((eq, i) => {
-      const txtReemp = eq.movimiento === "REEMPLAZO" ? `<br><span style="color:#fca5a5;">Quitaste el dañado: ${esc(eq.macDanado)}</span>` : "";
-      html += `
-        <div class="item-carrito">
-          <span><strong>Equipo:</strong> ${esc(eq.macNuevo)}${txtReemp}</span>
-          <button type="button" class="btn-quitar" onclick="eliminarEquipoCarrito(${i})">Quitar</button>
-        </div>`;
-    });
-
-    carritoConsumibles.forEach((c, i) => {
-      html += `
-        <div class="item-carrito" style="border-left-color:#fde047;">
-          <span><strong>Material (${esc(c.cantidad)}):</strong> ${esc(c.material)}</span>
-          <button type="button" class="btn-quitar" onclick="eliminarConsumibleCarrito(${i})">Quitar</button>
-        </div>`;
-    });
-    cont.innerHTML = html;
+    document.getElementById("lista-equipos").innerHTML = carritoEquipos.length
+      ? carritoEquipos.map((e, i) => fila(`<strong>${esc(e.macNuevo)}</strong>${e.modelo ? " · " + esc(e.modelo) : ""}`, "equipo", i, "#38bdf8")).join("")
+      : vacio;
+    document.getElementById("lista-materiales").innerHTML = carritoConsumibles.length
+      ? carritoConsumibles.map((c, i) => fila(`<strong>${esc(c.cantidad)} ×</strong> ${esc(c.nombre || c.material)}`, "material", i, "#fde047")).join("")
+      : vacio;
+    document.getElementById("lista-retirados").innerHTML = retirados.length
+      ? retirados.map((r, i) => fila(`<strong>${esc(r.mac)}</strong>${r.modelo ? " · " + esc(r.modelo) : ""} · ${esc(r.estado)}`, "retirado", i, "#f87171")).join("")
+      : vacio;
+    actualizarPestanas();
   }
 
   // =========================================================================
-  // HASTA 5 FOTOGRAFÍAS (CÁMARA + GALERÍA CON MINIATURAS)
+  // FOTOS: HASTA 15 DEL TRABAJO Y 3 DEL PROBLEMA (CÁMARA + GALERÍA)
   // =========================================================================
-  function procesarFotosSeleccionadas(input) {
-    if (!input.files || input.files.length === 0) return;
-    const archivos = Array.from(input.files);
+  const MAX_FOTOS_TRABAJO = 15;
+  const MAX_FOTOS_PROBLEMA = 3;
 
-    archivos.forEach(file => {
-      if (fotosComprimidasArray.length >= 5) {
-        alert("Ya tienes 5 fotos. No se pueden agregar más.");
-        return;
-      }
+  async function guardarFotosProblema() {
+    try { await idbGuardar("fotos_problema_actual", fotosProblemaArray.slice()); } catch (e) {}
+  }
+
+  async function cargarFotosProblema() {
+    try {
+      const f = await idbLeer("fotos_problema_actual");
+      if (Array.isArray(f)) return f;
+    } catch (e) {}
+    return [];
+  }
+
+  function comprimirFoto(file) {
+    return new Promise(resolve => {
       const reader = new FileReader();
-      reader.onload = function(e) {
+      reader.onload = e => {
         const img = new Image();
-        img.onload = function() {
-          if (fotosComprimidasArray.length >= 5) return;
+        img.onload = () => {
           const canvas = document.createElement("canvas");
-          const maxW = 800;
-          const scale = Math.min(1, maxW / img.width);
+          const scale = Math.min(1, 1000 / Math.max(img.width, img.height));
           canvas.width = Math.round(img.width * scale);
           canvas.height = Math.round(img.height * scale);
-          const ctx = canvas.getContext("2d");
-          ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
-          fotosComprimidasArray.push(canvas.toDataURL("image/jpeg", 0.60));
-          renderizarMiniaturasFotos();
-          guardarFotosActuales();
-          guardarEstadoVivo();
+          canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+          resolve(canvas.toDataURL("image/jpeg", 0.6));
         };
+        img.onerror = () => resolve(null);
         img.src = e.target.result;
       };
+      reader.onerror = () => resolve(null);
       reader.readAsDataURL(file);
     });
-    input.value = "";
   }
 
-  function eliminarFotoMiniatura(idx) {
-    fotosComprimidasArray.splice(idx, 1);
+  async function procesarFotosSeleccionadas(input, destino) {
+    if (!input.files || input.files.length === 0) return;
+    const archivos = Array.from(input.files);
+    input.value = "";
+    const lista = destino === "problema" ? fotosProblemaArray : fotosComprimidasArray;
+    const maximo = destino === "problema" ? MAX_FOTOS_PROBLEMA : MAX_FOTOS_TRABAJO;
+    let sobran = false;
+    for (const file of archivos) {
+      if (lista.length >= maximo) { sobran = true; break; }
+      const foto = await comprimirFoto(file);
+      if (foto && lista.length < maximo) lista.push(foto);
+    }
+    if (sobran) alert(`Ya tienes ${maximo} fotos. No se pueden agregar más.`);
     renderizarMiniaturasFotos();
-    guardarFotosActuales();
+    if (destino === "problema") await guardarFotosProblema(); else await guardarFotosActuales();
+    guardarEstadoVivo();
+  }
+
+  function eliminarFotoMiniatura(destino, idx) {
+    const lista = destino === "problema" ? fotosProblemaArray : fotosComprimidasArray;
+    lista.splice(idx, 1);
+    renderizarMiniaturasFotos();
+    if (destino === "problema") guardarFotosProblema(); else guardarFotosActuales();
     guardarEstadoVivo();
   }
 
   function renderizarMiniaturasFotos() {
-    const lbl = document.getElementById("lbl-conteo-fotos");
-    const cont = document.getElementById("contenedor-miniaturas");
-    if (lbl) lbl.innerText = `${fotosComprimidasArray.length} de 5 fotos`;
-    if (!cont) return;
-    cont.innerHTML = "";
-    fotosComprimidasArray.forEach((b64, idx) => {
-      cont.innerHTML += `
+    const pintar = (lista, maximo, idLbl, idCont, destino) => {
+      document.getElementById(idLbl).innerText = `${lista.length} de ${maximo} fotos`;
+      document.getElementById(idCont).innerHTML = lista.map((b64, idx) => `
         <div class="thumb-box">
-          <img src="${b64}" alt="Evidencia ${idx + 1}" />
-          <button type="button" class="thumb-del" onclick="eliminarFotoMiniatura(${idx})">X</button>
-        </div>`;
-    });
+          <img src="${b64}" alt="Foto ${idx + 1}" />
+          <button type="button" class="thumb-del" onclick="eliminarFotoMiniatura('${destino}', ${idx})">X</button>
+        </div>`).join("");
+    };
+    pintar(fotosComprimidasArray, MAX_FOTOS_TRABAJO, "lbl-conteo-fotos", "contenedor-miniaturas", "trabajo");
+    pintar(fotosProblemaArray, MAX_FOTOS_PROBLEMA, "lbl-conteo-fotos-inc", "contenedor-miniaturas-inc", "problema");
+    actualizarPestanas();
   }
 
   // =========================================================================
-  // HISTORIAL COMPLETO DE OTS DEL TÉCNICO (CON BUSCADOR Y CLIC PARA VER DETALLE)
+  // MIS ÓRDENES: BÚSQUEDA Y PDF
   // =========================================================================
   async function abrirHistorialTecnico() {
     document.getElementById("modal-historial-tec").style.display = "block";
+    filtrarHistorialTecnicoUI();
     await sincronizarMiBodega();
     filtrarHistorialTecnicoUI();
   }
@@ -1113,64 +1312,97 @@
     document.getElementById("modal-historial-tec").style.display = "none";
   }
 
-  function obtenerHistorialCombinadoTecnico() {
-    const remotos = JSON.parse(localStorage.getItem("cottech_mis_ots_servidor") || "[]");
-    const locales = JSON.parse(localStorage.getItem("cottech_mis_ots_realizadas") || "[]");
-    const mapaPorOt = new Map();
+  function leerJson(clave) {
+    try { return JSON.parse(localStorage.getItem(clave) || "[]") || []; } catch (e) { return []; }
+  }
 
-    remotos.forEach(b => mapaPorOt.set(String(b.ot).trim(), b));
-    locales.forEach(b => {
-      if (!mapaPorOt.has(String(b.ot).trim())) {
-        mapaPorOt.set(String(b.ot).trim(), b);
-      }
-    });
-    return Array.from(mapaPorOt.values());
+  // Une las órdenes del servidor con las que todavía están en el celular (pendientes de envío)
+  function obtenerHistorialCombinadoTecnico() {
+    const remotos = leerJson("cottech_mis_ots_servidor").map(b => Object.assign({ enServidor: true }, b));
+    const opIdsServidor = new Set(remotos.map(b => b.opId).filter(Boolean));
+    const otsServidor = new Set(remotos.map(b => String(b.ot).trim()));
+    const locales = leerJson("cottech_mis_ots_realizadas").filter(b =>
+      b.opId ? !opIdsServidor.has(b.opId) : !otsServidor.has(String(b.ot).trim())
+    ).map(b => Object.assign({ enServidor: false }, b));
+    return locales.concat(remotos).sort((a, b) => (Number(b.cierreMs) || 0) - (Number(a.cierreMs) || 0));
+  }
+
+  function fechaLocalDe(ms) {
+    if (!ms) return "";
+    const d = new Date(Number(ms));
+    return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+  }
+
+  function textoFechaHora(ms, respaldo) {
+    if (!ms) return String(respaldo || "").substring(0, 16);
+    return new Date(Number(ms)).toLocaleString("es-HN", { day: "2-digit", month: "2-digit", year: "numeric", hour: "numeric", minute: "2-digit" });
+  }
+
+  function listaTexto(b, campoNuevo, respaldo, formato) {
+    const lista = Array.isArray(b[campoNuevo]) ? b[campoNuevo] : [];
+    if (lista.length) return lista.map(formato).join(", ");
+    const r = String(respaldo || "");
+    return (!r || r === "N/A" || r === "Sin consumibles" || r === "Ninguno") ? "Ninguno" : r.replace(/ \| /g, ", ");
   }
 
   function filtrarHistorialTecnicoUI() {
     const container = document.getElementById("lista-historial-tec-container");
     const q = (document.getElementById("inp-buscar-mi-ot").value || "").trim().toLowerCase();
-    const lista = obtenerHistorialCombinadoTecnico().filter(b => {
+    const qDigitos = q.replace(/\D/g, "");
+    const fecha = document.getElementById("inp-fecha-mi-ot").value;
+    const todas = obtenerHistorialCombinadoTecnico();
+    historialVisible = todas.filter(b => {
+      if (fecha && fechaLocalDe(b.cierreMs) !== fecha) return false;
       if (!q) return true;
-      const texto = `${b.ot} ${b.tipoServicio} ${b.macNuevo || b.macEquipoNuevo || ""} ${b.material || b.materialUtilizado || ""} ${b.observaciones || ""}`.toLowerCase();
-      return texto.includes(q);
+      const texto = [
+        b.ot, b.nombreCliente, b.telCliente, b.tipoServicio, b.observaciones, b.inconveniente,
+        b.macNuevo, b.macDanado, b.material,
+        JSON.stringify(b.detEquipos || b.carritoEquipos || []),
+        JSON.stringify(b.detMateriales || b.carritoConsumibles || []),
+        JSON.stringify(b.detRetirados || b.retirados || [])
+      ].join(" ").toLowerCase();
+      if (texto.includes(q)) return true;
+      return qDigitos.length >= 4 && String(b.telCliente || "").replace(/\D/g, "").includes(qDigitos);
     });
 
-    if (lista.length === 0) {
+    document.getElementById("lbl-total-mis-ot").innerText = `${historialVisible.length} de ${todas.length} órdenes`;
+    if (historialVisible.length === 0) {
       container.innerHTML = `<div style="color:#94a3b8; font-size:14px; text-align:center; padding:30px;">No hay órdenes con esa búsqueda.</div>`;
       return;
     }
 
-    let html = "";
-    lista.forEach((b, idx) => {
-      const macN = b.macNuevo || b.macEquipoNuevo || "N/A";
-      const macM = b.macDanado || b.macEquipoDañado || "N/A";
-      const matU = b.material || b.materialUtilizado || "Ninguno";
-      const cli = sinEmojis(b.compCliente || b.comportamientoCliente || "") || "No indicado";
-      const min = b.minutos || b.minutosEnSitio || 1;
-      const obs = b.observaciones || "Sin descripción";
-
-      html += `
+    container.innerHTML = historialVisible.slice(0, 100).map((b, idx) => {
+      const equipos = listaTexto(b, "detEquipos", b.macNuevo, e => e.macNuevo + (e.modelo ? ` (${e.modelo})` : ""));
+      const materiales = listaTexto(b, "detMateriales", b.material, m => `${m.cantidad || ""} × ${m.nombre || m.material || m.codigo}`);
+      const quitados = listaTexto(b, "detRetirados", b.macDanado, r => r.mac + (r.estado ? ` (${r.estado})` : ""));
+      const noRealizada = b.estadoOt === "NO_REALIZADA";
+      const pdf = b.enServidor
+        ? `<button type="button" class="btn btn-azul btn-sm" onclick="event.stopPropagation(); descargarPdfOrden(${idx}, this)">DESCARGAR PDF</button>`
+        : `<div style="color:#fde047; margin-top:6px;">Todavía se está enviando. El PDF estará listo cuando llegue al sistema.</div>`;
+      return `
         <div class="ot-card" onclick="alternarDetalleOtCard(${idx})">
-          <div style="display:flex; justify-content:space-between; align-items:center;">
-            <span style="font-size:16px; font-weight:bold; color:#38bdf8;">Orden ${esc(b.ot)} · ${String(b.tipoServicio || '').toUpperCase().indexOf('REPARA') !== -1 ? 'Reparación' : 'Instalación'}</span>
-            <span style="font-size:13px; color:#4ade80;">${esc(String(b.fecha || '').substring(0, 16))}</span>
+          <div style="display:flex; justify-content:space-between; align-items:center; gap:6px;">
+            <span style="font-size:16px; font-weight:bold; color:#38bdf8;">Orden ${esc(b.ot)}</span>
+            <span style="font-size:13px; color:#4ade80;">${esc(textoFechaHora(b.cierreMs, b.fecha))}</span>
           </div>
-          <div style="font-size:13px; color:#94a3b8; margin-top:3px;">Toca para ver el detalle</div>
+          <div style="font-size:14px; color:#e2e8f0; margin-top:3px;">${esc(nombreTipo(b.tipoServicio))}${noRealizada ? " · <span style='color:#f87171;'>No realizada</span>" : ""}</div>
+          <div style="font-size:13.5px; color:#cbd5e1;">${esc(b.nombreCliente || "Cliente sin nombre")}${b.telCliente ? " · " + esc(b.telCliente) : ""}</div>
           <div id="det-ot-card-${idx}" class="ot-detalle oculto">
-            <div><strong>Tiempo en el lugar:</strong> ${esc(min)} minutos</div>
-            <div><strong>Equipo instalado (MAC):</strong> ${esc(macN)}</div>
-            <div><strong>Equipo dañado que quitaste:</strong> ${esc(macM)}</div>
-            <div><strong>Materiales usados:</strong> ${esc(matU)}</div>
-            <div><strong>Cómo fue el cliente:</strong> ${esc(cli)}</div>
-            ${b.alertas ? `<div style="color:#fca5a5;"><strong>Aviso de inventario:</strong> ${esc(b.alertas)}</div>` : ''}
+            ${b.minutos || b.minutosEnSitio ? `<div><strong>Tiempo en el sitio:</strong> ${esc(b.minutos || b.minutosEnSitio)} minutos</div>` : ""}
+            <div><strong>Equipos instalados:</strong> ${esc(equipos)}</div>
+            <div><strong>Materiales:</strong> ${esc(materiales)}</div>
+            <div><strong>Equipos quitados:</strong> ${esc(quitados)}</div>
+            <div><strong>Cómo fue el cliente:</strong> ${esc(sinEmojis(b.compCliente || b.comportamientoCliente || "") || "No indicado")}</div>
+            <div><strong>Fotos:</strong> ${esc(b.nFotos !== undefined ? b.nFotos : (b.nFotosLocal || 0))}</div>
+            ${b.alertas ? `<div style="color:#fca5a5;"><strong>Aviso de inventario:</strong> ${esc(b.alertas)}</div>` : ""}
             <div style="margin-top:6px; padding:8px; background:#1e293b; border-radius:6px; color:#f8fafc;">
-              <strong>Lo que hiciste:</strong><br>${esc(obs)}
+              <strong>Bitácora:</strong><br>${esc(b.observaciones || "Sin descripción")}
             </div>
+            ${b.inconveniente ? `<div style="margin-top:6px; padding:8px; background:#3f1d1d; border-radius:6px;"><strong>Problema:</strong><br>${esc(b.inconveniente)}</div>` : ""}
+            ${pdf}
           </div>
         </div>`;
-    });
-    container.innerHTML = html;
+    }).join("") + (historialVisible.length > 100 ? `<div class="ayuda" style="text-align:center;">Se muestran las 100 más recientes. Usa el buscador o la fecha.</div>` : "");
   }
 
   function alternarDetalleOtCard(idx) {
@@ -1178,18 +1410,58 @@
     if (el) el.classList.toggle("oculto");
   }
 
-  function guardarOTEnHistorialLocal(bData) {
-    let lista = JSON.parse(localStorage.getItem("cottech_mis_ots_realizadas") || "[]");
+  async function descargarPdfOrden(idx, boton) {
+    const b = historialVisible[idx];
+    if (!b) return;
+    const textoOriginal = boton.innerText;
+    boton.disabled = true;
+    boton.innerText = "Preparando el PDF...";
+    try {
+      const res = await postFirmado("PDF_OT", { opId: b.opId || "", fila: b.fila || 0 });
+      if (!res || res.status !== "success") {
+        alert(res && res.code === "AUTH" ? "Tu acceso no es válido. Pide a tu supervisor un enlace nuevo." : "No se pudo preparar el PDF. Intenta otra vez.");
+        return;
+      }
+      if (esNativo() && window.CottechNativo.compartirPdf) {
+        await window.CottechNativo.compartirPdf(res.nombre, res.pdfBase64);
+      } else {
+        const bytes = Uint8Array.from(atob(res.pdfBase64), c => c.charCodeAt(0));
+        const url = URL.createObjectURL(new Blob([bytes], { type: "application/pdf" }));
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = res.nombre;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 30000);
+      }
+    } catch (e) {
+      alert("No hay internet. Intenta otra vez cuando tengas señal.");
+    } finally {
+      boton.disabled = false;
+      boton.innerText = textoOriginal;
+    }
+  }
+
+  function guardarOTEnHistorialLocal(p) {
+    let lista = leerJson("cottech_mis_ots_realizadas");
     lista.unshift({
-      ot: bData.ot,
-      tipoServicio: bData.tipoServicio,
-      minutosEnSitio: bData.minutosEnSitio,
-      macEquipoNuevo: bData.macEquipoNuevo,
-      macEquipoDañado: bData.macEquipoDañado,
-      materialUtilizado: bData.materialUtilizado,
-      comportamientoCliente: bData.comportamientoCliente,
-      observaciones: bData.observaciones,
-      fecha: new Date().toLocaleString()
+      opId: p.opId,
+      ot: p.ot,
+      tipoServicio: p.tipoServicio,
+      estadoOt: p.estadoOt,
+      minutosEnSitio: p.minutosEnSitio,
+      carritoEquipos: p.carritoEquipos || [],
+      detEquipos: p.carritoEquipos || [],
+      detMateriales: p.carritoConsumibles || [],
+      detRetirados: p.retirados || [],
+      comportamientoCliente: p.comportamientoCliente,
+      observaciones: p.observaciones,
+      inconveniente: p.inconveniente || "",
+      telCliente: p.telefonoCliente || "",
+      nombreCliente: p.nombreCliente || "",
+      nFotosLocal: (p.fotosArray || []).length,
+      cierreMs: p.cierreMs
     });
     if (lista.length > 50) lista = lista.slice(0, 50);
     localStorage.setItem("cottech_mis_ots_realizadas", JSON.stringify(lista));
@@ -1214,9 +1486,12 @@
     if (!jornadaActiva) {
       lbl.innerText = "Día no iniciado";
       lbl.style.color = "#94a3b8";
-    } else if (otInicioMs) {
+    } else if (estadoOt === "SITIO") {
       lbl.innerText = "Trabajando en una orden";
       lbl.style.color = "#4ade80";
+    } else if (estadoOt === "CAMINO") {
+      lbl.innerText = "En camino a una orden";
+      lbl.style.color = "#60a5fa";
     } else {
       lbl.innerText = "Día iniciado · Sin orden ahora";
       lbl.style.color = "#fde047";
@@ -1224,7 +1499,7 @@
   }
 
   async function finalizarJornadaLaboral() {
-    if (otInicioMs) return alert("Primero termina la orden en la que estás trabajando.");
+    if (estadoOt) return alert("Primero termina la orden en la que estás trabajando.");
     if (!confirm("¿Ya terminaste tu día de trabajo?")) return;
 
     jornadaActiva = false;
@@ -1287,7 +1562,7 @@
         lng: ultimaLng,
         precision: precision,
         estado: estadoReporte,
-        otActiva: otInicioMs ? document.getElementById("inp-ot").value.trim().substring(0, 40) : "",
+        otActiva: estadoOt ? document.getElementById("inp-ot").value.trim().substring(0, 40) : "",
         timestampMs: ahoraServidor(),
         hora: new Date().toISOString(),
         k: cfg.gpsK          // Llave GPS: Firebase solo acepta la escritura si coincide
@@ -1319,79 +1594,132 @@
       }
   }
 
-  function iniciarTrabajoEnSitio() {
-    const ot = document.getElementById("inp-ot").value.trim();
-    if (!ot) return alert("Escribe el número de orden primero.");
-
-    if (!otInicioMs) otInicioMs = Date.now();
-    if (!jornadaActiva) {
-      iniciarJornadaLaboral();
-    } else {
-      iniciarMotorSegundoPlano();
-    }
-
-    mostrarEtapaPantalla("2");
-    actualizarEtiquetaEstadoUI();
-    enviarPulsoGpsAhora("EN_SITIO_OT_" + ot);
+  // =========================================================================
+  // FLUJO DE LA ORDEN: EN CAMINO → EN EL SITIO → TERMINADA
+  // =========================================================================
+  function asegurarJornadaActiva() {
+    if (!jornadaActiva) iniciarJornadaLaboral();
+    else iniciarMotorSegundoPlano();
   }
 
-  function abrirEscanerCamara(inputIdDestino) {
-    guardarEstadoVivo();
-    const divReader = document.getElementById("reader-mac");
-    divReader.style.display = "block";
-    if (html5QrScanner) { try { html5QrScanner.clear(); } catch (e) {} }
+  function salirEnCamino() {
+    const ot = valorDe("inp-ot").trim();
+    if (!ot) return alert("Escribe el número de orden primero.");
+    estadoOt = "CAMINO";
+    if (!caminoMs) caminoMs = ahoraServidor();
+    asegurarJornadaActiva();
+    mostrarEtapaPantalla("CAMINO");
+    actualizarEtiquetaEstadoUI();
+    enviarPulsoGpsAhora(estadoReporteActual());
+  }
 
-    html5QrScanner = new Html5Qrcode("reader-mac");
+  function corregirNumeroOrden() {
+    estadoOt = "";
+    mostrarEtapaPantalla("1");
+    actualizarEtiquetaEstadoUI();
+    enviarPulsoGpsAhora(estadoReporteActual());
+    document.getElementById("inp-ot").focus();
+  }
+
+  function irAElegirTipo() {
+    mostrarEtapaPantalla("TIPO");
+  }
+
+  function volverDeTipo() {
+    mostrarEtapaPantalla(estadoOt === "SITIO" ? "2" : "CAMINO");
+  }
+
+  async function elegirTipoTrabajo(tipo) {
+    const anterior = valorDe("sel-tipo-servicio");
+    document.getElementById("sel-tipo-servicio").value = tipo;
+    const llegandoAhora = estadoOt !== "SITIO";
+    if (llegandoAhora) {
+      estadoOt = "SITIO";
+      sitioMs = ahoraServidor();
+      if (!caminoMs) caminoMs = sitioMs;
+      pestanaActual = "productos";
+      asegurarJornadaActiva();
+    }
+    // El código de la encuesta lleva el tipo de trabajo: se hace de nuevo si cambió.
+    if (!urlEncuestaActual || anterior !== tipo) await generarQrEncuesta();
+    mostrarEtapaPantalla("2");
+    actualizarEtiquetaEstadoUI();
+    if (llegandoAhora) enviarPulsoGpsAhora(estadoReporteActual());
+  }
+
+  // ---------- Escáner de MAC con línea verde ----------
+  async function abrirEscanerCamara(inputIdDestino) {
+    guardarEstadoVivo();
+    await cerrarEscanerCamara();
+    const caja = document.getElementById("caja-escaner");
+    caja.classList.remove("oculto");
+    caja.scrollIntoView({ behavior: "smooth", block: "start" });
+
+    html5QrScanner = new Html5Qrcode("reader-mac", { experimentalFeatures: { useBarCodeDetectorIfSupported: true } });
     html5QrScanner.start(
       { facingMode: "environment" },
-      { fps: 10, qrbox: { width: 250, height: 110 } },
+      {
+        fps: 15,
+        // Recuadro ancho y bajo: el código de barras de la MAC es alargado
+        qrbox: (ancho, alto) => ({ width: Math.floor(ancho * 0.9), height: Math.max(60, Math.floor(alto * 0.3)) })
+      },
       decodedText => {
-        document.getElementById(inputIdDestino).value = decodedText.trim().toUpperCase();
+        const valor = decodedText.trim().toUpperCase();
+        document.getElementById(inputIdDestino).value = valor;
+        if (inputIdDestino === "inp-mac-nuevo") {
+          const deBodega = equipoDeMiBodega(valor);
+          if (deBodega) document.getElementById("sel-bodega-eq").value = deBodega.mac;
+        }
+        if (navigator.vibrate) navigator.vibrate(120);
         guardarEstadoVivo();
-        html5QrScanner.stop().then(() => { divReader.style.display = "none"; });
+        cerrarEscanerCamara();
       },
       () => {}
-    ).catch(() => {
+    ).then(() => {
+      // Línea verde centrada sobre la imagen de la cámara
+      const lector = document.getElementById("reader-mac");
+      if (!lector.querySelector(".linea-verde")) {
+        const linea = document.createElement("div");
+        linea.className = "linea-verde";
+        lector.appendChild(linea);
+      }
+    }).catch(() => {
       alert("No se pudo abrir la cámara. Revisa que la app tenga permiso de cámara.");
-      divReader.style.display = "none";
+      cerrarEscanerCamara();
     });
   }
 
-  async function pasarAPantallaQR() {
-    const macEscrita = document.getElementById("inp-mac-nuevo").value.trim();
-    if (macEscrita) agregarEquipoAlCarrito();
+  async function cerrarEscanerCamara() {
+    const caja = document.getElementById("caja-escaner");
+    if (caja) caja.classList.add("oculto");
+    if (html5QrScanner) {
+      const lectorActivo = html5QrScanner;
+      html5QrScanner = null;
+      try { await lectorActivo.stop(); } catch (e) {}
+      try { lectorActivo.clear(); } catch (e) {}
+    }
+    const lector = document.getElementById("reader-mac");
+    if (lector) lector.innerHTML = "";
+  }
 
+  // ---------- Código QR de la encuesta ----------
+  async function generarQrEncuesta() {
     const cfg = leerCfg();
-    const ot = document.getElementById("inp-ot").value.trim();
-    const tipoServ = document.getElementById("sel-tipo-servicio").value;
-
-    // Firma del QR: el servidor la recalcula con la llave del técnico y valida la vigencia.
+    const ot = valorDe("inp-ot").trim();
+    const tipoServ = valorDe("sel-tipo-servicio");
+    // Firma del QR: el servidor la recalcula con la llave del técnico y revisa si la orden sigue abierta.
     const ts = ahoraServidor();
     const firma = await sha256(`${cfg.id}|${ot}|${tipoServ.toUpperCase()}|${ts}|${cfg.llave}`);
-    const matchId = cfg.execUrl.match(/\/s\/([a-zA-Z0-9-_]+)\/exec/);
+    const matchId = String(cfg.execUrl || "").match(/\/s\/([a-zA-Z0-9-_]+)\/exec/);
     const kCorto = matchId ? matchId[1] : cfg.execUrl;
-
     const baseTecnico = esNativo()
       ? (cfg.baseWeb || URL_WEB_DEFAULT)
       : (window.location.origin + window.location.pathname);
     const baseUrl = baseTecnico.replace(/tecnico\.html.*$/, "index.html");
-    const params = new URLSearchParams({
-      tec: cfg.id,
-      ot: ot,
-      tipo: tipoServ,
-      ts: ts,
-      sig: firma,
-      k: kCorto
-    });
+    const params = new URLSearchParams({ tec: cfg.id, ot: ot, tipo: tipoServ, ts: ts, sig: firma, k: kCorto });
     urlEncuestaActual = `${baseUrl}?${params.toString()}`;
     urlCortaActual = urlEncuestaActual;
-
-    const contenedorQR = document.getElementById("qrcode");
-    contenedorQR.innerHTML = "";
-    new QRCode(contenedorQR, { text: urlEncuestaActual, width: 215, height: 215, correctLevel: QRCode.CorrectLevel.L });
-    document.getElementById("lbl-pie-qr").innerText = `Orden ${ot} · Escanee para evaluar`;
-
-    mostrarEtapaPantalla("3");
+    guardarEstadoVivo();
 
     fetch(`https://is.gd/create.php?format=json&url=${encodeURIComponent(urlEncuestaActual)}`)
       .then(r => r.json())
@@ -1404,133 +1732,177 @@
       .catch(() => {});
   }
 
-  function volverABitacoraDesdeQR() {
-    mostrarEtapaPantalla("2");
+  function dibujarQr(idContenedor, texto) {
+    const cont = document.getElementById(idContenedor);
+    if (!cont) return;
+    cont.innerHTML = "";
+    if (!texto) return;
+    new QRCode(cont, { text: texto, width: 215, height: 215, correctLevel: QRCode.CorrectLevel.L });
+    const pie = document.getElementById("lbl-pie-qr");
+    if (pie) pie.innerText = `Orden ${valorDe("inp-ot").trim() || otTerminada} · Escanee para evaluar`;
   }
 
   function enviarUrlCortaWhatsApp() {
     guardarEstadoVivo();
-    const ot = document.getElementById("inp-ot").value.trim();
+    const ot = valorDe("inp-ot").trim() || otTerminada;
     const link = urlCortaActual || urlEncuestaActual;
+    if (!link) return;
     const msg = `Hola, gracias por permitirnos atender su solicitud técnica (Orden #${ot}). Por favor ayúdenos evaluando el servicio recibido en este enlace corto y confidencial: ${link}`;
-    navigator.clipboard.writeText(msg).catch(() => {});
+    if (navigator.clipboard) navigator.clipboard.writeText(msg).catch(() => {});
     window.open(`https://wa.me/?text=${encodeURIComponent(msg)}`, "_blank");
   }
 
-  async function finalizarOrdenPorCompleto() {
+  // ---------- Terminar la orden ----------
+  function revisarAntesDeTerminar() {
+    const faltaEn = (pestana, mensaje) => { mostrarPestana(pestana); alert(mensaje); return false; };
+    const tel = valorDe("inp-tel-cliente").replace(/\D/g, "");
+    if (tel.length < 8) return faltaEn("bitacora", "Falta el teléfono del cliente (8 números).");
+    if (!valorDe("inp-nombre-cliente").trim()) return faltaEn("bitacora", "Falta el nombre del cliente.");
+    if (!valorDe("inp-bitacora-obs").trim()) return faltaEn("bitacora", "Escribe qué trabajo hiciste.");
+    if (fotosComprimidasArray.length === 0 &&
+        !confirm("No tomaste fotos del trabajo.\n\n¿Terminar la orden sin fotos?")) {
+      mostrarPestana("fotos");
+      return false;
+    }
+    return true;
+  }
+
+  function limpiarOrdenActual() {
+    ["inp-ot", "inp-mac-nuevo", "inp-mac-malo", "inp-modelo-malo", "inp-tel-cliente", "inp-nombre-cliente",
+     "inp-bitacora-obs", "inp-inconveniente", "txt-justificacion-no"].forEach(id => { document.getElementById(id).value = ""; });
+    document.getElementById("sel-comportamiento-cliente").selectedIndex = 0;
+    document.getElementById("sel-tipo-servicio").selectedIndex = 0;
+    fotosComprimidasArray = [];
+    fotosProblemaArray = [];
+    guardarFotosActuales();
+    guardarFotosProblema();
+    carritoEquipos = [];
+    carritoConsumibles = [];
+    retirados = [];
+    estadoOt = "";
+    caminoMs = 0;
+    sitioMs = 0;
+    pestanaActual = "productos";
+    renderizarCarritoVisual();
+    renderizarMiniaturasFotos();
+  }
+
+  function resumenesAnteriores(p) {
+    // Columnas de versiones anteriores (las sigue leyendo la PC)
+    p.tipoMovimientoEquipo = p.carritoEquipos.length ? (p.retirados.length ? "REEMPLAZO" : "INSTALADO") : (p.retirados.length ? "RETIRO" : "SIN_EQUIPO");
+    p.macEquipoNuevo = p.carritoEquipos.length ? p.carritoEquipos.map(e => e.macNuevo).join(" | ") : "N/A";
+    p.macEquipoDañado = p.retirados.length ? p.retirados.map(r => r.mac).join(" | ") : "N/A";
+    p.materialUtilizado = p.carritoConsumibles.length ? p.carritoConsumibles.map(c => `${c.material} (x${c.cantidad})`).join(" | ") : "Sin consumibles";
+    p.cantidadMaterial = p.carritoConsumibles.reduce((acc, c) => acc + c.cantidad, 0);
+    return p;
+  }
+
+  async function terminarOrden() {
+    // Lo que quedó escrito sin "Agregar" también cuenta
+    if (valorDe("inp-mac-nuevo").trim()) agregarEquipoAlCarrito();
+    if (valorDe("inp-mac-malo").trim()) agregarRetirado();
+    if (!revisarAntesDeTerminar()) return;
+
+    const ot = valorDe("inp-ot").trim();
+    if (!confirm(`¿Ya terminaste la orden ${ot}?`)) return;
+
     const cfg = leerCfg();
-    const ot = document.getElementById("inp-ot").value.trim();
-    const minTranscurridos = Math.max(1, Math.round((Date.now() - (otInicioMs || Date.now())) / 60000));
-    otInicioMs = null;
-
-    const movResumen = carritoEquipos.length > 0 ? carritoEquipos.map(e => e.movimiento).join(" + ") : "SIN_EQUIPO";
-    const macNuevasStr = carritoEquipos.length > 0 ? carritoEquipos.map(e => e.macNuevo).join(" | ") : "N/A";
-    const macMalasStr = carritoEquipos.some(e => e.macDanado !== "N/A") ? carritoEquipos.map(e => e.macDanado).join(" | ") : "N/A";
-    const matStr = carritoConsumibles.length > 0 ? carritoConsumibles.map(c => `${c.material} (x${c.cantidad})`).join(" | ") : "Sin consumibles";
-    const cantTotalMat = carritoConsumibles.reduce((acc, c) => acc + c.cantidad, 0);
-    const compCliente = document.getElementById("sel-comportamiento-cliente").value;
-
-    const payloadCierre = {
+    const fin = ahoraServidor();
+    if (!urlEncuestaActual) await generarQrEncuesta();
+    const payload = resumenesAnteriores({
       opId: nuevoId(),          // Identificador único: evita OTs duplicadas al reintentar
       tecnico: cfg.id,
       nombreTecnico: cfg.nombre || cfg.id,
       ot: ot,
-      tipoServicio: document.getElementById("sel-tipo-servicio").value,
+      tipoServicio: valorDe("sel-tipo-servicio"),
       estadoOt: "TERMINADA",
-      minutosEnSitio: minTranscurridos,
-      tipoMovimientoEquipo: movResumen,
-      macEquipoNuevo: macNuevasStr,
-      macEquipoDañado: macMalasStr,
-      materialUtilizado: matStr,
-      cantidadMaterial: cantTotalMat,
-      carritoEquipos: carritoEquipos,
-      carritoConsumibles: carritoConsumibles,
-      comportamientoCliente: compCliente,
-      observaciones: document.getElementById("inp-bitacora-obs").value.trim(),
-      fotosArray: fotosComprimidasArray,
+      minutosEnSitio: Math.max(1, Math.round((fin - (sitioMs || fin)) / 60000)),
+      caminoMs: caminoMs,
+      sitioMs: sitioMs,
+      carritoEquipos: carritoEquipos.slice(),
+      carritoConsumibles: carritoConsumibles.slice(),
+      retirados: retirados.slice(),
+      comportamientoCliente: valorDe("sel-comportamiento-cliente"),
+      observaciones: valorDe("inp-bitacora-obs").trim(),
+      telefonoCliente: valorDe("inp-tel-cliente").trim(),
+      nombreCliente: valorDe("inp-nombre-cliente").trim(),
+      inconveniente: valorDe("inp-inconveniente").trim(),
+      fotosArray: fotosComprimidasArray.slice(),
+      fotosInconveniente: fotosProblemaArray.slice(),
       lat: ultimaLat,
       lng: ultimaLng,
-      cierreMs: Date.now()
-    };
+      cierreMs: fin
+    });
 
-    guardarOTEnHistorialLocal(payloadCierre);
-
-    document.getElementById("inp-ot").value = "";
-    document.getElementById("inp-mac-nuevo").value = "";
-    document.getElementById("inp-mac-malo").value = "";
-    document.getElementById("inp-bitacora-obs").value = "";
-    fotosComprimidasArray = [];
-    guardarFotosActuales();
-    renderizarMiniaturasFotos();
-    urlEncuestaActual = "";
-    urlCortaActual = "";
-    carritoEquipos = [];
-    carritoConsumibles = [];
-    renderizarCarritoVisual();
+    guardarOTEnHistorialLocal(payload);
+    otTerminada = ot;
+    limpiarOrdenActual();
 
     // Primero se libera el estado (y sus fotos) del almacenamiento, luego se encola la OT.
-    mostrarEtapaPantalla("1");
+    mostrarEtapaPantalla("FIN");
     actualizarEtiquetaEstadoUI();
-    encolarYEnviarOT(payloadCierre);
-    enviarPulsoGpsAhora("INACTIVO_SIN_OT");
-
-    alert(`La orden ${ot} se terminó.\nTiempo: ${minTranscurridos} minutos.\nSe está enviando. Si no hay internet, se enviará sola cuando vuelva la señal.`);
+    encolarYEnviarOT(payload);
+    enviarPulsoGpsAhora(estadoReporteActual());
   }
 
+  function cerrarPantallaFin() {
+    otTerminada = "";
+    urlEncuestaActual = "";
+    urlCortaActual = "";
+    mostrarEtapaPantalla("1");
+  }
+
+  // ---------- Orden que no se pudo hacer ----------
   function abrirModalNoRealizada() {
+    etapaAntesNoRealizada = etapaActual;
     mostrarEtapaPantalla("NO_REALIZADA");
   }
 
   function cancelarNoRealizada() {
-    mostrarEtapaPantalla("2");
+    mostrarEtapaPantalla(etapaAntesNoRealizada === "CAMINO" ? "CAMINO" : (estadoOt === "SITIO" ? "2" : "CAMINO"));
   }
 
   function confirmarCierreNoRealizada() {
     const cfg = leerCfg();
-    const ot = document.getElementById("inp-ot").value.trim();
-    const motivo = document.getElementById("sel-motivo-no").value;
-    const detalle = document.getElementById("txt-justificacion-no").value.trim();
+    const ot = valorDe("inp-ot").trim();
+    const motivo = valorDe("sel-motivo-no");
+    const detalle = valorDe("txt-justificacion-no").trim();
     if (!detalle) return alert("Escribe en pocas palabras por qué no se pudo.");
 
-    const minTranscurridos = Math.max(1, Math.round((Date.now() - (otInicioMs || Date.now())) / 60000));
-    otInicioMs = null;
-
-    const payloadNo = {
+    const fin = ahoraServidor();
+    const payloadNo = resumenesAnteriores({
       opId: nuevoId(),
       tecnico: cfg.id,
       nombreTecnico: cfg.nombre || cfg.id,
       ot: ot,
-      tipoServicio: document.getElementById("sel-tipo-servicio").value,
+      tipoServicio: estadoOt === "SITIO" ? valorDe("sel-tipo-servicio") : "SIN DEFINIR",
       estadoOt: "NO_REALIZADA",
-      minutosEnSitio: minTranscurridos,
-      tipoMovimientoEquipo: "SIN_EQUIPO",
-      macEquipoNuevo: "N/A",
-      macEquipoDañado: "N/A",
-      materialUtilizado: "Ninguno",
-      cantidadMaterial: 0,
+      minutosEnSitio: Math.max(1, Math.round((fin - (sitioMs || caminoMs || fin)) / 60000)),
+      caminoMs: caminoMs,
+      sitioMs: sitioMs,
+      carritoEquipos: [],
+      carritoConsumibles: [],
+      retirados: [],
       comportamientoCliente: "N/A",
       observaciones: `[NO REALIZADA - ${motivo}]: ${detalle}`,
-      fotosArray: fotosComprimidasArray,
+      telefonoCliente: valorDe("inp-tel-cliente").trim(),
+      nombreCliente: valorDe("inp-nombre-cliente").trim(),
+      inconveniente: valorDe("inp-inconveniente").trim(),
+      fotosArray: fotosComprimidasArray.slice(),
+      fotosInconveniente: fotosProblemaArray.slice(),
       lat: ultimaLat,
       lng: ultimaLng,
-      cierreMs: Date.now()
-    };
+      cierreMs: fin
+    });
 
     guardarOTEnHistorialLocal(payloadNo);
-
-    document.getElementById("inp-ot").value = "";
-    document.getElementById("txt-justificacion-no").value = "";
-    fotosComprimidasArray = [];
-    guardarFotosActuales();
-    renderizarMiniaturasFotos();
-    carritoEquipos = [];
-    carritoConsumibles = [];
-    renderizarCarritoVisual();
-
+    limpiarOrdenActual();
+    urlEncuestaActual = "";
+    urlCortaActual = "";
     mostrarEtapaPantalla("1");
     actualizarEtiquetaEstadoUI();
     encolarYEnviarOT(payloadNo);
-    enviarPulsoGpsAhora("INACTIVO_SIN_OT");
+    enviarPulsoGpsAhora(estadoReporteActual());
     alert(`La orden ${ot} se cerró como NO REALIZADA.`);
   }
 
