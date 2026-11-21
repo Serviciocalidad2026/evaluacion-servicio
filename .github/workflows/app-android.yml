@@ -13,6 +13,12 @@ on:
       - "tecnico.html"
       - "Icono.png"
       - "app_nativa/**"
+      - "package.json"
+      - "capacitor.config.json"
+      - "preparar.mjs"
+      - "iconos.py"
+      - "nativo.js"
+      - "*.java"
       - ".github/workflows/app-android.yml"
 
 permissions:
@@ -39,6 +45,30 @@ jobs:
           fi
 
       - uses: actions/checkout@v5
+
+      # Los archivos de la app pueden estar en la carpeta app_nativa o sueltos en la raíz
+      # (así quedan si se suben arrastrándolos). Aquí se ordenan como los necesita la fábrica.
+      - name: Ordenar los archivos de la app
+        run: |
+          buscar() {
+            for c in "app_nativa/$1" "app_nativa/$(basename "$1")" "$(basename "$1")"; do
+              if [ -f "$c" ]; then echo "$c"; return; fi
+            done
+          }
+          ORDEN="$RUNNER_TEMP/app_nativa"
+          mkdir -p "$ORDEN/src" "$ORDEN/android_extra"
+          for f in package.json capacitor.config.json preparar.mjs iconos.py src/nativo.js \
+                   android_extra/AjustesCelularPlugin.java android_extra/MainActivity.java; do
+            ORIGEN=$(buscar "$f")
+            if [ -z "$ORIGEN" ]; then
+              echo "::error::Falta el archivo $(basename "$f") en el repositorio. Súbelo y vuelve a intentar."
+              exit 1
+            fi
+            cp "$ORIGEN" "$ORDEN/$f"
+          done
+          rm -rf app_nativa
+          cp -r "$ORDEN" app_nativa
+          echo "Archivos de la app:"; find app_nativa -type f | sort
 
       - uses: actions/setup-node@v5
         with:
