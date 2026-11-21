@@ -44,6 +44,9 @@
     .ot-card:hover { border-color: #38bdf8; }
     .ot-detalle { background: #0f172a; border-top: 1px solid #334155; margin-top: 8px; padding-top: 8px; font-size: 14px; color: #e2e8f0; line-height: 1.6; }
     #caja-qr { margin-top: 12px; background: white; padding: 16px; border-radius: 12px; display: flex; flex-direction: column; align-items: center; }
+    #reader-config { width: 100%; margin: 8px 0; border-radius: 8px; overflow: hidden; display: none; }
+    .aviso-actualizacion { background: #1d4ed8; color: white; border-radius: 10px; padding: 12px; margin-bottom: 12px; font-weight: bold; font-size: 15px; text-align: center; }
+    .aviso-actualizacion button { margin-top: 8px; background: white; color: #1d4ed8; }
     #reader-mac { width: 100%; margin-top: 8px; border-radius: 8px; overflow: hidden; display: none; }
     .oculto { display: none !important; }
   </style>
@@ -51,10 +54,20 @@
 <body>
 
 <div class="card">
+  <!-- AVISO DE VERSIÓN NUEVA (solo app Android) -->
+  <div id="aviso-actualizacion" class="aviso-actualizacion oculto">
+    Hay una versión nueva de la app.
+    <button type="button" class="btn btn-grande" onclick="descargarActualizacion()">ACTUALIZAR AHORA</button>
+  </div>
+
   <!-- 1. CONFIGURACIÓN INICIAL -->
   <div id="vista-config" class="oculto">
     <h2>Configurar mi app</h2>
-    <p class="ayuda">Pega aquí el enlace que te mandó tu supervisor por WhatsApp.</p>
+    <p class="ayuda">Pide a tu supervisor tu código y escanéalo con este botón.</p>
+    <button type="button" class="btn btn-verde btn-grande" style="margin-top:0;" onclick="abrirEscanerConfig()">ESCANEAR CÓDIGO DEL SUPERVISOR</button>
+    <div id="reader-config"></div>
+    <button type="button" id="btn-cerrar-escaner-config" class="btn btn-gris oculto" onclick="cerrarEscanerConfig()">Cancelar</button>
+    <p class="ayuda" style="margin-top:14px;">O pega aquí el enlace que te mandó tu supervisor por WhatsApp:</p>
     <label>Enlace de tu supervisor:</label>
     <div class="fila-input-cam">
       <input type="text" id="cfg-enlace" placeholder="Pega aquí el enlace" />
@@ -81,7 +94,7 @@
     <p class="ayuda" id="sub-bodega">Cargando tus equipos...</p>
 
     <button id="btn-instalar-pwa" class="btn btn-azul oculto" style="margin-top:0; margin-bottom:12px; background:#0284c7;" onclick="instalarAppLimpia()">
-      Instalar la app en mi celular
+      INSTALAR LA APP NUEVA
     </button>
 
     <!-- PANEL DE JORNADA LABORAL -->
@@ -716,16 +729,120 @@
     }
   }
 
-  function usarEnlacePegado() {
-    const texto = document.getElementById("cfg-enlace").value.trim();
+  // Acepta el enlace del supervisor (pegado o leído del código QR). Devuelve true si sirvió.
+  function usarEnlaceTexto(texto) {
     try {
-      const u = new URL(texto);
+      const u = new URL(String(texto || "").trim());
       const fuente = u.hash.length > 1 ? u.hash.substring(1) : u.search.substring(1);
-      if (!aplicarParametrosAcceso(new URLSearchParams(fuente), u.origin + u.pathname)) throw new Error("incompleto");
-      document.getElementById("cfg-enlace").value = "";
+      if (!aplicarParametrosAcceso(new URLSearchParams(fuente), u.origin + u.pathname)) return false;
       cargarVista();
+      return true;
     } catch (e) {
+      return false;
+    }
+  }
+
+  function usarEnlacePegado() {
+    if (usarEnlaceTexto(document.getElementById("cfg-enlace").value)) {
+      document.getElementById("cfg-enlace").value = "";
+    } else {
       alert("Ese enlace no sirve. Copia el enlace completo que te mandó tu supervisor.");
+    }
+  }
+
+  let escanerConfig = null;
+
+  function abrirEscanerConfig() {
+    const div = document.getElementById("reader-config");
+    div.style.display = "block";
+    document.getElementById("btn-cerrar-escaner-config").classList.remove("oculto");
+    if (escanerConfig) { try { escanerConfig.clear(); } catch (e) {} }
+    escanerConfig = new Html5Qrcode("reader-config");
+    escanerConfig.start(
+      { facingMode: "environment" },
+      { fps: 10, qrbox: { width: 240, height: 240 } },
+      textoLeido => {
+        const sirvio = usarEnlaceTexto(textoLeido);
+        cerrarEscanerConfig();
+        if (!sirvio) alert("Ese código no es el de tu supervisor. Pídele que te muestre tu código otra vez.");
+      },
+      () => {}
+    ).catch(() => {
+      alert("No se pudo abrir la cámara. Revisa que la app tenga permiso de cámara.");
+      cerrarEscanerConfig();
+    });
+  }
+
+  function cerrarEscanerConfig() {
+    document.getElementById("reader-config").style.display = "none";
+    document.getElementById("btn-cerrar-escaner-config").classList.add("oculto");
+    if (escanerConfig) {
+      const e = escanerConfig;
+      escanerConfig = null;
+      Promise.resolve().then(() => e.stop()).catch(() => {}).then(() => { try { e.clear(); } catch (x) {} });
+    }
+  }
+
+  // ===== App Android: aviso de versión nueva =====
+  // El número de versión y el repositorio los pone la fábrica de la app (GitHub) al compilar.
+  function enlaceDescargaApp() {
+    return `https://github.com/${window.COTTECH_APP_REPO}/releases/latest/download/CottechTecnico.apk`;
+  }
+
+  async function revisarActualizacionApp() {
+    if (!esNativo() || !window.COTTECH_APP_BUILD || !window.COTTECH_APP_REPO) return;
+    const hace = Date.now() - Number(localStorage.getItem("cottech_revision_app_ms") || 0);
+    let ultima = Number(localStorage.getItem("cottech_ultima_version_app") || 0);
+    if (hace > 60 * 60 * 1000) {
+      try {
+        const r = await fetch(`https://api.github.com/repos/${window.COTTECH_APP_REPO}/releases/latest`, { cache: "no-store" });
+        if (r.ok) {
+          const datos = await r.json();
+          const m = String(datos.tag_name || "").match(/^app-(\d+)$/);
+          if (m) {
+            ultima = Number(m[1]);
+            localStorage.setItem("cottech_ultima_version_app", String(ultima));
+          }
+          localStorage.setItem("cottech_revision_app_ms", String(Date.now()));
+        }
+      } catch (e) { /* sin internet: se revisa en otro momento */ }
+    }
+    document.getElementById("aviso-actualizacion").classList.toggle("oculto", !(ultima > Number(window.COTTECH_APP_BUILD)));
+  }
+
+  function descargarActualizacion() {
+    // Android abre el enlace en el navegador, descarga el archivo y pregunta si se instala.
+    window.location.href = enlaceDescargaApp();
+  }
+
+  // ===== App Android: ajustes del celular para que la app no se cierre sola =====
+  const MARCAS_INICIO_AUTOMATICO = /xiaomi|redmi|poco|tecno|infinix|itel/;
+  let revisandoAjustes = false;
+
+  async function revisarAjustesCelular() {
+    if (!esNativo() || !jornadaActiva || revisandoAjustes || !window.CottechNativo.estadoCelular) return;
+    revisandoAjustes = true;
+    try {
+      const est = await window.CottechNativo.estadoCelular();
+      const hoy = new Date().toDateString();
+      if (!est.bateriaSinRestriccion) {
+        if (localStorage.getItem("cottech_aviso_bateria") === hoy) return;
+        localStorage.setItem("cottech_aviso_bateria", hoy);
+        if (confirm("A la app le falta un ajuste para funcionar todo el día.\n\nEn la ventana que sale, toca PERMITIR.\n\n¿Lo activamos ahora?")) {
+          await window.CottechNativo.pedirBateriaSinRestriccion();
+        }
+        return;
+      }
+      if (MARCAS_INICIO_AUTOMATICO.test(String(est.fabricante || "")) && !localStorage.getItem("cottech_aviso_autoinicio")) {
+        localStorage.setItem("cottech_aviso_autoinicio", "1");
+        if (confirm("Falta un último ajuste.\n\nEn la pantalla que se abre, busca Cottech Técnico y ACTÍVALO.\n\n¿Abrir ahora?")) {
+          await window.CottechNativo.abrirInicioAutomatico();
+        }
+      }
+    } catch (e) {
+      /* si el celular no deja revisar, no se insiste */
+    } finally {
+      revisandoAjustes = false;
     }
   }
 
@@ -742,6 +859,7 @@
       document.getElementById("titulo-tec").innerHTML =
         `${esc(cfg.nombre || "Técnico")}<br><span style="font-size:13px;color:#94a3b8;font-weight:normal;">Código: ${esc(cfg.id)}</span>`;
       restaurarEstadoVivo();
+      mostrarBotonAppNueva();
       sincronizarMiBodega();
       migrarColaLegada().then(() => procesarCola());
     }
@@ -1088,6 +1206,7 @@
     actualizarEtiquetaEstadoUI();
     guardarEstadoVivo();
     iniciarMotorSegundoPlano();
+    setTimeout(revisarAjustesCelular, 1500);
   }
 
   function actualizarEtiquetaEstadoUI() {
@@ -1558,22 +1677,16 @@
     navigator.serviceWorker.register("./sw.js").catch(() => {});
   }
 
-  let eventoInstalacionPwa = null;
-  window.addEventListener("beforeinstallprompt", e => {
-    e.preventDefault();
-    eventoInstalacionPwa = e;
-    const btnInst = document.getElementById("btn-instalar-pwa");
-    if (btnInst) btnInst.classList.remove("oculto");
-  });
+  // La versión web ya no se instala como acceso directo: se invita a instalar la app Android.
+  window.addEventListener("beforeinstallprompt", e => { e.preventDefault(); });
 
-  async function instalarAppLimpia() {
-    if (!eventoInstalacionPwa) return;
-    eventoInstalacionPwa.prompt();
-    const resultado = await eventoInstalacionPwa.userChoice;
-    if (resultado.outcome === "accepted") {
-      document.getElementById("btn-instalar-pwa").classList.add("oculto");
-    }
-    eventoInstalacionPwa = null;
+  function mostrarBotonAppNueva() {
+    const btn = document.getElementById("btn-instalar-pwa");
+    if (btn && !esNativo() && /Android/i.test(navigator.userAgent)) btn.classList.remove("oculto");
+  }
+
+  function instalarAppLimpia() {
+    window.location.href = new URL("app.html", window.location.href).href;
   }
 
   window.addEventListener("pageshow", async () => {
@@ -1586,14 +1699,17 @@
   document.addEventListener("visibilitychange", async () => {
     guardarEstadoVivo();
     if (document.visibilityState === "visible") {
+      revisarActualizacionApp();
       const cerrado = await verificarSiSupervisorCerroTurno();
       if (!cerrado && jornadaActiva) {
         iniciarMotorSegundoPlano();
+        setTimeout(revisarAjustesCelular, 800);
       }
     }
   });
 
   cargarVista();
+  revisarActualizacionApp();
 </script>
 </body>
 </html>

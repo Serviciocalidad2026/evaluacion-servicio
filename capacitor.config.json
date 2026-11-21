@@ -1,0 +1,8 @@
+{
+  "appId": "com.cottech.tecnico",
+  "appName": "Cottech Técnico",
+  "webDir": "www",
+  "android": {
+    "useLegacyBridge": true
+  }
+}

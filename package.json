@@ -1,0 +1,23 @@
+{
+  "name": "cottech-tecnico",
+  "version": "2.5.0",
+  "private": true,
+  "type": "module",
+  "description": "App Android del técnico (Suite Cottech) con GPS en segundo plano",
+  "scripts": {
+    "preparar": "node preparar.mjs ../tecnico.html",
+    "abrir": "npx cap open android"
+  },
+  "dependencies": {
+    "@capacitor/android": "^8.0.0",
+    "@capacitor/core": "^8.0.0",
+    "@capgo/background-geolocation": "^8.0.0"
+  },
+  "devDependencies": {
+    "@capacitor/cli": "^8.0.0",
+    "esbuild": ">=0.24.0"
+  },
+  "engines": {
+    "node": ">=22"
+  }
+}
