@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <meta name="referrer" content="no-referrer" />
+  <title>Escáner de MACs · Cottech</title>
+  <meta name="theme-color" content="#0f172a" />
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
+  <style>
+    * { box-sizing: border-box; font-family: 'Segoe UI', system-ui, sans-serif; }
+    body { margin: 0; padding: 12px; background: #0f172a; color: #f8fafc; display: flex; justify-content: center; }
+    .card { width: 100%; max-width: 520px; background: #1e293b; border: 1px solid #334155; border-radius: 14px; padding: 16px; }
+    h1 { margin: 0 0 6px 0; color: #38bdf8; font-size: 20px; }
+    p { font-size: 15px; color: #cbd5e1; margin: 0 0 10px 0; }
+    b { color: #fde047; }
+    .btn { display: block; width: 100%; padding: 13px; border: none; border-radius: 8px; font-weight: bold; font-size: 15px; cursor: pointer; margin-top: 8px; }
+    .azul { background: #2563eb; color: white; } .gris { background: #334155; color: #e2e8f0; } .amarillo { background: #f59e0b; color: #0f172a; }
+    .oculto { display: none !important; }
+    .qr { background: white; padding: 14px; border-radius: 10px; display: inline-block; }
+    .lector { position: relative; width: 100%; border-radius: 8px; overflow: hidden; background: #000; }
+    .linea-verde { position: absolute; left: 6%; right: 6%; top: 50%; height: 3px; margin-top: -1px; background: #22c55e; box-shadow: 0 0 10px #22c55e; z-index: 10; pointer-events: none; }
+    .aviso { font-weight: bold; font-size: 15px; margin: 8px 0; min-height: 20px; }
+    .codigo { display: flex; justify-content: space-between; background: #0f172a; border: 1px solid #334155; border-radius: 8px; padding: 8px 10px; margin-top: 6px; font-family: monospace; font-size: 15px; }
+    .elegir { display: block; width: 100%; margin-top: 6px; padding: 10px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #f8fafc; font-family: monospace; font-size: 15px; font-weight: bold; }
+    input[type=range] { width: 100%; }
+  </style>
+</head>
+<body>
+
+<!-- EN LA PC: código para abrir el escáner en el celular -->
+<div id="vista-pc" class="card oculto" style="text-align:center;">
+  <h1>Escanear MACs con el celular</h1>
+  <p>1. Abre la <b>cámara</b> de tu celular y apunta a este código. Toca el enlace que aparece.</p>
+  <p>2. En el celular, apunta a cada código de barras. Las MAC aparecen solas en el programa de la PC.</p>
+  <div class="qr"><div id="qr-sesion"></div></div>
+  <p style="margin-top:10px; font-size:13px; color:#94a3b8;">El código sirve 30 minutos. Puedes cerrar esta página cuando el celular ya esté escaneando.</p>
+</div>
+
+<!-- EN EL CELULAR: escáner continuo -->
+<div id="vista-celular" class="card oculto">
+  <h1>Escáner de MACs</h1>
+  <p>Pon cada código de barras sobre la <b>línea verde</b>. Se envían solos a la PC.</p>
+  <div id="lector" class="lector" onclick="reenfocar()"></div>
+  <div id="ctrl-zoom" class="oculto" style="margin-top:6px;"><span style="font-size:14px;">Acercar:</span> <input type="range" id="rng-zoom" oninput="cambiarZoom(this.value)" /></div>
+  <div id="aviso" class="aviso"></div>
+  <button class="btn azul" onclick="document.getElementById('inp-foto').click()">Tomar foto del código</button>
+  <button id="btn-linterna" class="btn amarillo oculto" onclick="alternarLinterna()">Linterna</button>
+  <button id="btn-pausa" class="btn gris" onclick="pausarOSeguir()">Pausar</button>
+  <input type="file" id="inp-foto" accept="image/*" capture="environment" class="oculto" onchange="leerFoto(this)" />
+  <div id="lector-archivo" style="display:none;"></div>
+  <p style="margin-top:14px;"><b id="lbl-total">0</b> código(s) enviados:</p>
+  <div id="lista"></div>
+</div>
+
+<!-- SIN DATOS -->
+<div id="vista-error" class="card oculto">
+  <h1>Enlace no válido</h1>
+  <p>Abre el escáner desde el programa de la PC (Bodega → "Escanear MACs con el celular").</p>
+</div>
+
+<script>
+  const $ = id => document.getElementById(id);
+  const esc = v => String(v).replace(/[&<>"']/g, c => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  let escaner = null, sesion = "", execUrl = "", pausado = false, enviados = [], ultimo = { codigo: "", ms: 0 }, linterna = false;
+
+  function leerHash() {
+    const h = window.location.hash.substring(1);
+    if (!h) return {};
+    if (h.startsWith("ver=")) {
+      try {
+        let b64 = h.substring(4).replace(/-/g, "+").replace(/_/g, "/");
+        while (b64.length % 4) b64 += "=";
+        const datos = JSON.parse(new TextDecoder().decode(Uint8Array.from(atob(b64), c => c.charCodeAt(0))));
+        return { ver: datos.l };
+      } catch (e) { return {}; }
+    }
+    const p = new URLSearchParams(h);
+    return { s: p.get("s") || "", x: p.get("x") || "" };
+  }
+
+  // ---------------- PC ----------------
+  function mostrarEnPc(enlace) {
+    $("vista-pc").classList.remove("oculto");
+    new QRCode($("qr-sesion"), { text: enlace, width: 280, height: 280, correctLevel: QRCode.CorrectLevel.L });
+  }
+
+  // ---------------- Celular ----------------
+  async function enviarCodigo(codigo) {
+    codigo = String(codigo || "").trim().toUpperCase();
+    if (!codigo) return;
+    const ahora = Date.now();
+    if (codigo === ultimo.codigo && ahora - ultimo.ms < 4000) return;     // la cámara lo sigue viendo: no repetir
+    ultimo = { codigo, ms: ahora };
+    if (navigator.vibrate) navigator.vibrate(100);
+    const item = { codigo, estado: "Enviando..." };
+    enviados.unshift(item);
+    pintarLista();
+    try {
+      const r = await fetch(execUrl, {
+        method: "POST",
+        headers: { "Content-Type": "text/plain;charset=utf-8" },
+        body: JSON.stringify({ accion: "ESCANER_PC_ENVIAR", sesion, codigo })
+      });
+      const d = await r.json();
+      if (d.status === "success") {
+        item.estado = d.repetido ? "Ya estaba" : "Enviado";
+        mostrarAviso(d.repetido ? `${codigo} ya se había enviado` : `Enviado: ${codigo}`, d.repetido ? "#fde047" : "#4ade80");
+      } else {
+        item.estado = "No se envió";
+        mostrarAviso(d.message || "No se pudo enviar.", "#f87171");
+        if (d.code === "AUTH") detener();
+      }
+    } catch (e) {
+      item.estado = "Sin internet";
+      mostrarAviso("Sin internet. Vuelve a escanear ese código.", "#f87171");
+      ultimo = { codigo: "", ms: 0 };
+    }
+    pintarLista();
+  }
+
+  function pintarLista() {
+    $("lbl-total").innerText = enviados.filter(x => x.estado === "Enviado").length;
+    $("lista").innerHTML = enviados.slice(0, 100).map(x =>
+      `<div class="codigo"><span>${esc(x.codigo)}</span><span style="color:${x.estado === "Enviado" ? "#4ade80" : "#fde047"};">${esc(x.estado)}</span></div>`).join("");
+  }
+
+  function mostrarAviso(texto, color) {
+    $("aviso").innerHTML = texto;
+    $("aviso").style.color = color || "#fde047";
+  }
+
+  function alLeer(texto) {
+    if (!pausado) enviarCodigo(texto);
+  }
+
+  async function iniciarCamara() {
+    const opciones = {
+      fps: 15,
+      qrbox: (w, h) => ({ width: Math.floor(w * 0.9), height: Math.max(50, Math.floor(h * 0.18)) }),
+      videoConstraints: { facingMode: "environment", width: { ideal: 1920 }, height: { ideal: 1080 }, advanced: [{ focusMode: "continuous" }] }
+    };
+    escaner = new Html5Qrcode("lector", { experimentalFeatures: { useBarCodeDetectorIfSupported: true } });
+    try {
+      try { await escaner.start({ facingMode: "environment" }, opciones, alLeer, () => {}); }
+      catch (e) { delete opciones.videoConstraints; await escaner.start({ facingMode: "environment" }, opciones, alLeer, () => {}); }
+    } catch (e) {
+      return mostrarAviso("No se pudo abrir la cámara. Permite el uso de la cámara y recarga la página.", "#f87171");
+    }
+    const linea = document.createElement("div");
+    linea.className = "linea-verde";
+    $("lector").appendChild(linea);
+    let cap = {};
+    try { cap = escaner.getRunningTrackCapabilities() || {}; } catch (e) {}
+    if (cap.zoom && cap.zoom.max > cap.zoom.min) {
+      Object.assign($("rng-zoom"), { min: cap.zoom.min, max: Math.min(cap.zoom.max, cap.zoom.min * 8), step: cap.zoom.step || 0.1, value: cap.zoom.min });
+      $("ctrl-zoom").classList.remove("oculto");
+    }
+    if (cap.torch) $("btn-linterna").classList.remove("oculto");
+  }
+
+  function cambiarZoom(v) { if (escaner) escaner.applyVideoConstraints({ advanced: [{ zoom: Number(v) }] }).catch(() => {}); }
+  function alternarLinterna() { if (!escaner) return; linterna = !linterna; escaner.applyVideoConstraints({ advanced: [{ torch: linterna }] }).catch(() => {}); }
+  function reenfocar() {
+    if (!escaner) return;
+    escaner.applyVideoConstraints({ advanced: [{ focusMode: "single-shot" }] })
+      .then(() => setTimeout(() => escaner && escaner.applyVideoConstraints({ advanced: [{ focusMode: "continuous" }] }).catch(() => {}), 1500))
+      .catch(() => {});
+  }
+
+  function pausarOSeguir() {
+    pausado = !pausado;
+    $("btn-pausa").innerText = pausado ? "Seguir escaneando" : "Pausar";
+    mostrarAviso(pausado ? "En pausa." : "");
+  }
+
+  function detener() {
+    pausado = true;
+    if (escaner) escaner.stop().catch(() => {});
+    $("btn-pausa").classList.add("oculto");
+  }
+
+  async function leerFoto(input) {
+    const file = input.files && input.files[0];
+    input.value = "";
+    if (!file) return;
+    mostrarAviso("Buscando códigos en la foto...", "#38bdf8");
+    let codigos = [];
+    if ("BarcodeDetector" in window) {
+      try {
+        const res = await new BarcodeDetector().detect(await createImageBitmap(file));
+        codigos = [...new Set(res.map(r => String(r.rawValue || "").trim().toUpperCase()).filter(Boolean))];
+      } catch (e) {}
+    }
+    if (!codigos.length) {
+      try {
+        const r = await new Html5Qrcode("lector-archivo").scanFileV2(file, false);
+        if (r && r.decodedText) codigos = [String(r.decodedText).trim().toUpperCase()];
+      } catch (e) {}
+    }
+    if (!codigos.length) return mostrarAviso("No encontré códigos en la foto. Tómala más cerca y con buena luz.", "#f87171");
+    if (codigos.length === 1) return enviarCodigo(codigos[0]);
+    mostrarAviso("La etiqueta tiene varios códigos. Toca el que quieres enviar:" +
+      codigos.map(c => `<button class="elegir" onclick="enviarCodigo('${esc(c)}')">${esc(c)}</button>`).join(""), "#fde047");
+  }
+
+  // ---------------- Inicio ----------------
+  const datos = leerHash();
+  if (datos.ver && /^https:\/\//.test(datos.ver)) {
+    history.replaceState(null, document.title, window.location.pathname);
+    mostrarEnPc(datos.ver);
+  } else if (/^[a-f0-9]{32}$/.test(datos.s || "") && /^https:\/\/script\.google\.com\//.test(datos.x || "")) {
+    sesion = datos.s;
+    execUrl = datos.x;
+    $("vista-celular").classList.remove("oculto");
+    iniciarCamara();
+  } else {
+    $("vista-error").classList.remove("oculto");
+  }
+</script>
+</body>
+</html>

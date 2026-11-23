@@ -64,7 +64,20 @@
     #caja-escaner { margin-bottom: 10px; }
     .ayuda-escaner { color: #4ade80; font-weight: bold; font-size: 15px; text-align: center; margin-bottom: 6px; }
     .lector { position: relative; width: 100%; border-radius: 8px; overflow: hidden; background: #000; }
+    .btn-codigo { display: block; width: 100%; margin-top: 6px; padding: 10px; border-radius: 8px; border: 1px solid #475569; background: #0f172a; color: #f8fafc; font-family: monospace; font-size: 15px; font-weight: bold; cursor: pointer; }
+    .btn-codigo.de-mi-lista { border-color: #22c55e; color: #4ade80; }
     .linea-verde { position: absolute; left: 6%; right: 6%; top: 50%; height: 3px; margin-top: -1px; background: #22c55e; box-shadow: 0 0 10px #22c55e; z-index: 10; pointer-events: none; }
+    .inv-grupo, .inv-fila { background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 9px 11px; margin-bottom: 6px; }
+    .inv-fila { display: flex; justify-content: space-between; align-items: center; gap: 8px; }
+    .inv-titulo { display: flex; justify-content: space-between; font-weight: bold; color: #f8fafc; margin-bottom: 4px; }
+    .inv-cant { background: #0e7490; color: white; font-weight: bold; border-radius: 12px; padding: 2px 10px; font-size: 14px; white-space: nowrap; }
+    .inv-mac { font-family: monospace; font-size: 14px; color: #a5f3fc; padding: 2px 0; }
+    .inv-codigo { font-size: 12.5px; color: #94a3b8; }
+    .fila-captura { display: flex; align-items: center; gap: 10px; background: #1e293b; border: 1px solid #334155; border-radius: 8px; padding: 10px; margin-bottom: 8px; cursor: pointer; }
+    .fila-captura input[type=checkbox] { width: 24px; height: 24px; flex: none; }
+    .fila-captura.no-encontrado { border-style: dashed; opacity: 0.8; cursor: default; }
+    .ayuda-pestana { font-size: 15px; color: #fde047; font-weight: bold; margin: 0 0 10px 0; }
+    .pestanas button { font-size: 13.5px; }
     .oculto { display: none !important; }
   </style>
 </head>
@@ -84,7 +97,9 @@
     <button type="button" class="btn btn-verde btn-grande" style="margin-top:0;" onclick="abrirEscanerConfig()">ESCANEAR CÓDIGO DEL SUPERVISOR</button>
     <div id="reader-config"></div>
     <button type="button" id="btn-cerrar-escaner-config" class="btn btn-gris oculto" onclick="cerrarEscanerConfig()">Cancelar</button>
-    <p class="ayuda" style="margin-top:14px;">O pega aquí el enlace que te mandó tu supervisor por WhatsApp:</p>
+    <button type="button" id="btn-otra-forma" class="btn btn-gris" style="margin-top:16px;" onclick="document.getElementById('config-manual').classList.remove('oculto'); this.classList.add('oculto');">Otra forma de configurar</button>
+    <div id="config-manual" class="oculto">
+    <p class="ayuda" style="margin-top:14px;">Pega aquí el enlace que te mandó tu supervisor por WhatsApp:</p>
     <label>Enlace de tu supervisor:</label>
     <div class="fila-input-cam">
       <input type="text" id="cfg-enlace" placeholder="Pega aquí el enlace" />
@@ -100,15 +115,17 @@
     <label>Dirección del sistema (te la da tu supervisor):</label>
     <input type="text" id="cfg-exec" placeholder="https://script.google.com/..." />
     <button class="btn btn-azul" onclick="guardarConfigCelular()">Guardar</button>
+    </div>
   </div>
 
   <!-- 2. PANEL OPERATIVO PRINCIPAL -->
   <div id="vista-operacion" class="oculto">
-    <div style="display:flex; justify-content:space-between; align-items:center; gap:8px; margin-bottom:4px;">
-      <h2 id="titulo-tec" style="margin:0;">Técnico</h2>
-      <button type="button" class="btn btn-amarillo btn-sm" style="margin-top:0; width:auto; white-space:nowrap;" onclick="abrirHistorialTecnico()">Mis órdenes</button>
-    </div>
+    <h2 id="titulo-tec" style="margin:0 0 4px 0;">Técnico</h2>
     <p class="ayuda" id="sub-bodega">Cargando tus equipos...</p>
+    <div style="display:flex; gap:8px; margin-bottom:12px;">
+      <button type="button" class="btn btn-amarillo btn-sm" style="margin-top:0;" onclick="abrirHistorialTecnico()">Mis órdenes</button>
+      <button type="button" class="btn btn-azul btn-sm" style="margin-top:0; background:#0e7490;" onclick="abrirMiInventario()">Mi inventario</button>
+    </div>
 
     <button id="btn-instalar-pwa" class="btn btn-azul oculto" style="margin-top:0; margin-bottom:12px; background:#0284c7;" onclick="instalarAppLimpia()">
       INSTALAR LA APP NUEVA
@@ -129,7 +146,7 @@
 
     <!-- ORDEN · PASO 1: NÚMERO DE ORDEN -->
     <div id="etapa-1-inicio" class="bloque">
-      <label>Número de orden (OT):</label>
+      <label style="margin-top:0;">Número de orden:</label>
       <input type="text" id="inp-ot" inputmode="numeric" placeholder="Ejemplo: 15612" oninput="guardarEstadoVivo()" />
       <button class="btn btn-azul btn-grande" onclick="salirEnCamino()">VOY EN CAMINO</button>
     </div>
@@ -170,40 +187,54 @@
       <div class="aviso-guardado">Todo se guarda solo, aunque salgas de la app.</div>
 
       <div class="pestanas">
-        <button type="button" id="tab-btn-productos" onclick="mostrarPestana('productos')">Productos</button>
-        <button type="button" id="tab-btn-retirado" onclick="mostrarPestana('retirado')">Retirado</button>
-        <button type="button" id="tab-btn-fotos" onclick="mostrarPestana('fotos')">Fotos</button>
-        <button type="button" id="tab-btn-bitacora" onclick="mostrarPestana('bitacora')">Bitácora</button>
-        <button type="button" id="tab-btn-problema" onclick="mostrarPestana('problema')">Problema</button>
-        <button type="button" id="tab-btn-encuesta" class="tab-encuesta" onclick="mostrarPestana('encuesta')">Encuesta</button>
+        <button type="button" id="tab-btn-productos" onclick="mostrarPestana('productos')">1. Productos</button>
+        <button type="button" id="tab-btn-retirado" onclick="mostrarPestana('retirado')">2. Retirado</button>
+        <button type="button" id="tab-btn-fotos" onclick="mostrarPestana('fotos')">3. Fotos</button>
+        <button type="button" id="tab-btn-bitacora" onclick="mostrarPestana('bitacora')">4. Bitácora</button>
+        <button type="button" id="tab-btn-problema" onclick="mostrarPestana('problema')">5. Problema</button>
+        <button type="button" id="tab-btn-encuesta" class="tab-encuesta" onclick="mostrarPestana('encuesta')">6. Encuesta</button>
       </div>
 
       <!-- Cámara para escanear MAC (se usa en Productos y Retirado) -->
       <div id="caja-escaner" class="oculto">
         <div class="ayuda-escaner">Pon el código de barras sobre la línea verde</div>
-        <div id="reader-mac" class="lector"></div>
+        <div id="reader-mac" class="lector" onclick="reenfocarCamara()"></div>
+        <div class="ayuda" style="text-align:center; margin:4px 0 0 0;">Si no enfoca: aleja un poco el celular, toca la imagen o usa "Acercar".</div>
+        <div id="ctrl-zoom" class="oculto" style="margin-top:6px;">
+          <label style="margin:0;">Acercar:</label>
+          <input type="range" id="rng-zoom" oninput="cambiarZoom(this.value)" style="padding:0;" />
+        </div>
+        <div id="msg-escaner" style="font-size:14px; font-weight:bold; margin-top:6px;"></div>
+        <div style="display:flex; gap:8px;">
+          <button type="button" class="btn btn-azul btn-sm" onclick="tomarFotoDelCodigo()">Tomar foto del código</button>
+          <button type="button" id="btn-linterna" class="btn btn-amarillo btn-sm oculto" style="width:auto;" onclick="alternarLinterna()">Linterna</button>
+        </div>
+        <input type="file" id="inp-foto-codigo" accept="image/*" capture="environment" class="oculto" onchange="alElegirFotoCodigo(this)" />
+        <div id="lector-archivo" style="display:none;"></div>
         <button type="button" class="btn btn-gris" onclick="cerrarEscanerCamara()">Cerrar cámara</button>
       </div>
 
       <!-- PESTAÑA: PRODUCTOS -->
       <div id="tab-productos" class="pestana">
+        <p class="ayuda-pestana">Lo que usaste en este trabajo.</p>
+        <button type="button" class="btn btn-azul" style="margin-top:0; background:#0e7490;" onclick="abrirLecturaCaptura()">SUBIR CAPTURA DE LA OTRA APP</button>
+        <input type="file" id="inp-captura" accept="image/*" multiple class="oculto" onchange="alElegirCapturas(this)" />
+        <div id="msg-captura" class="ayuda" style="color:#38bdf8; font-weight:bold; margin:6px 0 0 0;"></div>
         <div class="sub-caja" style="margin-top:0;">
           <p class="titulo-sec">Equipo que instalaste</p>
-          <label>Elige el equipo de tu lista o escanea la MAC:</label>
+          <button type="button" class="btn btn-azul" style="margin-top:2px;" onclick="abrirEscanerCamara('inp-mac-nuevo')">ESCANEAR MAC</button>
+          <label>O búscalo en tu lista:</label>
           <select id="sel-bodega-eq" onchange="alElegirEquipoBodega(); guardarEstadoVivo();">
             <option value="">-- No tienes equipos asignados --</option>
           </select>
-          <div class="fila-input-cam" style="margin-top:6px;">
-            <input type="text" id="inp-mac-nuevo" placeholder="MAC del equipo" oninput="guardarEstadoVivo()" />
-            <button type="button" class="btn-cam" onclick="abrirEscanerCamara('inp-mac-nuevo')">Escanear</button>
-          </div>
+          <input type="text" id="inp-mac-nuevo" placeholder="MAC del equipo" style="margin-top:6px;" oninput="guardarEstadoVivo()" />
           <button type="button" class="btn btn-azul btn-sm" onclick="agregarEquipoAlCarrito()">Agregar equipo</button>
           <div id="lista-equipos" class="lista-items"></div>
         </div>
 
         <div class="sub-caja">
           <p class="titulo-sec" style="color:#fde047;">Material que usaste</p>
-          <label>Elige el material y escribe cuántos usaste:</label>
+          <label>Elige el material y cuántos usaste:</label>
           <div class="fila-input-cam">
             <select id="sel-bodega-mat" style="flex:2.2;">
               <option value="">-- No tienes materiales asignados --</option>
@@ -218,12 +249,10 @@
       <!-- PESTAÑA: EQUIPO RETIRADO / DAÑADO -->
       <div id="tab-retirado" class="pestana oculto">
         <div class="sub-caja" style="margin-top:0;">
-          <p class="titulo-sec" style="color:#fca5a5;">Equipo que le quitaste al cliente</p>
-          <label>MAC o serie del equipo que quitaste:</label>
-          <div class="fila-input-cam">
-            <input type="text" id="inp-mac-malo" placeholder="MAC del equipo que quitaste" oninput="guardarEstadoVivo()" />
-            <button type="button" class="btn-cam" onclick="abrirEscanerCamara('inp-mac-malo')">Escanear</button>
-          </div>
+          <p class="ayuda-pestana" style="margin-top:0;">Llena esto solo si le quitaste un equipo al cliente.</p>
+          <p class="titulo-sec" style="color:#fca5a5;">Equipo que quitaste</p>
+          <button type="button" class="btn btn-azul" style="margin-top:2px;" onclick="abrirEscanerCamara('inp-mac-malo')">ESCANEAR MAC</button>
+          <input type="text" id="inp-mac-malo" placeholder="O escribe la MAC aquí" style="margin-top:8px;" oninput="guardarEstadoVivo()" />
           <label>Modelo (si lo sabes):</label>
           <input type="text" id="inp-modelo-malo" placeholder="Ejemplo: Router ZTE" oninput="guardarEstadoVivo()" />
           <label>¿Cómo estaba el equipo?</label>
@@ -239,7 +268,7 @@
       <!-- PESTAÑA: FOTOS -->
       <div id="tab-fotos" class="pestana oculto">
         <div class="sub-caja" style="margin-top:0;">
-          <p class="titulo-sec" style="color:#4ade80;">Fotos del trabajo (máximo 15)</p>
+          <p class="ayuda-pestana" style="margin-top:0;">Toma fotos del trabajo terminado (hasta 15).</p>
           <input type="file" id="inp-foto-camara" accept="image/*" capture="environment" class="oculto" onchange="procesarFotosSeleccionadas(this, 'trabajo')" />
           <input type="file" id="inp-foto-galeria" accept="image/*" multiple class="oculto" onchange="procesarFotosSeleccionadas(this, 'trabajo')" />
           <div style="display:flex; gap:8px;">
@@ -253,6 +282,7 @@
 
       <!-- PESTAÑA: BITÁCORA -->
       <div id="tab-bitacora" class="pestana oculto">
+        <p class="ayuda-pestana">Datos del cliente y lo que hiciste. Es obligatorio.</p>
         <label style="margin-top:0;">Teléfono del cliente:</label>
         <input type="tel" id="inp-tel-cliente" inputmode="tel" placeholder="Ejemplo: 9988-7766" oninput="guardarEstadoVivo()" />
         <label>Nombre del cliente:</label>
@@ -270,7 +300,7 @@
 
       <!-- PESTAÑA: PROBLEMA / INCONVENIENTE -->
       <div id="tab-problema" class="pestana oculto">
-        <p class="ayuda">Llena esto solo si hubo algún problema en el servicio.</p>
+        <p class="ayuda-pestana">Llena esto solo si pasó algún problema en el servicio.</p>
         <label style="margin-top:0;">¿Qué pasó?</label>
         <textarea id="inp-inconveniente" rows="3" placeholder="Escribe qué pasó..." oninput="guardarEstadoVivo()"></textarea>
         <input type="file" id="inp-foto-camara-inc" accept="image/*" capture="environment" class="oculto" onchange="procesarFotosSeleccionadas(this, 'problema')" />
@@ -286,7 +316,7 @@
       <!-- PESTAÑA: ENCUESTA DEL CLIENTE -->
       <div id="tab-encuesta" class="pestana oculto">
         <p class="ayuda" style="text-align:center; color:#fde047; font-size:14.5px;">
-          Pídele al cliente que escanee este código con su celular.<br>Puede hacerlo ahora o cuando termines.
+          Enséñale este código al cliente para que lo escanee con su celular.
         </p>
         <div id="caja-qr" class="caja-qr">
           <div id="qrcode"></div>
@@ -305,7 +335,6 @@
       <label>¿Por qué no se pudo?</label>
       <select id="sel-motivo-no" onchange="guardarEstadoVivo()">
         <option value="Cliente ausente en el domicilio">El cliente no estaba</option>
-        <option value="Ductería interna obstruida">El tubo de adentro está tapado</option>
         <option value="Falta de postería o red externa">Falta poste o red afuera</option>
         <option value="Cliente solicitó reprogramar o cancelar">El cliente pidió otro día o canceló</option>
         <option value="Otro motivo">Otro motivo (escríbelo abajo)</option>
@@ -327,6 +356,37 @@
     </div>
 
     <button class="btn btn-gris" onclick="editarConfig()">Configurar mi app</button>
+  </div>
+</div>
+
+<!-- RESULTADO DE LEER CAPTURAS -->
+<div id="modal-captura" class="modal-historial">
+  <div style="max-width:480px; margin:0 auto;">
+    <h2 style="color:#38bdf8; margin:0 0 6px 0;">Revisa lo que encontró la app</h2>
+    <p class="ayuda">Quita la marca a lo que no usaste y corrige las cantidades si hace falta.</p>
+    <div id="lista-captura"></div>
+    <button type="button" class="btn btn-verde btn-grande" onclick="agregarDesdeCaptura()">AGREGAR LO MARCADO</button>
+    <button type="button" class="btn btn-gris" onclick="cerrarResultadoCaptura()">Cancelar</button>
+  </div>
+</div>
+
+<!-- MI INVENTARIO -->
+<div id="modal-inventario" class="modal-historial">
+  <div style="max-width:480px; margin:0 auto;">
+    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:6px;">
+      <h2 style="color:#38bdf8; margin:0;">Mi inventario</h2>
+      <button type="button" class="btn btn-rojo" style="width:auto; margin:0; padding:8px 16px;" onclick="cerrarMiInventario()">Cerrar</button>
+    </div>
+    <div id="lbl-inventario-fecha" class="ayuda"></div>
+    <input type="text" id="inp-buscar-inventario" placeholder="Buscar modelo, MAC o material..." oninput="pintarMiInventario()" style="border-color:#38bdf8;" />
+    <p class="titulo-sec" style="margin-top:14px;">Equipos</p>
+    <div id="inv-equipos"></div>
+    <p class="titulo-sec" style="margin-top:14px; color:#fde047;">Materiales (lo que te queda)</p>
+    <div id="inv-materiales"></div>
+    <div id="caja-por-devolver" class="oculto">
+      <p class="titulo-sec" style="margin-top:14px; color:#fca5a5;">Equipos que debes devolver a bodega</p>
+      <div id="inv-por-devolver"></div>
+    </div>
   </div>
 </div>
 
@@ -374,6 +434,7 @@
   let html5QrScanner = null;
   let bodegaEquiposLocal = [];
   let bodegaMaterialesLocal = [];
+  let bodegaPorDevolverLocal = [];
   let historialCompletoTecnico = [];
 
   let carritoEquipos = [];
@@ -640,12 +701,7 @@
       await verificarSiSupervisorCerroTurno();
 
       if (jornadaActiva) {
-        document.getElementById("btn-iniciar-dia").classList.add("oculto");
-        document.getElementById("btn-fin-dia").classList.remove("oculto");
         iniciarMotorSegundoPlano();
-      } else {
-        document.getElementById("btn-iniciar-dia").classList.remove("oculto");
-        document.getElementById("btn-fin-dia").classList.add("oculto");
       }
 
       mostrarEtapaPantalla(etapaActual);
@@ -672,6 +728,7 @@
       document.getElementById(ETAPAS[k]).classList.toggle("oculto", k !== numEtapa);
     });
     if (numEtapa !== "2") cerrarEscanerCamara();
+    actualizarBotonesJornada();
 
     const ot = valorDe("inp-ot").trim();
     document.getElementById("lbl-ot-camino").innerText = `Orden ${ot}`;
@@ -706,12 +763,12 @@
     const conNumero = (id, texto, n) => {
       document.getElementById(id).innerText = n > 0 ? `${texto} (${n})` : texto;
     };
-    conNumero("tab-btn-productos", "Productos", carritoEquipos.length + carritoConsumibles.length);
-    conNumero("tab-btn-retirado", "Retirado", retirados.length);
-    conNumero("tab-btn-fotos", "Fotos", fotosComprimidasArray.length);
+    conNumero("tab-btn-productos", "1. Productos", carritoEquipos.length + carritoConsumibles.length);
+    conNumero("tab-btn-retirado", "2. Retirado", retirados.length);
+    conNumero("tab-btn-fotos", "3. Fotos", fotosComprimidasArray.length);
     const bitacoraLista = Boolean(valorDe("inp-tel-cliente").trim() && valorDe("inp-nombre-cliente").trim() && valorDe("inp-bitacora-obs").trim());
     document.getElementById("tab-btn-bitacora").classList.toggle("lista", bitacoraLista);
-    conNumero("tab-btn-problema", "Problema", valorDe("inp-inconveniente").trim() ? Math.max(1, fotosProblemaArray.length) : fotosProblemaArray.length);
+    conNumero("tab-btn-problema", "5. Problema", valorDe("inp-inconveniente").trim() ? Math.max(1, fotosProblemaArray.length) : fotosProblemaArray.length);
   }
 
   function minutosEncuesta() {
@@ -745,8 +802,7 @@
           // El programa de PC cerró el turno: regresar el botón a VERDE automáticamente
           jornadaActiva = false;
           detenerMotorSegundoPlano();
-          document.getElementById("btn-iniciar-dia").classList.remove("oculto");
-          document.getElementById("btn-fin-dia").classList.add("oculto");
+          actualizarBotonesJornada();
           actualizarEtiquetaEstadoUI();
           guardarEstadoVivo();
           return true;
@@ -1090,32 +1146,12 @@
         return;
       }
 
-      // 1. Equipos Únicos asignados al técnico
-      const selEq = document.getElementById("sel-bodega-eq");
-      bodegaEquiposLocal = (data && Array.isArray(data.equipos)) ? data.equipos : [];
-      if (bodegaEquiposLocal.length > 0) {
-        selEq.innerHTML = `<option value="">-- Elige un equipo (tienes ${bodegaEquiposLocal.length}) --</option>`;
-        bodegaEquiposLocal.forEach(eq => {
-          selEq.innerHTML += `<option value="${esc(eq.mac)}">${esc(eq.modelo)} | MAC: ${esc(eq.mac)}</option>`;
-        });
-      } else {
-        selEq.innerHTML = `<option value="">-- No tienes equipos asignados --</option>`;
-      }
-
-      // 2. Consumibles estrictamente asignados al técnico con saldo > 0
-      const selMat = document.getElementById("sel-bodega-mat");
-      bodegaMaterialesLocal = (data && Array.isArray(data.materiales))
-        ? data.materiales.filter(m => Number(m.saldo) > 0)
-        : [];
-
-      if (bodegaMaterialesLocal.length > 0) {
-        selMat.innerHTML = "";
-        bodegaMaterialesLocal.forEach(m => {
-          selMat.innerHTML += `<option value="${esc(m.codigo)} - ${esc(m.nombre)}">${esc(m.codigo)} - ${esc(m.nombre)} (tienes ${esc(m.saldo)})</option>`;
-        });
-      } else {
-        selMat.innerHTML = `<option value="">-- No tienes materiales asignados --</option>`;
-      }
+      try {
+        localStorage.setItem("cottech_mi_bodega", JSON.stringify({
+          equipos: data.equipos || [], porDevolver: data.porDevolver || [], materiales: data.materiales || [], ms: Date.now()
+        }));
+      } catch (e) {}
+      pintarMiBodega(data);
 
       if (data.minutosEncuesta) localStorage.setItem("cottech_minutos_encuesta", String(data.minutosEncuesta));
 
@@ -1125,10 +1161,96 @@
         localStorage.setItem("cottech_mis_ots_servidor", JSON.stringify(historialCompletoTecnico));
       }
 
-      document.getElementById("sub-bodega").innerText = `Tienes ${bodegaEquiposLocal.length} equipo(s) y ${bodegaMaterialesLocal.length} material(es) asignados.`;
     } catch (e) {
+      const guardada = leerBodegaGuardada();
+      if (guardada) pintarMiBodega(guardada);
       document.getElementById("sub-bodega").innerText = "Sin internet: se muestran tus equipos guardados.";
     }
+  }
+
+  function leerBodegaGuardada() {
+    try { return JSON.parse(localStorage.getItem("cottech_mi_bodega") || "null"); } catch (e) { return null; }
+  }
+
+  function pintarMiBodega(data) {
+    bodegaEquiposLocal = Array.isArray(data.equipos) ? data.equipos : [];
+    bodegaPorDevolverLocal = Array.isArray(data.porDevolver) ? data.porDevolver : [];
+    bodegaMaterialesLocal = Array.isArray(data.materiales) ? data.materiales.filter(m => Number(m.saldo) > 0) : [];
+
+    const ordenarEq = (a, b) => String(a.modelo).localeCompare(String(b.modelo)) || String(a.mac).localeCompare(String(b.mac));
+    const selEq = document.getElementById("sel-bodega-eq");
+    const anteriorEq = selEq.value;
+    selEq.innerHTML = bodegaEquiposLocal.length
+      ? `<option value="">-- Elige un equipo (tienes ${bodegaEquiposLocal.length}) --</option>` +
+        bodegaEquiposLocal.slice().sort(ordenarEq).map(eq => `<option value="${esc(eq.mac)}">${esc(eq.modelo)} | MAC: ${esc(eq.mac)}</option>`).join("")
+      : `<option value="">-- No tienes equipos asignados --</option>`;
+    selEq.value = anteriorEq;
+    if (selEq.selectedIndex < 0) selEq.selectedIndex = 0;
+
+    const selMat = document.getElementById("sel-bodega-mat");
+    const anteriorMat = selMat.value;
+    selMat.innerHTML = bodegaMaterialesLocal.length
+      ? bodegaMaterialesLocal.slice().sort((a, b) => String(a.nombre).localeCompare(String(b.nombre)))
+          .map(m => `<option value="${esc(m.codigo)} - ${esc(m.nombre)}">${esc(m.nombre)} (tienes ${esc(m.saldo)})</option>`).join("")
+      : `<option value="">-- No tienes materiales asignados --</option>`;
+    selMat.value = anteriorMat;
+    if (selMat.selectedIndex < 0) selMat.selectedIndex = 0;
+
+    document.getElementById("sub-bodega").innerText = `Tienes ${bodegaEquiposLocal.length} equipo(s) y ${bodegaMaterialesLocal.length} material(es) asignados.`;
+  }
+
+  // =========================================================================
+  // MI INVENTARIO (LO QUE EL TÉCNICO TIENE AHORA, ORDENADO)
+  // =========================================================================
+  function abrirMiInventario() {
+    document.getElementById("modal-inventario").style.display = "block";
+    document.getElementById("inp-buscar-inventario").value = "";
+    pintarMiInventario();
+    sincronizarMiBodega().then(pintarMiInventario);
+  }
+
+  function cerrarMiInventario() {
+    document.getElementById("modal-inventario").style.display = "none";
+  }
+
+  function pintarMiInventario() {
+    const q = (document.getElementById("inp-buscar-inventario").value || "").trim().toLowerCase();
+    const coincide = (...campos) => !q || campos.join(" ").toLowerCase().includes(q);
+    const guardada = leerBodegaGuardada();
+    document.getElementById("lbl-inventario-fecha").innerText = guardada && guardada.ms
+      ? `Actualizado: ${new Date(guardada.ms).toLocaleString("es-HN", { day: "2-digit", month: "2-digit", hour: "numeric", minute: "2-digit" })}`
+      : "";
+
+    // Equipos agrupados por modelo
+    const grupos = {};
+    bodegaEquiposLocal.filter(e => coincide(e.modelo, e.mac)).forEach(e => {
+      (grupos[e.modelo || "Sin modelo"] = grupos[e.modelo || "Sin modelo"] || []).push(e.mac);
+    });
+    const modelos = Object.keys(grupos).sort();
+    document.getElementById("inv-equipos").innerHTML = modelos.length
+      ? modelos.map(mod => `
+          <div class="inv-grupo">
+            <div class="inv-titulo"><span>${esc(mod)}</span><span class="inv-cant">${grupos[mod].length}</span></div>
+            ${grupos[mod].sort().map(mac => `<div class="inv-mac">${esc(mac)}</div>`).join("")}
+          </div>`).join("")
+      : `<div class="lista-vacia">${q ? "Ningún equipo con esa búsqueda." : "No tienes equipos asignados."}</div>`;
+
+    const mats = bodegaMaterialesLocal.filter(m => coincide(m.nombre, m.codigo))
+      .sort((a, b) => String(a.nombre).localeCompare(String(b.nombre)));
+    document.getElementById("inv-materiales").innerHTML = mats.length
+      ? mats.map(m => `
+          <div class="inv-fila">
+            <div><div style="font-weight:bold;">${esc(m.nombre)}</div><div class="inv-codigo">Código: ${esc(m.codigo)}</div></div>
+            <div class="inv-cant">${esc(m.saldo)}</div>
+          </div>`).join("")
+      : `<div class="lista-vacia">${q ? "Ningún material con esa búsqueda." : "No tienes materiales asignados."}</div>`;
+
+    const dev = bodegaPorDevolverLocal.filter(e => coincide(e.modelo, e.mac, e.ot));
+    document.getElementById("caja-por-devolver").classList.toggle("oculto", dev.length === 0);
+    document.getElementById("inv-por-devolver").innerHTML = dev.map(e => `
+      <div class="inv-fila">
+        <div><div style="font-weight:bold;">${esc(e.mac)}</div><div class="inv-codigo">${esc(e.modelo)}${e.ot ? " · Orden " + esc(e.ot) : ""}</div></div>
+      </div>`).join("");
   }
 
   function alElegirEquipoBodega() {
@@ -1217,6 +1339,226 @@
       ? retirados.map((r, i) => fila(`<strong>${esc(r.mac)}</strong>${r.modelo ? " · " + esc(r.modelo) : ""} · ${esc(r.estado)}`, "retirado", i, "#f87171")).join("")
       : vacio;
     actualizarPestanas();
+  }
+
+  // =========================================================================
+  // LEER CAPTURAS DE LA OTRA APP DE INVENTARIO
+  // La app de inventario muestra cada producto así:
+  //   PC-33505156
+  //   CONNECTOR, RG6 EX PLUS • PI-5373343 • 2.00
+  // Se lee el texto (Google lo reconoce en el servidor) y se compara con TU inventario.
+  // =========================================================================
+  function normalizarTexto(t) {
+    return String(t || "").toUpperCase().normalize("NFD").replace(/[̀-ͯ]/g, "").replace(/[^A-Z0-9]+/g, " ").trim();
+  }
+
+  function soloAlfanumerico(t) {
+    return normalizarTexto(t).replace(/ /g, "");
+  }
+
+  function palabrasDe(t) {
+    return normalizarTexto(t).split(" ").filter(p => p.length >= 2);
+  }
+
+  // Separa el texto leído en productos: [{pc, descripcion, pi, cantidad}]
+  function interpretarCapturaInventario(texto) {
+    const limpio = String(texto || "").replace(/\r/g, "");
+    const marcas = [...limpio.matchAll(/P\s?C\s*[-–]?\s*(\d{5,})/g)];
+    const productos = [];
+    marcas.forEach((m, i) => {
+      const fin = i + 1 < marcas.length ? marcas[i + 1].index : limpio.length;
+      const bloque = limpio.slice(m.index + m[0].length, fin);
+      const pi = bloque.match(/P\s?[I1lL|]\s*[-–]?\s*(\d{4,})/);
+      let descripcion, resto;
+      if (pi) {
+        descripcion = bloque.slice(0, pi.index);
+        resto = bloque.slice(pi.index + pi[0].length);
+      } else {
+        const lineas = bloque.split("\n").map(x => x.trim()).filter(Boolean);
+        descripcion = lineas.filter(x => !/^\d+([.,]\d+)?$/.test(x)).join(" ");
+        resto = lineas.join(" ");
+      }
+      descripcion = descripcion.replace(/\s+/g, " ").replace(/[\s•·«»+\-–|.,:]+$/g, "").replace(/^[\s•·«»+\-–|.,:]+/g, "").trim();
+      const num = resto.match(/(\d+)(?:[.,](\d+))?/);
+      const cantidad = num ? Number(num[1] + (num[2] ? "." + num[2] : "")) : 1;
+      if (descripcion) productos.push({ pc: m[1], descripcion: descripcion, pi: pi ? pi[1] : "", cantidad: cantidad || 1 });
+    });
+    return productos;
+  }
+
+  function parecido(a, b) {
+    const A = new Set(palabrasDe(a)), B = new Set(palabrasDe(b));
+    if (!A.size || !B.size) return 0;
+    let comunes = 0;
+    A.forEach(p => { if (B.has(p)) comunes++; });
+    return Math.max((2 * comunes) / (A.size + B.size), comunes / Math.min(A.size, B.size) * 0.9);
+  }
+
+  // Busca cada producto leído en el inventario del técnico (por código o por nombre)
+  function compararConMiInventario(productos) {
+    const usadosEq = new Set(carritoEquipos.map(e => e.macNuevo));
+    return productos.map(p => {
+      const textoProd = soloAlfanumerico(p.descripcion + " " + p.pi + " PI" + p.pi);
+      // Material por código
+      let material = bodegaMaterialesLocal.find(m => {
+        const cod = soloAlfanumerico(m.codigo);
+        return cod.length >= 4 && textoProd.includes(cod);
+      });
+      // Material por nombre
+      if (!material) {
+        let mejor = null, puntos = 0;
+        bodegaMaterialesLocal.forEach(m => {
+          const s = parecido(p.descripcion, m.nombre);
+          if (s > puntos) { puntos = s; mejor = m; }
+        });
+        if (puntos >= 0.6) material = mejor;
+      }
+      // Equipo por modelo
+      let equipos = [];
+      if (!material) {
+        const modelos = [...new Set(bodegaEquiposLocal.map(e => e.modelo))];
+        let mejorModelo = null, puntos = 0;
+        modelos.forEach(mod => {
+          const cod = soloAlfanumerico(mod);
+          const s = (cod.length >= 4 && textoProd.includes(cod)) ? 1 : parecido(p.descripcion, mod);
+          if (s > puntos) { puntos = s; mejorModelo = mod; }
+        });
+        if (puntos >= 0.5) equipos = bodegaEquiposLocal.filter(e => e.modelo === mejorModelo && !usadosEq.has(String(e.mac).toUpperCase()));
+      }
+      return Object.assign({}, p, {
+        tipo: material ? "material" : (equipos.length ? "equipo" : "ninguno"),
+        material: material || null,
+        equipos: equipos,
+        cantidadUsar: Math.max(1, Math.round(p.cantidad))
+      });
+    });
+  }
+
+  let resultadoCaptura = [];
+
+  function abrirLecturaCaptura() {
+    if (!bodegaEquiposLocal.length && !bodegaMaterialesLocal.length) {
+      return alert("Primero se debe cargar tu inventario. Revisa tu internet y abre 'VER MI INVENTARIO'.");
+    }
+    document.getElementById("inp-captura").click();
+  }
+
+  function imagenParaLeer(file) {
+    // Las capturas se mandan nítidas (el texto debe verse bien) pero sin pasar de 1600 px
+    return new Promise(resolve => {
+      const reader = new FileReader();
+      reader.onload = e => {
+        const img = new Image();
+        img.onload = () => {
+          const escala = Math.min(1, 1600 / Math.max(img.width, img.height));
+          const c = document.createElement("canvas");
+          c.width = Math.round(img.width * escala);
+          c.height = Math.round(img.height * escala);
+          const ctx = c.getContext("2d");
+          ctx.fillStyle = "#fff";
+          ctx.fillRect(0, 0, c.width, c.height);
+          ctx.drawImage(img, 0, 0, c.width, c.height);
+          resolve(c.toDataURL("image/jpeg", 0.9));
+        };
+        img.onerror = () => resolve(null);
+        img.src = e.target.result;
+      };
+      reader.onerror = () => resolve(null);
+      reader.readAsDataURL(file);
+    });
+  }
+
+  async function alElegirCapturas(input) {
+    const archivos = Array.from(input.files || []).slice(0, 6);
+    input.value = "";
+    if (!archivos.length) return;
+    const aviso = document.getElementById("msg-captura");
+    aviso.innerText = `Leyendo ${archivos.length} captura(s)... espera un momento.`;
+    try {
+      const imagenes = (await Promise.all(archivos.map(imagenParaLeer))).filter(Boolean);
+      const res = await postFirmado("LEER_CAPTURA", { imagenes: imagenes, ot: valorDe("inp-ot").trim() });
+      if (!res || res.status !== "success") {
+        aviso.innerText = res && res.code === "AUTH" ? "Tu acceso no es válido. Pide a tu supervisor un enlace nuevo." : "No se pudieron leer las capturas. Intenta otra vez.";
+        return;
+      }
+      // Se juntan todas las capturas; un producto que sale en dos capturas cuenta una vez
+      const porId = new Map();
+      res.textos.forEach(t => interpretarCapturaInventario(t.texto || "").forEach(p => porId.set(p.pc, p)));
+      const productos = [...porId.values()];
+      if (!productos.length) {
+        aviso.innerText = "No encontré productos en las capturas. Toma la captura de la pantalla PRODUCTOS de la otra app.";
+        return;
+      }
+      aviso.innerText = "";
+      resultadoCaptura = compararConMiInventario(productos);
+      pintarResultadoCaptura();
+    } catch (e) {
+      aviso.innerText = "Necesitas internet para leer las capturas.";
+    }
+  }
+
+  function pintarResultadoCaptura() {
+    const filas = resultadoCaptura.map((r, i) => {
+      const origen = `<div class="inv-codigo">En la otra app: ${esc(r.descripcion)} · ${esc(r.cantidad)}</div>`;
+      if (r.tipo === "material") {
+        const saldo = Number(r.material.saldo) || 0;
+        return `
+          <label class="fila-captura">
+            <input type="checkbox" id="cap-ok-${i}" checked />
+            <div style="flex:1;">
+              <div style="font-weight:bold;">${esc(r.material.nombre)}</div>${origen}
+              ${r.cantidadUsar > saldo ? `<div style="color:#f87171;">Solo tienes ${saldo}</div>` : ""}
+            </div>
+            <input type="number" id="cap-cant-${i}" value="${esc(r.cantidadUsar)}" min="1" style="width:70px;" />
+          </label>`;
+      }
+      if (r.tipo === "equipo") {
+        const opciones = r.equipos.map(e => `<option value="${esc(e.mac)}">${esc(e.mac)}</option>`).join("");
+        return `
+          <label class="fila-captura">
+            <input type="checkbox" id="cap-ok-${i}" ${r.equipos.length === 1 ? "checked" : ""} />
+            <div style="flex:1;">
+              <div style="font-weight:bold;">Equipo ${esc(r.equipos[0].modelo)}</div>${origen}
+              ${r.equipos.length > 1 ? `<div style="color:#fde047;">Tienes ${r.equipos.length}: elige cuál instalaste</div>` : ""}
+              <select id="cap-mac-${i}" style="margin-top:4px;">${opciones}</select>
+            </div>
+          </label>`;
+      }
+      return `<div class="fila-captura no-encontrado"><div><div style="font-weight:bold;">No está en tu inventario</div>${origen}</div></div>`;
+    }).join("");
+    document.getElementById("lista-captura").innerHTML = filas;
+    document.getElementById("modal-captura").style.display = "block";
+  }
+
+  function cerrarResultadoCaptura() {
+    document.getElementById("modal-captura").style.display = "none";
+  }
+
+  function agregarDesdeCaptura() {
+    let agregados = 0;
+    resultadoCaptura.forEach((r, i) => {
+      const marcado = document.getElementById(`cap-ok-${i}`);
+      if (!marcado || !marcado.checked) return;
+      if (r.tipo === "material") {
+        const cant = Math.max(1, Math.round(Number(document.getElementById(`cap-cant-${i}`).value) || 1));
+        const codigo = r.material.codigo;
+        const existente = carritoConsumibles.find(x => (x.codigo || String(x.material).split(" - ")[0]) === codigo);
+        if (existente) existente.cantidad = cant;      // La captura manda: es el total usado en la orden
+        else carritoConsumibles.push({ codigo: codigo, nombre: r.material.nombre, material: `${codigo} - ${r.material.nombre}`, cantidad: cant });
+        agregados++;
+      } else if (r.tipo === "equipo") {
+        const mac = String(document.getElementById(`cap-mac-${i}`).value || "").toUpperCase();
+        if (mac && !carritoEquipos.some(e => e.macNuevo === mac)) {
+          const eq = equipoDeMiBodega(mac);
+          carritoEquipos.push({ movimiento: "INSTALADO", macNuevo: mac, modelo: eq ? eq.modelo : "" });
+          agregados++;
+        }
+      }
+    });
+    cerrarResultadoCaptura();
+    renderizarCarritoVisual();
+    guardarEstadoVivo();
+    document.getElementById("msg-captura").innerText = agregados ? `Se agregaron ${agregados} producto(s). Revisa la lista.` : "";
   }
 
   // =========================================================================
@@ -1473,12 +1815,18 @@
   async function iniciarJornadaLaboral() {
     jornadaActiva = true;
     inicioJornadaMs = ahoraServidor();   // Misma referencia de reloj que usa el servidor para el cierre
-    document.getElementById("btn-iniciar-dia").classList.add("oculto");
-    document.getElementById("btn-fin-dia").classList.remove("oculto");
+    actualizarBotonesJornada();
     actualizarEtiquetaEstadoUI();
     guardarEstadoVivo();
     iniciarMotorSegundoPlano();
     setTimeout(revisarAjustesCelular, 1500);
+  }
+
+  // EMPEZAR MI DÍA: solo si el día no ha empezado.
+  // TERMINAR MI DÍA: solo en la pantalla de inicio, sin ninguna orden abierta.
+  function actualizarBotonesJornada() {
+    document.getElementById("btn-iniciar-dia").classList.toggle("oculto", jornadaActiva);
+    document.getElementById("btn-fin-dia").classList.toggle("oculto", !(jornadaActiva && etapaActual === "1" && !estadoOt));
   }
 
   function actualizarEtiquetaEstadoUI() {
@@ -1507,8 +1855,7 @@
     detenerMotorSegundoPlano();
     await enviarPulsoGpsAhora("FUERA_DE_TURNO");
 
-    document.getElementById("btn-iniciar-dia").classList.remove("oculto");
-    document.getElementById("btn-fin-dia").classList.add("oculto");
+    actualizarBotonesJornada();
     actualizarEtiquetaEstadoUI();
     guardarEstadoVivo();
   }
@@ -1647,51 +1994,137 @@
     if (llegandoAhora) enviarPulsoGpsAhora(estadoReporteActual());
   }
 
-  // ---------- Escáner de MAC con línea verde ----------
+  // ---------- Escáner de MAC con línea verde, enfoque, zoom y linterna ----------
+  let destinoEscaner = "";
+  let codigoNoEnLista = "";
+
+  function configCamara(conEnfoque) {
+    const v = { facingMode: "environment", width: { ideal: 1920 }, height: { ideal: 1080 } };
+    if (conEnfoque) v.advanced = [{ focusMode: "continuous" }];
+    return v;
+  }
+
+  // El equipo instalado debe salir de la bodega del técnico: si el código leído no está en su
+  // lista (la etiqueta trae varios códigos: SN, CM MAC, MTA MAC...), la cámara sigue buscando.
+  function exigeCodigoDeMiLista() {
+    return destinoEscaner === "inp-mac-nuevo" && bodegaEquiposLocal.length > 0;
+  }
+
+  function mensajeEscaner(texto, color) {
+    const el = document.getElementById("msg-escaner");
+    el.innerHTML = texto || "";
+    el.style.color = color || "#fde047";
+  }
+
+  function usarCodigoLeido(valor) {
+    valor = String(valor || "").trim().toUpperCase();
+    if (!valor || !destinoEscaner) return;
+    document.getElementById(destinoEscaner).value = valor;
+    if (destinoEscaner === "inp-mac-nuevo") {
+      const deBodega = equipoDeMiBodega(valor);
+      if (deBodega) document.getElementById("sel-bodega-eq").value = deBodega.mac;
+    }
+    if (navigator.vibrate) navigator.vibrate(120);
+    guardarEstadoVivo();
+    cerrarEscanerCamara();
+  }
+
+  function alLeerCodigoEnVivo(texto) {
+    const valor = String(texto || "").trim().toUpperCase();
+    if (!valor) return;
+    if (exigeCodigoDeMiLista() && !equipoDeMiBodega(valor)) {
+      if (codigoNoEnLista !== valor) {
+        codigoNoEnLista = valor;
+        mensajeEscaner(`Leí <b>${esc(valor)}</b>, pero no está en tu lista.<br>Apunta a otro código de la etiqueta.`
+          + ` <button type="button" class="btn-cam" style="margin-top:6px;" onclick="usarCodigoLeido('${esc(valor)}')">Usar ${esc(valor)}</button>`);
+      }
+      return;
+    }
+    usarCodigoLeido(valor);
+  }
+
   async function abrirEscanerCamara(inputIdDestino) {
     guardarEstadoVivo();
     await cerrarEscanerCamara();
+    destinoEscaner = inputIdDestino;
+    codigoNoEnLista = "";
+    mensajeEscaner("");
+    document.getElementById("ctrl-zoom").classList.add("oculto");
+    document.getElementById("btn-linterna").classList.add("oculto");
     const caja = document.getElementById("caja-escaner");
     caja.classList.remove("oculto");
     caja.scrollIntoView({ behavior: "smooth", block: "start" });
 
+    const opciones = {
+      fps: 15,
+      // Franja ancha y baja: así entra UN solo código de barras de la etiqueta
+      qrbox: (ancho, alto) => ({ width: Math.floor(ancho * 0.9), height: Math.max(50, Math.floor(alto * 0.18)) })
+    };
     html5QrScanner = new Html5Qrcode("reader-mac", { experimentalFeatures: { useBarCodeDetectorIfSupported: true } });
-    html5QrScanner.start(
+    const arrancar = conEnfoque => html5QrScanner.start(
       { facingMode: "environment" },
-      {
-        fps: 15,
-        // Recuadro ancho y bajo: el código de barras de la MAC es alargado
-        qrbox: (ancho, alto) => ({ width: Math.floor(ancho * 0.9), height: Math.max(60, Math.floor(alto * 0.3)) })
-      },
-      decodedText => {
-        const valor = decodedText.trim().toUpperCase();
-        document.getElementById(inputIdDestino).value = valor;
-        if (inputIdDestino === "inp-mac-nuevo") {
-          const deBodega = equipoDeMiBodega(valor);
-          if (deBodega) document.getElementById("sel-bodega-eq").value = deBodega.mac;
-        }
-        if (navigator.vibrate) navigator.vibrate(120);
-        guardarEstadoVivo();
-        cerrarEscanerCamara();
-      },
+      Object.assign({ videoConstraints: configCamara(conEnfoque) }, opciones),
+      alLeerCodigoEnVivo,
       () => {}
-    ).then(() => {
-      // Línea verde centrada sobre la imagen de la cámara
-      const lector = document.getElementById("reader-mac");
-      if (!lector.querySelector(".linea-verde")) {
-        const linea = document.createElement("div");
-        linea.className = "linea-verde";
-        lector.appendChild(linea);
-      }
-    }).catch(() => {
+    );
+    try {
+      try { await arrancar(true); } catch (e) { await arrancar(false); }   // Algunos celulares no aceptan el enfoque pedido
+    } catch (e) {
       alert("No se pudo abrir la cámara. Revisa que la app tenga permiso de cámara.");
-      cerrarEscanerCamara();
-    });
+      return cerrarEscanerCamara();
+    }
+    const lector = document.getElementById("reader-mac");
+    if (!lector.querySelector(".linea-verde")) {
+      const linea = document.createElement("div");
+      linea.className = "linea-verde";
+      lector.appendChild(linea);
+    }
+    prepararControlesCamara();
+  }
+
+  function capacidadesCamara() {
+    try { return (html5QrScanner && html5QrScanner.getRunningTrackCapabilities()) || {}; } catch (e) { return {}; }
+  }
+
+  function prepararControlesCamara() {
+    const cap = capacidadesCamara();
+    if (cap.zoom && cap.zoom.max > cap.zoom.min) {
+      const z = document.getElementById("rng-zoom");
+      z.min = cap.zoom.min;
+      z.max = Math.min(cap.zoom.max, cap.zoom.min * 8);
+      z.step = cap.zoom.step || 0.1;
+      z.value = cap.zoom.min;
+      document.getElementById("ctrl-zoom").classList.remove("oculto");
+    }
+    if (cap.torch) document.getElementById("btn-linterna").classList.remove("oculto");
+  }
+
+  function cambiarZoom(valor) {
+    if (!html5QrScanner) return;
+    html5QrScanner.applyVideoConstraints({ advanced: [{ zoom: Number(valor) }] }).catch(() => {});
+  }
+
+  let linternaEncendida = false;
+  function alternarLinterna() {
+    if (!html5QrScanner) return;
+    linternaEncendida = !linternaEncendida;
+    html5QrScanner.applyVideoConstraints({ advanced: [{ torch: linternaEncendida }] }).catch(() => {});
+  }
+
+  // Tocar la imagen vuelve a enfocar (en los celulares que lo permiten)
+  function reenfocarCamara() {
+    if (!html5QrScanner) return;
+    const cap = capacidadesCamara();
+    if (!cap.focusMode || cap.focusMode.indexOf("single-shot") === -1) return;
+    html5QrScanner.applyVideoConstraints({ advanced: [{ focusMode: "single-shot" }] })
+      .then(() => setTimeout(() => html5QrScanner && html5QrScanner.applyVideoConstraints({ advanced: [{ focusMode: "continuous" }] }).catch(() => {}), 1500))
+      .catch(() => {});
   }
 
   async function cerrarEscanerCamara() {
     const caja = document.getElementById("caja-escaner");
     if (caja) caja.classList.add("oculto");
+    linternaEncendida = false;
     if (html5QrScanner) {
       const lectorActivo = html5QrScanner;
       html5QrScanner = null;
@@ -1700,6 +2133,49 @@
     }
     const lector = document.getElementById("reader-mac");
     if (lector) lector.innerHTML = "";
+  }
+
+  // ---------- Leer el código desde una foto (la cámara normal enfoca mejor) ----------
+  function tomarFotoDelCodigo() {
+    document.getElementById("inp-foto-codigo").click();
+  }
+
+  async function codigosDeFoto(file) {
+    // 1. Detector del celular: encuentra TODOS los códigos de la etiqueta
+    if ("BarcodeDetector" in window) {
+      try {
+        const bmp = await createImageBitmap(file);
+        const det = new BarcodeDetector();
+        const res = await det.detect(bmp);
+        const vals = [...new Set(res.map(r => String(r.rawValue || "").trim().toUpperCase()).filter(Boolean))];
+        if (vals.length) return vals;
+      } catch (e) {}
+    }
+    // 2. Librería del escáner: encuentra un código
+    try {
+      const lectorFoto = new Html5Qrcode("lector-archivo");
+      const r = await lectorFoto.scanFileV2(file, false);
+      try { lectorFoto.clear(); } catch (e) {}
+      return r && r.decodedText ? [String(r.decodedText).trim().toUpperCase()] : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  async function alElegirFotoCodigo(input) {
+    const file = input.files && input.files[0];
+    input.value = "";
+    if (!file) return;
+    mensajeEscaner("Buscando códigos en la foto...", "#38bdf8");
+    const codigos = await codigosDeFoto(file);
+    if (codigos.length === 0) {
+      return mensajeEscaner("No encontré ningún código en la foto. Tómala más cerca y con buena luz.", "#f87171");
+    }
+    const deMiLista = destinoEscaner === "inp-mac-nuevo" ? codigos.filter(c => equipoDeMiBodega(c)) : [];
+    if (deMiLista.length === 1) return usarCodigoLeido(deMiLista[0]);
+    if (codigos.length === 1) return usarCodigoLeido(codigos[0]);
+    mensajeEscaner("La etiqueta tiene varios códigos. Toca el que quieres usar:<br>" +
+      codigos.map(c => `<button type="button" class="btn-codigo${deMiLista.includes(c) ? " de-mi-lista" : ""}" onclick="usarCodigoLeido('${esc(c)}')">${esc(c)}</button>`).join(""));
   }
 
   // ---------- Código QR de la encuesta ----------
