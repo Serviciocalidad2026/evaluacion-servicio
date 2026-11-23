@@ -78,6 +78,11 @@
     .fila-captura.no-encontrado { border-style: dashed; opacity: 0.8; cursor: default; }
     .ayuda-pestana { font-size: 15px; color: #fde047; font-weight: bold; margin: 0 0 10px 0; }
     .pestanas button { font-size: 13.5px; }
+    .estrellas { display: flex; justify-content: space-between; gap: 6px; }
+    .btn-star { flex: 1; padding: 12px 0; font-size: 18px; font-weight: bold; background: #1e293b; color: #64748b; border: 1px solid #334155; border-radius: 8px; cursor: pointer; }
+    .btn-star.activo { background: #f59e0b; color: #0f172a; border-color: #fbbf24; }
+    .texto-estrellas { font-size: 14px; color: #94a3b8; margin-top: 6px; font-weight: bold; }
+    .texto-estrellas.elegido { color: #fde047; font-size: 16px; }
     .oculto { display: none !important; }
   </style>
 </head>
@@ -288,13 +293,23 @@
         <label>Nombre del cliente:</label>
         <input type="text" id="inp-nombre-cliente" placeholder="Nombre y apellido" oninput="guardarEstadoVivo()" />
         <label>¿Cómo fue el cliente?</label>
-        <select id="sel-comportamiento-cliente" onchange="guardarEstadoVivo()">
-          <option value="Colaborador">Colaborador: me ayudó</option>
-          <option value="Normal">Normal: sin problemas</option>
-          <option value="Exigente / Con quejas">Exigente: tuvo quejas</option>
-          <option value="Difícil / Conflictivo">Difícil: no dejaba trabajar</option>
+        <div class="estrellas" id="estrellas-cliente">
+          <button type="button" class="btn-star" onclick="calificarCliente(1)">1 ★</button>
+          <button type="button" class="btn-star" onclick="calificarCliente(2)">2 ★</button>
+          <button type="button" class="btn-star" onclick="calificarCliente(3)">3 ★</button>
+          <button type="button" class="btn-star" onclick="calificarCliente(4)">4 ★</button>
+          <button type="button" class="btn-star" onclick="calificarCliente(5)">5 ★</button>
+        </div>
+        <div id="lbl-calificacion-cliente" class="texto-estrellas">Toca las estrellas</div>
+        <select id="sel-comportamiento-cliente" class="oculto">
+          <option value="">Sin calificar</option>
+          <option value="1 de 5 - Muy difícil">1</option>
+          <option value="2 de 5 - Difícil">2</option>
+          <option value="3 de 5 - Normal">3</option>
+          <option value="4 de 5 - Bueno">4</option>
+          <option value="5 de 5 - Excelente">5</option>
         </select>
-        <label>¿Qué trabajo hiciste?</label>
+        <label>Bitácora</label>
         <textarea id="inp-bitacora-obs" rows="4" placeholder="Escribe qué hiciste y qué pruebas hiciste..." oninput="guardarEstadoVivo()"></textarea>
       </div>
 
@@ -691,11 +706,12 @@
       if (est.comportamientoCliente) {
         const selCli = document.getElementById("sel-comportamiento-cliente");
         selCli.value = est.comportamientoCliente;
-        if (selCli.selectedIndex < 0) selCli.selectedIndex = 0;   // Valor de una versión anterior (con emojis)
+        if (selCli.selectedIndex < 0) selCli.selectedIndex = 0;   // Valor de una versión anterior: queda sin calificar
       }
 
       renderizarCarritoVisual();
       renderizarMiniaturasFotos();
+      pintarEstrellasCliente();
 
       // Antes de reactivar el turno, verificar si el supervisor lo cerró desde la PC
       await verificarSiSupervisorCerroTurno();
@@ -748,6 +764,23 @@
     guardarEstadoVivo();
   }
 
+  const TEXTO_ESTRELLAS = ["Toca las estrellas", "Muy difícil", "Difícil", "Normal", "Bueno", "Excelente"];
+
+  function calificarCliente(valor) {
+    document.getElementById("sel-comportamiento-cliente").selectedIndex = valor;
+    pintarEstrellasCliente();
+    guardarEstadoVivo();
+    actualizarPestanas();
+  }
+
+  function pintarEstrellasCliente() {
+    const valor = document.getElementById("sel-comportamiento-cliente").selectedIndex;
+    document.querySelectorAll("#estrellas-cliente .btn-star").forEach((b, i) => b.classList.toggle("activo", i + 1 <= valor));
+    const lbl = document.getElementById("lbl-calificacion-cliente");
+    lbl.innerText = TEXTO_ESTRELLAS[valor] || TEXTO_ESTRELLAS[0];
+    lbl.classList.toggle("elegido", valor > 0);
+  }
+
   function mostrarPestana(nombre) {
     pestanaActual = nombre;
     ["productos", "retirado", "fotos", "bitacora", "problema", "encuesta"].forEach(p => {
@@ -766,7 +799,7 @@
     conNumero("tab-btn-productos", "1. Productos", carritoEquipos.length + carritoConsumibles.length);
     conNumero("tab-btn-retirado", "2. Retirado", retirados.length);
     conNumero("tab-btn-fotos", "3. Fotos", fotosComprimidasArray.length);
-    const bitacoraLista = Boolean(valorDe("inp-tel-cliente").trim() && valorDe("inp-nombre-cliente").trim() && valorDe("inp-bitacora-obs").trim());
+    const bitacoraLista = Boolean(valorDe("inp-tel-cliente").trim() && valorDe("inp-nombre-cliente").trim() && valorDe("sel-comportamiento-cliente") && valorDe("inp-bitacora-obs").trim());
     document.getElementById("tab-btn-bitacora").classList.toggle("lista", bitacoraLista);
     conNumero("tab-btn-problema", "5. Problema", valorDe("inp-inconveniente").trim() ? Math.max(1, fotosProblemaArray.length) : fotosProblemaArray.length);
   }
@@ -1734,7 +1767,7 @@
             <div><strong>Equipos instalados:</strong> ${esc(equipos)}</div>
             <div><strong>Materiales:</strong> ${esc(materiales)}</div>
             <div><strong>Equipos quitados:</strong> ${esc(quitados)}</div>
-            <div><strong>Cómo fue el cliente:</strong> ${esc(sinEmojis(b.compCliente || b.comportamientoCliente || "") || "No indicado")}</div>
+            <div><strong>Calificación del cliente:</strong> ${esc(sinEmojis(b.compCliente || b.comportamientoCliente || "") || "No indicado")}</div>
             <div><strong>Fotos:</strong> ${esc(b.nFotos !== undefined ? b.nFotos : (b.nFotosLocal || 0))}</div>
             ${b.alertas ? `<div style="color:#fca5a5;"><strong>Aviso de inventario:</strong> ${esc(b.alertas)}</div>` : ""}
             <div style="margin-top:6px; padding:8px; background:#1e293b; border-radius:6px; color:#f8fafc;">
@@ -2234,7 +2267,8 @@
     const tel = valorDe("inp-tel-cliente").replace(/\D/g, "");
     if (tel.length < 8) return faltaEn("bitacora", "Falta el teléfono del cliente (8 números).");
     if (!valorDe("inp-nombre-cliente").trim()) return faltaEn("bitacora", "Falta el nombre del cliente.");
-    if (!valorDe("inp-bitacora-obs").trim()) return faltaEn("bitacora", "Escribe qué trabajo hiciste.");
+    if (!valorDe("sel-comportamiento-cliente")) return faltaEn("bitacora", "Falta calificar al cliente con las estrellas.");
+    if (!valorDe("inp-bitacora-obs").trim()) return faltaEn("bitacora", "Falta escribir la bitácora.");
     if (fotosComprimidasArray.length === 0 &&
         !confirm("No tomaste fotos del trabajo.\n\n¿Terminar la orden sin fotos?")) {
       mostrarPestana("fotos");
@@ -2247,6 +2281,7 @@
     ["inp-ot", "inp-mac-nuevo", "inp-mac-malo", "inp-modelo-malo", "inp-tel-cliente", "inp-nombre-cliente",
      "inp-bitacora-obs", "inp-inconveniente", "txt-justificacion-no"].forEach(id => { document.getElementById(id).value = ""; });
     document.getElementById("sel-comportamiento-cliente").selectedIndex = 0;
+    pintarEstrellasCliente();
     document.getElementById("sel-tipo-servicio").selectedIndex = 0;
     fotosComprimidasArray = [];
     fotosProblemaArray = [];
