@@ -1273,7 +1273,7 @@
     document.getElementById("inv-materiales").innerHTML = mats.length
       ? mats.map(m => `
           <div class="inv-fila">
-            <div><div style="font-weight:bold;">${esc(m.nombre)}</div><div class="inv-codigo">Código: ${esc(m.codigo)}</div></div>
+            <div><div style="font-weight:bold;">${esc(m.nombre)}</div>${String(m.codigo).toUpperCase() !== String(m.nombre).toUpperCase() ? `<div class="inv-codigo">Código: ${esc(m.codigo)}</div>` : ""}</div>
             <div class="inv-cant">${esc(m.saldo)}</div>
           </div>`).join("")
       : `<div class="lista-vacia">${q ? "Ningún material con esa búsqueda." : "No tienes materiales asignados."}</div>`;
