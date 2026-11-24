@@ -83,6 +83,31 @@
     .btn-star.activo { background: #f59e0b; color: #0f172a; border-color: #fbbf24; }
     .texto-estrellas { font-size: 14px; color: #94a3b8; margin-top: 6px; font-weight: bold; }
     .texto-estrellas.elegido { color: #fde047; font-size: 16px; }
+    /* v2.8.1: botones y casillas grandes (mínimo 48 px), íconos con texto, un paso a la vez */
+    .ico { width: 22px; height: 22px; flex: none; }
+    .btn { min-height: 52px; display: flex; align-items: center; justify-content: center; gap: 10px; line-height: 1.2; }
+    .btn-grande { min-height: 60px; }
+    .btn-sm { min-height: 50px; }
+    .btn-gris { min-height: 46px; font-size: 14px; }
+    .btn-cam { min-height: 50px; min-width: 64px; font-size: 15px; }
+    input, select, textarea { min-height: 50px; font-size: 16px; }
+    label { font-size: 15px; }
+    .pestanas button { position: relative; min-height: 66px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 4px; line-height: 1.15; }
+    .pestanas button .ico { width: 24px; height: 24px; }
+    .pestanas button.lista::after { content: "✓"; position: absolute; top: 3px; right: 7px; font-weight: 900; font-size: 15px; color: #4ade80; }
+    .pestanas button.lista.activa::after { color: white; }
+    .btn-quitar { min-height: 44px; min-width: 72px; font-size: 14px; }
+    .thumb-del { width: 34px !important; height: 34px !important; font-size: 16px !important; }
+    .titulo-sec { display: flex; align-items: center; gap: 8px; font-size: 16px; }
+    .btn-siguiente { background: #0ea5e9; color: #0f172a; margin-top: 16px; }
+    .marca { display: inline-block; font-size: 12px; font-weight: 800; padding: 2px 8px; border-radius: 10px; margin-left: 6px; vertical-align: middle; }
+    .marca-obligatorio { background: #7f1d1d; color: #fecaca; }
+    .marca-si-pasa { background: #334155; color: #cbd5e1; }
+    .colilla-sugerida { background: #f59e0b; color: #0f172a; font-size: 19px; }
+    .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 8px; }
+    .chip { min-height: 48px; min-width: 76px; padding: 8px 14px; border-radius: 24px; border: 2px solid #f59e0b; background: #1e293b; color: #fde047; font-size: 17px; font-weight: bold; cursor: pointer; }
+    .fila-input-cam > input { flex: 1; min-width: 0; }
+    .fila-input-cam > .btn-cam { flex: none; padding-left: 16px; padding-right: 16px; }
     .oculto { display: none !important; }
   </style>
 </head>
@@ -128,8 +153,8 @@
     <h2 id="titulo-tec" style="margin:0 0 4px 0;">Técnico</h2>
     <p class="ayuda" id="sub-bodega">Cargando tus equipos...</p>
     <div style="display:flex; gap:8px; margin-bottom:12px;">
-      <button type="button" class="btn btn-amarillo btn-sm" style="margin-top:0;" onclick="abrirHistorialTecnico()">Mis órdenes</button>
-      <button type="button" class="btn btn-azul btn-sm" style="margin-top:0; background:#0e7490;" onclick="abrirMiInventario()">Mi inventario</button>
+      <button type="button" class="btn btn-amarillo btn-sm" style="margin-top:0;" data-icono="lista" onclick="abrirHistorialTecnico()">Mis órdenes</button>
+      <button type="button" class="btn btn-azul btn-sm" style="margin-top:0; background:#0e7490;" data-icono="cajas" onclick="abrirMiInventario()">Mi inventario</button>
     </div>
 
     <button id="btn-instalar-pwa" class="btn btn-azul oculto" style="margin-top:0; margin-bottom:12px; background:#0284c7;" onclick="instalarAppLimpia()">
@@ -143,8 +168,8 @@
       </div>
       <div id="lbl-ultimo-gps" style="font-size:13px;font-weight:bold;margin:-2px 0 8px 0;"></div>
       <div style="display:flex; gap:8px;">
-        <button id="btn-iniciar-dia" class="btn btn-verde btn-grande" style="margin-top:0;" onclick="iniciarJornadaLaboral()">EMPEZAR MI DÍA</button>
-        <button id="btn-fin-dia" class="btn btn-rojo btn-grande oculto" style="margin-top:0;" onclick="finalizarJornadaLaboral()">TERMINAR MI DÍA</button>
+        <button id="btn-iniciar-dia" class="btn btn-verde btn-grande" style="margin-top:0;" data-icono="play" onclick="iniciarJornadaLaboral()">EMPEZAR MI DÍA</button>
+        <button id="btn-fin-dia" class="btn btn-rojo btn-grande oculto" style="margin-top:0;" data-icono="stop" onclick="finalizarJornadaLaboral()">TERMINAR MI DÍA</button>
       </div>
       <div id="lbl-cola-ot" class="oculto" style="font-size:13px;color:#fde047;margin-top:8px;font-weight:bold;"></div>
     </div>
@@ -153,15 +178,15 @@
     <div id="etapa-1-inicio" class="bloque">
       <label style="margin-top:0;">Número de orden:</label>
       <input type="text" id="inp-ot" inputmode="numeric" placeholder="Ejemplo: 15612" oninput="guardarEstadoVivo()" />
-      <button class="btn btn-azul btn-grande" onclick="salirEnCamino()">VOY EN CAMINO</button>
+      <button class="btn btn-azul btn-grande" data-icono="camion" onclick="salirEnCamino()">VOY EN CAMINO</button>
     </div>
 
     <!-- ORDEN · PASO 2: EN CAMINO -->
     <div id="etapa-camino" class="bloque oculto">
       <div class="titulo-orden" id="lbl-ot-camino">Orden</div>
       <div class="estado-orden" style="color:#60a5fa;">Vas en camino</div>
-      <button class="btn btn-verde btn-grande" onclick="irAElegirTipo()">LLEGUÉ AL SITIO</button>
-      <button class="btn btn-rojo" onclick="abrirModalNoRealizada()">No se pudo hacer esta orden</button>
+      <button class="btn btn-verde btn-grande" data-icono="pin" onclick="irAElegirTipo()">LLEGUÉ AL SITIO</button>
+      <button class="btn btn-rojo" data-icono="x" onclick="abrirModalNoRealizada()">No se pudo hacer esta orden</button>
       <button class="btn btn-gris" onclick="corregirNumeroOrden()">Corregir el número de orden</button>
     </div>
 
@@ -222,23 +247,39 @@
       <!-- PESTAÑA: PRODUCTOS -->
       <div id="tab-productos" class="pestana">
         <p class="ayuda-pestana">Lo que usaste en este trabajo.</p>
-        <button type="button" class="btn btn-azul" style="margin-top:0; background:#0e7490;" onclick="abrirLecturaCaptura()">SUBIR CAPTURA DE LA OTRA APP</button>
+        <button type="button" class="btn btn-azul" style="margin-top:0; background:#0e7490;" data-icono="galeria" onclick="abrirLecturaCaptura()">SUBIR CAPTURA DE LA OTRA APP</button>
         <input type="file" id="inp-captura" accept="image/*" multiple class="oculto" onchange="alElegirCapturas(this)" />
         <div id="msg-captura" class="ayuda" style="color:#38bdf8; font-weight:bold; margin:6px 0 0 0;"></div>
-        <div class="sub-caja" style="margin-top:0;">
-          <p class="titulo-sec">Equipo que instalaste</p>
-          <button type="button" class="btn btn-azul" style="margin-top:2px;" onclick="abrirEscanerCamara('inp-mac-nuevo')">ESCANEAR MAC</button>
+        <div class="sub-caja" id="caja-colilla">
+          <p class="titulo-sec" style="color:#fbbf24;"><span data-icono="colilla"></span>Colilla</p>
+          <div id="lista-colillas" class="lista-items"></div>
+          <button type="button" id="btn-usar-colilla" class="btn btn-grande colilla-sugerida" style="margin-top:2px;" onclick="abrirElegirColilla()">USAR COLILLA</button>
+          <div id="panel-colilla" class="oculto">
+            <label style="margin-top:4px;">Toca el número de tu colilla:</label>
+            <div id="chips-colillas" class="chips"></div>
+            <label>O escribe el número:</label>
+            <div class="fila-input-cam">
+              <input type="text" id="inp-colilla" inputmode="numeric" placeholder="Número de colilla" oninput="pintarColillas()" />
+              <button type="button" class="btn-cam" style="background:#f59e0b; color:#0f172a;" onclick="agregarColillaEscrita()">Agregar</button>
+            </div>
+            <button type="button" class="btn btn-gris" onclick="cerrarElegirColilla()">Cancelar</button>
+          </div>
+        </div>
+
+        <div class="sub-caja">
+          <p class="titulo-sec"><span data-icono="caja"></span>Equipo que instalaste</p>
+          <button type="button" class="btn btn-azul" style="margin-top:2px;" data-icono="barras" onclick="abrirEscanerCamara('inp-mac-nuevo')">ESCANEAR MAC</button>
           <label>O búscalo en tu lista:</label>
           <select id="sel-bodega-eq" onchange="alElegirEquipoBodega(); guardarEstadoVivo();">
             <option value="">-- No tienes equipos asignados --</option>
           </select>
           <input type="text" id="inp-mac-nuevo" placeholder="MAC del equipo" style="margin-top:6px;" oninput="guardarEstadoVivo()" />
-          <button type="button" class="btn btn-azul btn-sm" onclick="agregarEquipoAlCarrito()">Agregar equipo</button>
+          <button type="button" class="btn btn-azul btn-sm" data-icono="mas" onclick="agregarEquipoAlCarrito()">Agregar equipo</button>
           <div id="lista-equipos" class="lista-items"></div>
         </div>
 
         <div class="sub-caja">
-          <p class="titulo-sec" style="color:#fde047;">Material que usaste</p>
+          <p class="titulo-sec" style="color:#fde047;"><span data-icono="rollo"></span>Material que usaste</p>
           <label>Elige el material y cuántos usaste:</label>
           <div class="fila-input-cam">
             <select id="sel-bodega-mat" style="flex:2.2;">
@@ -246,7 +287,7 @@
             </select>
             <input type="number" id="inp-cant-mat" inputmode="numeric" placeholder="Cant." value="1" min="1" style="flex:0.8;" />
           </div>
-          <button type="button" class="btn btn-amarillo btn-sm" onclick="agregarConsumibleAlCarrito()">Agregar material</button>
+          <button type="button" class="btn btn-amarillo btn-sm" data-icono="mas" onclick="agregarConsumibleAlCarrito()">Agregar material</button>
           <div id="lista-materiales" class="lista-items"></div>
         </div>
       </div>
@@ -254,9 +295,9 @@
       <!-- PESTAÑA: EQUIPO RETIRADO / DAÑADO -->
       <div id="tab-retirado" class="pestana oculto">
         <div class="sub-caja" style="margin-top:0;">
-          <p class="ayuda-pestana" style="margin-top:0;">Llena esto solo si le quitaste un equipo al cliente.</p>
-          <p class="titulo-sec" style="color:#fca5a5;">Equipo que quitaste</p>
-          <button type="button" class="btn btn-azul" style="margin-top:2px;" onclick="abrirEscanerCamara('inp-mac-malo')">ESCANEAR MAC</button>
+          <p class="ayuda-pestana" style="margin-top:0;">Llena esto solo si le quitaste un equipo al cliente.<span class="marca marca-si-pasa">SOLO SI PASÓ</span></p>
+          <p class="titulo-sec" style="color:#fca5a5;"><span data-icono="salida"></span>Equipo que quitaste</p>
+          <button type="button" class="btn btn-azul" style="margin-top:2px;" data-icono="barras" onclick="abrirEscanerCamara('inp-mac-malo')">ESCANEAR MAC</button>
           <input type="text" id="inp-mac-malo" placeholder="O escribe la MAC aquí" style="margin-top:8px;" oninput="guardarEstadoVivo()" />
           <label>Modelo (si lo sabes):</label>
           <input type="text" id="inp-modelo-malo" placeholder="Ejemplo: Router ZTE" oninput="guardarEstadoVivo()" />
@@ -265,7 +306,7 @@
             <option value="Dañado">Dañado</option>
             <option value="Funcionando">Funcionaba (solo se cambió)</option>
           </select>
-          <button type="button" class="btn btn-rojo btn-sm" onclick="agregarRetirado()">Agregar equipo quitado</button>
+          <button type="button" class="btn btn-rojo btn-sm" data-icono="mas" onclick="agregarRetirado()">Agregar equipo quitado</button>
           <div id="lista-retirados" class="lista-items"></div>
         </div>
       </div>
@@ -277,8 +318,8 @@
           <input type="file" id="inp-foto-camara" accept="image/*" capture="environment" class="oculto" onchange="procesarFotosSeleccionadas(this, 'trabajo')" />
           <input type="file" id="inp-foto-galeria" accept="image/*" multiple class="oculto" onchange="procesarFotosSeleccionadas(this, 'trabajo')" />
           <div style="display:flex; gap:8px;">
-            <button type="button" class="btn btn-azul btn-sm" style="margin-top:2px;" onclick="document.getElementById('inp-foto-camara').click()">Tomar foto</button>
-            <button type="button" class="btn btn-amarillo btn-sm" style="margin-top:2px;" onclick="document.getElementById('inp-foto-galeria').click()">Elegir de la galería</button>
+            <button type="button" class="btn btn-azul btn-sm" style="margin-top:2px;" data-icono="camara" onclick="document.getElementById('inp-foto-camara').click()">Tomar foto</button>
+            <button type="button" class="btn btn-amarillo btn-sm" style="margin-top:2px;" data-icono="galeria" onclick="document.getElementById('inp-foto-galeria').click()">Galería</button>
           </div>
           <div id="lbl-conteo-fotos" class="conteo-fotos">0 de 15 fotos</div>
           <div id="contenedor-miniaturas" class="galeria-previews"></div>
@@ -287,7 +328,7 @@
 
       <!-- PESTAÑA: BITÁCORA -->
       <div id="tab-bitacora" class="pestana oculto">
-        <p class="ayuda-pestana">Datos del cliente y lo que hiciste. Es obligatorio.</p>
+        <p class="ayuda-pestana">Datos del cliente y lo que hiciste.<span class="marca marca-obligatorio">OBLIGATORIO</span></p>
         <label style="margin-top:0;">Teléfono del cliente:</label>
         <input type="tel" id="inp-tel-cliente" inputmode="tel" placeholder="Ejemplo: 9988-7766" oninput="guardarEstadoVivo()" />
         <label>Nombre del cliente:</label>
@@ -315,14 +356,14 @@
 
       <!-- PESTAÑA: PROBLEMA / INCONVENIENTE -->
       <div id="tab-problema" class="pestana oculto">
-        <p class="ayuda-pestana">Llena esto solo si pasó algún problema en el servicio.</p>
+        <p class="ayuda-pestana">Llena esto solo si pasó algún problema en el servicio.<span class="marca marca-si-pasa">SOLO SI PASÓ</span></p>
         <label style="margin-top:0;">¿Qué pasó?</label>
         <textarea id="inp-inconveniente" rows="3" placeholder="Escribe qué pasó..." oninput="guardarEstadoVivo()"></textarea>
         <input type="file" id="inp-foto-camara-inc" accept="image/*" capture="environment" class="oculto" onchange="procesarFotosSeleccionadas(this, 'problema')" />
         <input type="file" id="inp-foto-galeria-inc" accept="image/*" multiple class="oculto" onchange="procesarFotosSeleccionadas(this, 'problema')" />
         <div style="display:flex; gap:8px;">
-          <button type="button" class="btn btn-azul btn-sm" onclick="document.getElementById('inp-foto-camara-inc').click()">Tomar foto</button>
-          <button type="button" class="btn btn-amarillo btn-sm" onclick="document.getElementById('inp-foto-galeria-inc').click()">Elegir de la galería</button>
+          <button type="button" class="btn btn-azul btn-sm" data-icono="camara" onclick="document.getElementById('inp-foto-camara-inc').click()">Tomar foto</button>
+          <button type="button" class="btn btn-amarillo btn-sm" data-icono="galeria" onclick="document.getElementById('inp-foto-galeria-inc').click()">Galería</button>
         </div>
         <div id="lbl-conteo-fotos-inc" class="conteo-fotos">0 de 3 fotos</div>
         <div id="contenedor-miniaturas-inc" class="galeria-previews"></div>
@@ -337,11 +378,12 @@
           <div id="qrcode"></div>
           <div class="pie-qr" id="lbl-pie-qr"></div>
         </div>
-        <button type="button" class="btn btn-amarillo" onclick="enviarUrlCortaWhatsApp()">Mandar enlace por WhatsApp</button>
+        <button type="button" class="btn btn-amarillo" data-icono="enviar" onclick="enviarUrlCortaWhatsApp()">Mandar enlace por WhatsApp</button>
       </div>
 
-      <button class="btn btn-verde btn-grande" style="margin-top:18px;" onclick="terminarOrden()">TERMINAR ORDEN</button>
-      <button class="btn btn-rojo" onclick="abrirModalNoRealizada()">No se pudo hacer esta orden</button>
+      <button type="button" id="btn-siguiente-pestana" class="btn btn-siguiente btn-grande" onclick="siguientePestana()">SIGUIENTE</button>
+      <button class="btn btn-verde btn-grande" style="margin-top:12px;" data-icono="check" onclick="terminarOrden()">TERMINAR ORDEN</button>
+      <button class="btn btn-rojo" data-icono="x" onclick="abrirModalNoRealizada()">No se pudo hacer esta orden</button>
     </div>
 
     <!-- SI LA ORDEN NO SE PUDO HACER -->
@@ -366,8 +408,8 @@
       <p class="ayuda">Se está enviando. Si no hay internet, se envía sola cuando vuelva la señal.</p>
       <p class="ayuda" id="lbl-aviso-fin" style="color:#fde047; font-size:15px;"></p>
       <div id="caja-qr-fin" class="caja-qr"><div id="qrcode-fin"></div></div>
-      <button type="button" class="btn btn-amarillo" onclick="enviarUrlCortaWhatsApp()">Mandar enlace por WhatsApp</button>
-      <button class="btn btn-verde btn-grande" onclick="cerrarPantallaFin()">LISTO</button>
+      <button type="button" class="btn btn-amarillo" data-icono="enviar" onclick="enviarUrlCortaWhatsApp()">Mandar enlace por WhatsApp</button>
+      <button class="btn btn-verde btn-grande" data-icono="check" onclick="cerrarPantallaFin()">LISTO</button>
     </div>
 
     <button class="btn btn-gris" onclick="editarConfig()">Configurar mi app</button>
@@ -393,11 +435,13 @@
       <button type="button" class="btn btn-rojo" style="width:auto; margin:0; padding:8px 16px;" onclick="cerrarMiInventario()">Cerrar</button>
     </div>
     <div id="lbl-inventario-fecha" class="ayuda"></div>
-    <input type="text" id="inp-buscar-inventario" placeholder="Buscar modelo, MAC o material..." oninput="pintarMiInventario()" style="border-color:#38bdf8;" />
+    <input type="text" id="inp-buscar-inventario" placeholder="Buscar modelo, MAC, material o colilla..." oninput="pintarMiInventario()" style="border-color:#38bdf8;" />
     <p class="titulo-sec" style="margin-top:14px;">Equipos</p>
     <div id="inv-equipos"></div>
     <p class="titulo-sec" style="margin-top:14px; color:#fde047;">Materiales (lo que te queda)</p>
     <div id="inv-materiales"></div>
+    <p class="titulo-sec" style="margin-top:14px; color:#fbbf24;">Colillas</p>
+    <div id="inv-colillas"></div>
     <div id="caja-por-devolver" class="oculto">
       <p class="titulo-sec" style="margin-top:14px; color:#fca5a5;">Equipos que debes devolver a bodega</p>
       <div id="inv-por-devolver"></div>
@@ -450,6 +494,41 @@
   let bodegaEquiposLocal = [];
   let bodegaMaterialesLocal = [];
   let bodegaPorDevolverLocal = [];
+  let bodegaColillasLocal = [];   // Números de colilla que el técnico tiene sin usar
+  let carritoColillas = [];       // Colillas usadas en la orden actual
+
+  // Íconos simples (dibujos de línea, sin emojis) que acompañan al texto de los botones
+  const ICONOS = {
+    caja: '<path d="M3 7.5l9-4.5 9 4.5-9 4.5z"/><path d="M3 7.5V17l9 4.5 9-4.5V7.5"/><path d="M12 12v9.5"/>',
+    salida: '<path d="M14 3h7v7"/><path d="M21 3l-9 9"/><path d="M19 14v5a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2h5"/>',
+    camara: '<path d="M3 8.5A2 2 0 0 1 5 6.5h2.5l2-2.5h5l2 2.5H19a2 2 0 0 1 2 2V18a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/><circle cx="12" cy="13" r="3.8"/>',
+    libreta: '<path d="M6 3h11a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6z"/><path d="M9.5 8h6M9.5 12h6M9.5 16h4"/><path d="M4 7h3M4 11h3M4 15h3"/>',
+    alerta: '<path d="M12 3.5L22 20.5H2z"/><path d="M12 10v5"/><path d="M12 17.8v.2"/>',
+    qr: '<rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/><path d="M14 14h3v3h-3zM20 14v.2M14 20.5h.2M17.5 17.5H21V21h-3.5z"/>',
+    play: '<circle cx="12" cy="12" r="9.5"/><path d="M10 8l6 4-6 4z"/>',
+    stop: '<circle cx="12" cy="12" r="9.5"/><rect x="9" y="9" width="6" height="6" rx="1"/>',
+    camion: '<path d="M2 6h11v10H2z"/><path d="M13 9.5h4.5l3.5 3.5v3h-8"/><circle cx="6" cy="17.5" r="2"/><circle cx="17" cy="17.5" r="2"/>',
+    pin: '<path d="M12 21.5s-7-7.3-7-12.2a7 7 0 0 1 14 0c0 4.9-7 12.2-7 12.2z"/><circle cx="12" cy="9.3" r="2.6"/>',
+    check: '<circle cx="12" cy="12" r="9.5"/><path d="M7.5 12.5l3 3 6-6.5"/>',
+    x: '<circle cx="12" cy="12" r="9.5"/><path d="M9 9l6 6M15 9l-6 6"/>',
+    lista: '<path d="M9 6h12M9 12h12M9 18h12"/><path d="M4 6h.2M4 12h.2M4 18h.2"/>',
+    cajas: '<rect x="3" y="12" width="8" height="8" rx="1"/><rect x="13" y="12" width="8" height="8" rx="1"/><rect x="8" y="3" width="8" height="8" rx="1"/>',
+    barras: '<path d="M4 5v14M7.5 5v14M11 5v14M13.5 5v14M17 5v14M20 5v14"/>',
+    flecha: '<path d="M4 12h15M13 6l6 6-6 6"/>',
+    mas: '<path d="M12 5v14M5 12h14"/>',
+    colilla: '<path d="M3 7h18v3.2a2 2 0 0 0 0 3.6V17H3v-3.2a2 2 0 0 0 0-3.6z"/><path d="M9 7.5v1.5M9 11.2v1.6M9 15v1.5"/>',
+    rollo: '<circle cx="9" cy="12" r="6.5"/><circle cx="9" cy="12" r="2"/><path d="M9 5.5h11.5"/>',
+    galeria: '<rect x="3" y="3.5" width="18" height="17" rx="2"/><circle cx="8.5" cy="9" r="1.6"/><path d="M21 15.5l-5-5-11 10"/>',
+    enviar: '<path d="M21.5 2.5L10.5 13.5"/><path d="M21.5 2.5l-7 19-4-8-8-4z"/>'
+  };
+  function icono(nombre) {
+    return ICONOS[nombre]
+      ? `<svg class="ico" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">${ICONOS[nombre]}</svg>`
+      : "";
+  }
+  document.querySelectorAll("[data-icono]").forEach(el => {
+    el.insertAdjacentHTML(el.tagName === "SPAN" ? "beforeend" : "afterbegin", icono(el.dataset.icono));
+  });
   let historialCompletoTecnico = [];
 
   let carritoEquipos = [];
@@ -634,6 +713,8 @@
       comportamientoCliente: valorDe("sel-comportamiento-cliente"),
       carritoEquipos: carritoEquipos,
       carritoConsumibles: carritoConsumibles,
+      carritoColillas: carritoColillas,
+      colillaEscrita: valorDe("inp-colilla"),
       retirados: retirados,
       urlEncuestaActual: urlEncuestaActual,
       urlCortaActual: urlCortaActual,
@@ -643,6 +724,7 @@
     try {
       localStorage.setItem("cottech_estado_vivo", JSON.stringify(estado));
     } catch (e) {}
+    if (etapaActual === "2") actualizarPestanas();   // la marca ✓ de cada pestaña se actualiza al escribir
   }
 
   async function restaurarEstadoVivo() {
@@ -656,6 +738,7 @@
       etapaAntesNoRealizada = est.etapaAntesNoRealizada || "";
       carritoEquipos = Array.isArray(est.carritoEquipos) ? est.carritoEquipos : [];
       carritoConsumibles = Array.isArray(est.carritoConsumibles) ? est.carritoConsumibles : [];
+      carritoColillas = Array.isArray(est.carritoColillas) ? est.carritoColillas : [];
       retirados = Array.isArray(est.retirados) ? est.retirados : [];
       urlEncuestaActual = est.urlEncuestaActual || "";
       urlCortaActual = est.urlCortaActual || "";
@@ -701,6 +784,7 @@
       poner("inp-nombre-cliente", est.nombreCliente);
       poner("inp-bitacora-obs", est.obs);
       poner("inp-inconveniente", est.inconveniente);
+      poner("inp-colilla", est.colillaEscrita);
       if (est.motivoNo) document.getElementById("sel-motivo-no").value = est.motivoNo;
       poner("txt-justificacion-no", est.justificacionNo);
       if (est.comportamientoCliente) {
@@ -754,6 +838,7 @@
 
     if (numEtapa === "2") {
       mostrarPestana(pestanaActual || "productos");
+      pintarColillas();
     }
     if (numEtapa === "FIN") {
       document.getElementById("lbl-ot-fin").innerText = otTerminada;
@@ -781,27 +866,55 @@
     lbl.classList.toggle("elegido", valor > 0);
   }
 
+  // Orden de las pestañas: el botón SIGUIENTE lleva de una a otra, como una lista de pasos
+  const PESTANAS = [
+    { id: "productos", texto: "Productos", icono: "caja" },
+    { id: "retirado", texto: "Retirado", icono: "salida" },
+    { id: "fotos", texto: "Fotos", icono: "camara" },
+    { id: "bitacora", texto: "Bitácora", icono: "libreta" },
+    { id: "problema", texto: "Problema", icono: "alerta" },
+    { id: "encuesta", texto: "Encuesta", icono: "qr" }
+  ];
+
   function mostrarPestana(nombre) {
     pestanaActual = nombre;
-    ["productos", "retirado", "fotos", "bitacora", "problema", "encuesta"].forEach(p => {
-      document.getElementById("tab-" + p).classList.toggle("oculto", p !== nombre);
-      document.getElementById("tab-btn-" + p).classList.toggle("activa", p === nombre);
+    PESTANAS.forEach(p => {
+      document.getElementById("tab-" + p.id).classList.toggle("oculto", p.id !== nombre);
+      document.getElementById("tab-btn-" + p.id).classList.toggle("activa", p.id === nombre);
     });
+    const i = PESTANAS.findIndex(p => p.id === nombre);
+    const sig = PESTANAS[i + 1];
+    const btnSig = document.getElementById("btn-siguiente-pestana");
+    btnSig.classList.toggle("oculto", !sig);
+    if (sig) btnSig.innerHTML = `SIGUIENTE: ${i + 2}. ${sig.texto} ${icono("flecha")}`;
     if (nombre === "encuesta") dibujarQr("qrcode", urlEncuestaActual);
     actualizarPestanas();
     guardarEstadoVivo();
   }
 
+  function siguientePestana() {
+    const i = PESTANAS.findIndex(p => p.id === pestanaActual);
+    if (PESTANAS[i + 1]) mostrarPestana(PESTANAS[i + 1].id);
+    window.scrollTo({ top: document.getElementById("etapa-2-bitacora").offsetTop - 10, behavior: "smooth" });
+  }
+
   function actualizarPestanas() {
-    const conNumero = (id, texto, n) => {
-      document.getElementById(id).innerText = n > 0 ? `${texto} (${n})` : texto;
+    const conNumero = (id, n, lista) => {
+      const p = PESTANAS.find(x => "tab-btn-" + x.id === id);
+      const num = PESTANAS.indexOf(p) + 1;
+      const el = document.getElementById(id);
+      el.innerHTML = `${icono(p.icono)}<span>${num}. ${p.texto}${n > 0 ? ` (${n})` : ""}</span>`;
+      el.classList.toggle("lista", Boolean(lista));
     };
-    conNumero("tab-btn-productos", "1. Productos", carritoEquipos.length + carritoConsumibles.length);
-    conNumero("tab-btn-retirado", "2. Retirado", retirados.length);
-    conNumero("tab-btn-fotos", "3. Fotos", fotosComprimidasArray.length);
+    const nProd = carritoEquipos.length + carritoConsumibles.length + carritoColillas.length;
+    conNumero("tab-btn-productos", nProd, nProd > 0);
+    conNumero("tab-btn-retirado", retirados.length, retirados.length > 0);
+    conNumero("tab-btn-fotos", fotosComprimidasArray.length, fotosComprimidasArray.length > 0);
     const bitacoraLista = Boolean(valorDe("inp-tel-cliente").trim() && valorDe("inp-nombre-cliente").trim() && valorDe("sel-comportamiento-cliente") && valorDe("inp-bitacora-obs").trim());
-    document.getElementById("tab-btn-bitacora").classList.toggle("lista", bitacoraLista);
-    conNumero("tab-btn-problema", "5. Problema", valorDe("inp-inconveniente").trim() ? Math.max(1, fotosProblemaArray.length) : fotosProblemaArray.length);
+    conNumero("tab-btn-bitacora", 0, bitacoraLista);
+    const nProb = valorDe("inp-inconveniente").trim() ? Math.max(1, fotosProblemaArray.length) : fotosProblemaArray.length;
+    conNumero("tab-btn-problema", nProb, nProb > 0);
+    conNumero("tab-btn-encuesta", 0, false);
   }
 
   function minutosEncuesta() {
@@ -1181,7 +1294,7 @@
 
       try {
         localStorage.setItem("cottech_mi_bodega", JSON.stringify({
-          equipos: data.equipos || [], porDevolver: data.porDevolver || [], materiales: data.materiales || [], ms: Date.now()
+          equipos: data.equipos || [], porDevolver: data.porDevolver || [], materiales: data.materiales || [], colillas: data.colillas || [], ms: Date.now()
         }));
       } catch (e) {}
       pintarMiBodega(data);
@@ -1209,6 +1322,11 @@
     bodegaEquiposLocal = Array.isArray(data.equipos) ? data.equipos : [];
     bodegaPorDevolverLocal = Array.isArray(data.porDevolver) ? data.porDevolver : [];
     bodegaMaterialesLocal = Array.isArray(data.materiales) ? data.materiales.filter(m => Number(m.saldo) > 0) : [];
+    // Las colillas ya usadas en órdenes guardadas en el celular no se vuelven a sugerir (aunque no haya señal)
+    const usadasLocal = new Set();
+    leerJson("cottech_mis_ots_realizadas").forEach(b => String(b.colillas || "").split(",").forEach(x => { if (x.trim()) usadasLocal.add(Number(x)); }));
+    bodegaColillasLocal = (Array.isArray(data.colillas) ? data.colillas : []).map(String)
+      .filter(n => !usadasLocal.has(Number(n))).sort((a, b) => Number(a) - Number(b));
 
     const ordenarEq = (a, b) => String(a.modelo).localeCompare(String(b.modelo)) || String(a.mac).localeCompare(String(b.mac));
     const selEq = document.getElementById("sel-bodega-eq");
@@ -1229,7 +1347,82 @@
     selMat.value = anteriorMat;
     if (selMat.selectedIndex < 0) selMat.selectedIndex = 0;
 
-    document.getElementById("sub-bodega").innerText = `Tienes ${bodegaEquiposLocal.length} equipo(s) y ${bodegaMaterialesLocal.length} material(es) asignados.`;
+    document.getElementById("sub-bodega").innerText = `Tienes ${bodegaEquiposLocal.length} equipo(s), ${bodegaMaterialesLocal.length} material(es) y ${bodegaColillasLocal.length} colilla(s).`;
+    pintarColillas();
+  }
+
+  // =========================================================================
+  // COLILLAS NUMERADAS: la app sugiere la siguiente (la de número más bajo).
+  // Si usó otra, se escribe el número y aparecen las que coinciden para tocarla.
+  // =========================================================================
+  const mismoNumero = (a, b) => String(a).trim() !== "" && Number(a) === Number(b);
+  const colillaUsada = n => carritoColillas.some(c => mismoNumero(c, n));
+
+  function rangosDe(numeros) {
+    const nums = numeros.map(Number).filter(n => !isNaN(n)).sort((a, b) => a - b);
+    const partes = [];
+    for (let i = 0; i < nums.length; i++) {
+      let j = i;
+      while (j + 1 < nums.length && nums[j + 1] === nums[j] + 1) j++;
+      partes.push(i === j ? String(nums[i]) : `${nums[i]} a ${nums[j]}`);
+      i = j;
+    }
+    return partes.join(", ");
+  }
+
+  // La colilla solo se usa en Instalación y Reinstalación (en Reparación casi nunca)
+  const tipoLlevaColilla = () => valorDe("sel-tipo-servicio") !== "REPARACION";
+
+  function abrirElegirColilla() {
+    document.getElementById("panel-colilla").classList.remove("oculto");
+    document.getElementById("btn-usar-colilla").classList.add("oculto");
+    pintarColillas();
+  }
+
+  function cerrarElegirColilla() {
+    document.getElementById("panel-colilla").classList.add("oculto");
+    document.getElementById("inp-colilla").value = "";
+    pintarColillas();
+  }
+
+  function pintarColillas() {
+    document.getElementById("caja-colilla").classList.toggle("oculto", !tipoLlevaColilla());
+    const panelAbierto = !document.getElementById("panel-colilla").classList.contains("oculto");
+    const btn = document.getElementById("btn-usar-colilla");
+    btn.classList.toggle("oculto", panelAbierto);
+    btn.innerHTML = `${icono("colilla")} ${carritoColillas.length ? "USAR OTRA COLILLA" : "USAR COLILLA"}`;
+    btn.classList.toggle("btn-grande", carritoColillas.length === 0);
+
+    const libres = bodegaColillasLocal.filter(n => !colillaUsada(n));
+    const q = (valorDe("inp-colilla") || "").replace(/\D/g, "");
+    const lista = !q ? libres.slice(0, 8)
+      : libres.filter(n => String(n).includes(q) || String(Number(n)).includes(q))
+          .sort((a, b) => (mismoNumero(a, q) ? -1 : 0) - (mismoNumero(b, q) ? -1 : 0) || Number(a) - Number(b))
+          .slice(0, 8);
+    let aviso = "";
+    if (!q && libres.length === 0) aviso = "No tienes colillas asignadas. Escribe el número de la que usaste.";
+    if (q && lista.length === 0) aviso = `No tienes la colilla ${esc(q)} en tu lista.`;
+    document.getElementById("chips-colillas").innerHTML = lista.map(n => `<button type="button" class="chip" onclick="usarColilla('${esc(n)}')">${esc(n)}</button>`).join("") +
+      (aviso ? `<div class="lista-vacia" style="width:100%;">${aviso}</div>` : "");
+  }
+
+  function usarColilla(numero) {
+    const n = String(numero).trim();
+    if (!n || colillaUsada(n)) return;
+    carritoColillas.push(n);
+    document.getElementById("inp-colilla").value = "";
+    document.getElementById("panel-colilla").classList.add("oculto");
+    renderizarCarritoVisual();
+    guardarEstadoVivo();
+  }
+
+  function agregarColillaEscrita() {
+    const q = (valorDe("inp-colilla") || "").replace(/\D/g, "");
+    if (!q) return alert("Escribe el número de la colilla.");
+    const deMiLista = bodegaColillasLocal.find(n => mismoNumero(n, q));
+    if (colillaUsada(q)) { document.getElementById("inp-colilla").value = ""; return alert("Esa colilla ya está en la lista."); }
+    if (!deMiLista && !confirm(`La colilla ${q} no está en tu lista. ¿Usarla de todas formas?`)) return;
+    usarColilla(deMiLista || q);
   }
 
   // =========================================================================
@@ -1277,6 +1470,18 @@
             <div class="inv-cant">${esc(m.saldo)}</div>
           </div>`).join("")
       : `<div class="lista-vacia">${q ? "Ningún material con esa búsqueda." : "No tienes materiales asignados."}</div>`;
+
+    const qNum = q.replace(/\D/g, "");
+    let htmlCol;
+    if (!bodegaColillasLocal.length) {
+      htmlCol = `<div class="lista-vacia">No tienes colillas asignadas.</div>`;
+    } else if (qNum && qNum === q.replace(/\s/g, "")) {
+      const la = bodegaColillasLocal.find(n => mismoNumero(n, qNum));
+      htmlCol = `<div class="inv-fila"><div style="font-weight:bold;">${la ? `Sí tienes la colilla ${esc(la)}` : `No tienes la colilla ${esc(qNum)}`}</div></div>`;
+    } else {
+      htmlCol = `<div class="inv-fila"><div><div style="font-weight:bold;">Te quedan</div><div class="inv-codigo" style="font-size:15px; color:#fde047;">${esc(rangosDe(bodegaColillasLocal))}</div></div><div class="inv-cant">${bodegaColillasLocal.length}</div></div>`;
+    }
+    document.getElementById("inv-colillas").innerHTML = htmlCol;
 
     const dev = bodegaPorDevolverLocal.filter(e => coincide(e.modelo, e.mac, e.ot));
     document.getElementById("caja-por-devolver").classList.toggle("oculto", dev.length === 0);
@@ -1350,6 +1555,7 @@
     if (lista === "equipo") carritoEquipos.splice(idx, 1);
     if (lista === "material") carritoConsumibles.splice(idx, 1);
     if (lista === "retirado") retirados.splice(idx, 1);
+    if (lista === "colilla") carritoColillas.splice(idx, 1);
     renderizarCarritoVisual();
     guardarEstadoVivo();
   }
@@ -1368,6 +1574,10 @@
     document.getElementById("lista-materiales").innerHTML = carritoConsumibles.length
       ? carritoConsumibles.map((c, i) => fila(`<strong>${esc(c.cantidad)} ×</strong> ${esc(c.nombre || c.material)}`, "material", i, "#fde047")).join("")
       : vacio;
+    document.getElementById("lista-colillas").innerHTML = carritoColillas.length
+      ? carritoColillas.map((n, i) => fila(`Colilla <strong>N° ${esc(n)}</strong>`, "colilla", i, "#f59e0b")).join("")
+      : "";
+    pintarColillas();
     document.getElementById("lista-retirados").innerHTML = retirados.length
       ? retirados.map((r, i) => fila(`<strong>${esc(r.mac)}</strong>${r.modelo ? " · " + esc(r.modelo) : ""} · ${esc(r.estado)}`, "retirado", i, "#f87171")).join("")
       : vacio;
@@ -1731,7 +1941,7 @@
       if (!q) return true;
       const texto = [
         b.ot, b.nombreCliente, b.telCliente, b.tipoServicio, b.observaciones, b.inconveniente,
-        b.macNuevo, b.macDanado, b.material,
+        b.macNuevo, b.macDanado, b.material, Array.isArray(b.colillas) ? b.colillas.join(" ") : b.colillas,
         JSON.stringify(b.detEquipos || b.carritoEquipos || []),
         JSON.stringify(b.detMateriales || b.carritoConsumibles || []),
         JSON.stringify(b.detRetirados || b.retirados || [])
@@ -1766,6 +1976,7 @@
             ${b.minutos || b.minutosEnSitio ? `<div><strong>Tiempo en el sitio:</strong> ${esc(b.minutos || b.minutosEnSitio)} minutos</div>` : ""}
             <div><strong>Equipos instalados:</strong> ${esc(equipos)}</div>
             <div><strong>Materiales:</strong> ${esc(materiales)}</div>
+            ${b.colillas && String(b.colillas).length ? `<div><strong>Colilla:</strong> ${esc(Array.isArray(b.colillas) ? b.colillas.join(", ") : b.colillas)}</div>` : ""}
             <div><strong>Equipos quitados:</strong> ${esc(quitados)}</div>
             <div><strong>Calificación del cliente:</strong> ${esc(sinEmojis(b.compCliente || b.comportamientoCliente || "") || "No indicado")}</div>
             <div><strong>Fotos:</strong> ${esc(b.nFotos !== undefined ? b.nFotos : (b.nFotosLocal || 0))}</div>
@@ -1830,6 +2041,7 @@
       detEquipos: p.carritoEquipos || [],
       detMateriales: p.carritoConsumibles || [],
       detRetirados: p.retirados || [],
+      colillas: (p.colillas || []).join(", "),
       comportamientoCliente: p.comportamientoCliente,
       observaciones: p.observaciones,
       inconveniente: p.inconveniente || "",
@@ -2012,6 +2224,12 @@
   async function elegirTipoTrabajo(tipo) {
     const anterior = valorDe("sel-tipo-servicio");
     document.getElementById("sel-tipo-servicio").value = tipo;
+    if (tipo === "REPARACION" && carritoColillas.length) {
+      alert("En Reparación no se usa colilla. Se quitó la colilla de esta orden.");
+      carritoColillas = [];
+      document.getElementById("inp-colilla").value = "";
+      renderizarCarritoVisual();
+    }
     const llegandoAhora = estadoOt !== "SITIO";
     if (llegandoAhora) {
       estadoOt = "SITIO";
@@ -2289,6 +2507,8 @@
     guardarFotosProblema();
     carritoEquipos = [];
     carritoConsumibles = [];
+    carritoColillas = [];
+    document.getElementById("inp-colilla").value = "";
     retirados = [];
     estadoOt = "";
     caminoMs = 0;
@@ -2312,6 +2532,7 @@
     // Lo que quedó escrito sin "Agregar" también cuenta
     if (valorDe("inp-mac-nuevo").trim()) agregarEquipoAlCarrito();
     if (valorDe("inp-mac-malo").trim()) agregarRetirado();
+    if (tipoLlevaColilla() && valorDe("inp-colilla").replace(/\D/g, "")) agregarColillaEscrita();
     if (!revisarAntesDeTerminar()) return;
 
     const ot = valorDe("inp-ot").trim();
@@ -2332,6 +2553,7 @@
       sitioMs: sitioMs,
       carritoEquipos: carritoEquipos.slice(),
       carritoConsumibles: carritoConsumibles.slice(),
+      colillas: tipoLlevaColilla() ? carritoColillas.slice() : [],
       retirados: retirados.slice(),
       comportamientoCliente: valorDe("sel-comportamiento-cliente"),
       observaciones: valorDe("inp-bitacora-obs").trim(),
@@ -2346,6 +2568,8 @@
     });
 
     guardarOTEnHistorialLocal(payload);
+    const bodegaGuardada = leerBodegaGuardada();
+    if (bodegaGuardada) pintarMiBodega(bodegaGuardada);
     otTerminada = ot;
     limpiarOrdenActual();
 

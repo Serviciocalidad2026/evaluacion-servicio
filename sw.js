@@ -4,7 +4,7 @@
 // - Guarda la app (tecnico.html, encuesta, ícono y librerías) para que ABRA SIN SEÑAL.
 // - Nunca guarda ni intercepta datos: Apps Script, Firebase e is.gd van siempre directo a internet.
 // =============================================================================
-const CACHE = "cottech-app-v2-8";
+const CACHE = "cottech-app-v2-8-1";
 
 const ARCHIVOS_APP = [
   "./tecnico.html",
